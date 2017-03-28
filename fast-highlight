@@ -686,7 +686,5 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
   __hsmw_highlight_main__command_type_cache=()
 }
 
-__HSMW_MH_SOURCED=1
-
 # vim:ft=zsh:sw=2:sts=2
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
