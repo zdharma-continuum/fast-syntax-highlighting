@@ -195,11 +195,11 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
   # in_array_assignment true between 'a=(' and the matching ')'
   # braces_stack: "R" for round, "Q" for square, "Y" for curly
   # mybuf, cdpath_dir are used in sub-functions
-  local start_pos=0 end_pos highlight_glob=1 arg style in_array_assignment=0 MATCH expanded_path braces_stack buf="$BUFFER" mybuf cdpath_dir cur_cmd alias_target
+  local start_pos=0 end_pos start end highlight_glob=1 arg style in_array_assignment=0 MATCH expanded_path braces_stack buf="$PREBUFFER$BUFFER" mybuf cdpath_dir cur_cmd alias_target
   # arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # idx and end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
-  integer arg_type=0 MBEGIN MEND in_redirection len=${#buf} already_added offset idx end_idx this_word=1 next_word=0 insane_alias
+  integer arg_type=0 MBEGIN MEND in_redirection len=${#buf} already_added offset idx end_idx this_word=1 next_word=0 insane_alias pos
   local -a match mbegin mend
 
   # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16
@@ -295,7 +295,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
         # One more short path – for ';' command separator
         (( in_array_assignment )) && (( this_word = 2 )) || { (( this_word = 1 )); highlight_glob=1; }
         in_redirection=0
-        [[ "${FAST_HIGHLIGHT_STYLES[commandseparator]}" != "none" ]] && reply+=("$start_pos $end_pos ${FAST_HIGHLIGHT_STYLES[commandseparator]}")
+        [[ "${FAST_HIGHLIGHT_STYLES[commandseparator]}" != "none" ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[commandseparator]}")
         proc_buf="${proc_buf[offset + $#arg + 1,len]}"
         start_pos=$end_pos
         continue
@@ -327,7 +327,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
         style=unknown-token # prematurely terminated
       fi
       # ADD
-      reply+=("$start_pos $end_pos ${FAST_HIGHLIGHT_STYLES[$style]}")
+      (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[$style]}")
       start_pos=$end_pos
       continue
     fi
@@ -461,10 +461,10 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
                           # is how [[ ... ]] is highlighted, too.
 
                           # ADD
-                          reply+=("$start_pos $(( start_pos + 2 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                          (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $(( start + 2 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                           already_added=1
                           # ADD
-                          [[ $arg[-2,-1] == '))' ]] && reply+=("$(( end_pos - 2 )) $end_pos ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                          [[ $arg[-2,-1] == '))' ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 2 )) $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                         elif [[ $arg == '()' ]]; then
                           # anonymous function
                           style=reserved-word
@@ -478,7 +478,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
                         ;;
         *)
                         # ADD
-                        # reply+=("$start_pos $end_pos commandtypefromthefuture-$REPLY")
+                        # (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end commandtypefromthefuture-$REPLY")
                         already_added=1
                         ;;
       esac
@@ -511,13 +511,13 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
         "'"*)    style=single-quoted-argument;;
         '"'*)
                  # ADD
-                 reply+=("$start_pos $end_pos ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
+                 (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
                  -fast-highlight-string
                  already_added=1
                  ;;
         \$\'*)
                  # ADD
-                 reply+=("$start_pos $end_pos ${FAST_HIGHLIGHT_STYLES[dollar-quoted-argument]}")
+                 (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[dollar-quoted-argument]}")
                  -fast-highlight-dollar-string
                  already_added=1
                  ;;
@@ -545,14 +545,13 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
                  else
                    if (( __hsmw_no_check_paths == 0 )) && -fast-highlight-check-path; then
                      # ADD
-                     reply+=("$start_pos $end_pos ${FAST_HIGHLIGHT_STYLES[path]}")
+                     (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[path]}")
                      already_added=1
 
                      [[ -n "$FAST_HIGHLIGHT_STYLES[path_pathseparator]" && "$FAST_HIGHLIGHT_STYLES[path]" != "$FAST_HIGHLIGHT_STYLES[path_pathseparator]" ]] && {
-                       local pos
                        for (( pos = start_pos; pos <= end_pos; pos++ )) ; do
                          # ADD
-                         [[ ${buf[pos]} == "/" ]] && reply+=("$(( pos - 1 )) $pos ${FAST_HIGHLIGHT_STYLES[path_pathseparator]}")
+                         [[ ${buf[pos]} == "/" ]] && (( start=pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( start - 1 )) $start ${FAST_HIGHLIGHT_STYLES[path_pathseparator]}")
                        done
                      }
                    else
@@ -564,7 +563,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
     fi
 
     # ADD
-    (( already_added == 0 )) && [[ "${FAST_HIGHLIGHT_STYLES[$style]}" != "none" ]] && reply+=("$start_pos $end_pos ${FAST_HIGHLIGHT_STYLES[$style]}")
+    (( already_added == 0 )) && [[ "${FAST_HIGHLIGHT_STYLES[$style]}" != "none" ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[$style]}")
 
     if (( arg_type == 3 )); then
       if [[ $arg == ';' ]] && (( in_array_assignment )); then
@@ -631,7 +630,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
       mybuf="${match[8]}"
 
       # ADD
-      reply+=("$idx $end_idx ${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]}")
+      (( start=idx-${#PREBUFFER}, end=end_idx-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]}")
 
       idx=end_idx
     }
@@ -675,7 +674,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
 
     esac
     # ADD
-    reply+=("$j $k ${FAST_HIGHLIGHT_STYLES[$style]}")
+    (( start=j-${#PREBUFFER}, end=k-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[$style]}")
   done
 }
 
