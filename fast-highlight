@@ -488,6 +488,9 @@ typeset -gA FAST_HIGHLIGHT
         ']]')
                  style=reserved-word
                  ;;
+        ']')
+                 style=builtin
+                 ;;
         $'\x29') # subshell or end of array assignment
                  if (( in_array_assignment )); then
                    style=assign
