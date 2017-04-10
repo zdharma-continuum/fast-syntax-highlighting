@@ -4,6 +4,9 @@
 functions with `zed`/`vared`. Also added:
 
 1. Variable highlighting
+
+    ![variables](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/parameter.png)
+
 1. Colorizing of `${(a)parameter[...]}` inside strings (normally only `$parameter` is colorized)
 1. Fixed colorizing of function definition, like `abc() { ... }` – `abc` will not be red
 1. Fixed colorizing of complex conditions inside `[[`, like `[[ "$a" || "$b" ]]`
