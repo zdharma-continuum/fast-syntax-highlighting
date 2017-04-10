@@ -552,7 +552,7 @@ typeset -gA FAST_HIGHLIGHT
                  elif (( in_redirection == 2 )); then
                    style=redirection
                  else
-                   if (( __hsmw_no_check_paths == 0 )) && -fast-highlight-check-path; then
+                   if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]] && -fast-highlight-check-path; then
                      # ADD
                      (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[path]}")
                      already_added=1
