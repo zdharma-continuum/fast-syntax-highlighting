@@ -188,6 +188,9 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
   emulate -L zsh
   setopt extendedglob bareglobqual nonomatch noksharrays
 
+  [[ $CONTEXT == "select" ]] && return 1
+  [[ ${#BUFFER} -gt 10000 ]] && return 1 # Limit based on n-history length
+
   (( path_dirs_was_set )) && setopt PATH_DIRS
   (( ointeractive_comments )) && local interactive_comments= # _set_ to empty
 
@@ -591,6 +594,8 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
     # This is the default/common codepath.
     (( in_redirection == 0 )) && (( this_word = next_word )) #else # Stall $this_word.
   done
+
+  return 0
 }
 
 # Check if $arg is a path.
