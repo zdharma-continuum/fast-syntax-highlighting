@@ -8,8 +8,16 @@ functions with `zed`/`vared`. Also added:
     ![variables](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/parameter.png)
 
 1. Colorizing of `${(a)parameter[...]}` inside strings (normally only `$parameter` is colorized)
-1. Fixed colorizing of function definition, like `abc() { ... }` – `abc` will not be red
-1. Fixed colorizing of complex conditions inside `[[`, like `[[ "$a" || "$b" ]]`
-1. Closing `]]` and `]` are highlighted
 
+    ![in-string](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/in_string.png)
+
+1. Fixed colorizing of function definition, like `abc() { ... }` – `abc` will not be red
+
+    ![function](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/function.png)
+
+1. Fixed colorizing of complex conditions inside `[[`, like `[[ "$a" || "$b" ]]`
+
+    ![complex conditions](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/cplx_cond.png)
+
+1. Closing `]]` and `]` are highlighted (see above)
 
