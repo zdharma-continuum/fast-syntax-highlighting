@@ -267,6 +267,4 @@ zmodload zsh/parameter 2>/dev/null
 autoload -U is-at-least 
 source "${ZERO:h}/fast-highlight"
 
-typeset -g right_brace_is_recognised_everywhere
-typeset -gi path_dirs_was_set multi_func_def ointeractive_comments
 -fast-highlight-fill-option-variables

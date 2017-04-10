@@ -103,8 +103,8 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
   # ';;' ';&' ';|'
 )
 
-
-
+# A hash instead of multiple globals
+typeset -gA FAST_HIGHLIGHT
 
 # Get the type of a command.
 #
@@ -151,34 +151,29 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
 
 # Below are variables that must be defined in outer
 # scope so that they are reachable in *-process()
-#
-# local right_brace_is_recognised_everywhere
-# integer path_dirs_was_set
-# integer multi_func_def
-# integer ointeractive_comments
 -fast-highlight-fill-option-variables() {
   if [[ -o ignore_braces ]] || eval '[[ -o ignore_close_braces ]] 2>/dev/null'; then
-    right_brace_is_recognised_everywhere=0
+    FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]=0
   else
-    right_brace_is_recognised_everywhere=1
+    FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]=1
   fi
 
   if [[ -o path_dirs ]]; then
-    path_dirs_was_set=1
+    FAST_HIGHLIGHT[path_dirs_was_set]=1
   else
-    path_dirs_was_set=0
+    FAST_HIGHLIGHT[path_dirs_was_set]=0
   fi
 
   if [[ -o multi_func_def ]]; then
-    multi_func_def=1
+    FAST_HIGHLIGHT[multi_func_def]=1
   else
-    multi_func_def=0
+    FAST_HIGHLIGHT[multi_func_def]=0
   fi
 
   if [[ -o interactive_comments ]]; then
-    ointeractive_comments=1
+    FAST_HIGHLIGHT[ointeractive_comments]=1
   else
-    ointeractive_comments=0
+    FAST_HIGHLIGHT[ointeractive_comments]=0
   fi
 }
 
@@ -191,8 +186,8 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
   [[ $CONTEXT == "select" ]] && return 1
   [[ ${#BUFFER} -gt 10000 ]] && return 1 # Limit based on n-history length
 
-  (( path_dirs_was_set )) && setopt PATH_DIRS
-  (( ointeractive_comments )) && local interactive_comments= # _set_ to empty
+  (( FAST_HIGHLIGHT[path_dirs_was_set] )) && setopt PATH_DIRS
+  (( FAST_HIGHLIGHT[ointeractive_comments] )) && local interactive_comments= # _set_ to empty
 
   # Variable declarations and initializations
   # in_array_assignment true between 'a=(' and the matching ')'
@@ -405,7 +400,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
                         if [[ $arg == $'\x7b' ]]; then
                           braces_stack='Y'"$braces_stack"
                         elif [[ $arg == $'\x7d' && $braces_stack[1] == "Y" ]]; then
-                          # We're at command word, so no need to check $right_brace_is_recognised_everywhere
+                          # We're at command word, so no need to check right_brace_is_recognised_everywhere
                           braces_stack[1]=""
                           style=reserved-word
                           (( next_word = next_word | 16 ))
@@ -504,7 +499,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
                  fi;;
         $'\x28\x29') # possibly a function definition
                  # || false # TODO: or if the previous word was a command word
-                 (( multi_func_def )) && (( next_word = next_word | 1 ))
+                 (( FAST_HIGHLIGHT[multi_func_def] )) && (( next_word = next_word | 1 ))
                  style=reserved-word
                  # Remove possible annoying unknown-token style, or misleading function style
                  reply[-1]=()
@@ -530,7 +525,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
         '`'*)    style=back-quoted-argument;;
         [*?]*|*[^\\][*?]*)
                  (( highlight_glob )) && style=globbing || style=default;;
-        *)       if [[ $arg = $'\x7d' && $braces_stack[1] == "Y" && "$right_brace_is_recognised_everywhere" = "1" ]]; then
+        *)       if [[ $arg = $'\x7d' && $braces_stack[1] == "Y" && "$FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]" = "1" ]]; then
                    # right brace
                    # Parsing rule: # {
                    #
