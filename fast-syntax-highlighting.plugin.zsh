@@ -1,5 +1,6 @@
 # -------------------------------------------------------------------------------------------------
 # Copyright (c) 2010-2016 zsh-syntax-highlighting contributors
+# Copyright (c) 2017 Sebastian Gniazdowski (modifications)
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted
