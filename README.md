@@ -1,7 +1,8 @@
 # Zshell Fast Syntax Highlighting
 
 60 commits that optimized standard `zsh-syntax-highlighting` to the point that it can edit `10 kB`
-functions with `zed`/`vared`. Also added:
+functions with `zed`/`vared` (optimizations done in
+[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)). Also added:
 
 1. Variable highlighting
 
