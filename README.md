@@ -21,6 +21,8 @@ functions with `zed`/`vared`. Also added:
 
 1. Closing `]]` and `]` are highlighted (see above)
 
+1. Paths from `$CDPATH` aren't colorized unless the command is `cd`
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
