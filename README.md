@@ -25,6 +25,7 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
+
 ## Installation
 
 **The plugin is "standalone"**, which means that only sourcing it is needed. So to
