@@ -25,7 +25,7 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -------------------------------------------------------------------------------------------------
 
-typeset -gA __hsmw_highlight_main__command_type_cache
+typeset -gA __fast_highlight_main__command_type_cache
 
 # Define default styles.
 typeset -gA FAST_HIGHLIGHT_STYLES
@@ -115,7 +115,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
 #
 # The result will be stored in REPLY.
 -fast-highlight-main-type() {
-  REPLY=$__hsmw_highlight_main__command_type_cache[(e)$1]
+  REPLY=$__fast_highlight_main__command_type_cache[(e)$1]
   [[ -z "$REPLY" ]] && {
 
   if zmodload -e zsh/parameter; then
@@ -144,7 +144,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
 
   [[ -z "$REPLY" ]] && REPLY="${$(LC_ALL=C builtin type -w -- $1 2>/dev/null)##*: }"
 
-  __hsmw_highlight_main__command_type_cache[(e)$1]=$REPLY
+  __fast_highlight_main__command_type_cache[(e)$1]=$REPLY
 
   }
 }
@@ -688,7 +688,7 @@ __HSMW_HIGHLIGHT_TOKENS_TYPES=(
 # -------------------------------------------------------------------------------------------------
 
 -fast-highlight-init() {
-  __hsmw_highlight_main__command_type_cache=()
+  __fast_highlight_main__command_type_cache=()
 }
 
 # vim:ft=zsh:sw=2:sts=2
