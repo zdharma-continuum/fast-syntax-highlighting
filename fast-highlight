@@ -472,6 +472,8 @@ typeset -gA FAST_HIGHLIGHT
                           # subshell
                           style=reserved-word
                           braces_stack='R'"$braces_stack"
+                        elif [[ $arg == $'\x29' ]]; then
+                          [[ $braces_stack[1] == "R" ]] && { braces_stack[1]=""; style=reserved-word; }
                         elif (( this_word & 14 )); then
                           style=default
                         fi
