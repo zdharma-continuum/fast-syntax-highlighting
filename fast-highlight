@@ -404,6 +404,8 @@ typeset -gA FAST_HIGHLIGHT
                           braces_stack[1]=""
                           style=reserved-word
                           (( next_word = next_word | 16 ))
+                        elif [[ $arg == "[[" ]]; then
+                          braces_stack='A'"$braces_stack"
                         fi
                         ;;
         'suffix alias') style=suffix-alias;;
@@ -487,9 +489,15 @@ typeset -gA FAST_HIGHLIGHT
       case $arg in
         ']]')
                  style=reserved-word
+                 [[ $braces_stack[1] == "A" ]] && braces_stack[1]=""
                  ;;
         ']')
                  style=builtin
+                 ;;
+        $'\x28')
+                 # '(' inside [[
+                 style=reserved-word
+                 braces_stack='R'"$braces_stack"
                  ;;
         $'\x29') # subshell or end of array assignment
                  if (( in_array_assignment )); then
@@ -569,6 +577,8 @@ typeset -gA FAST_HIGHLIGHT
     if (( arg_type == 3 )); then
       if [[ $arg == ';' ]] && (( in_array_assignment )); then
         # literal newline inside an array assignment
+        (( next_word = 2 ))
+      elif [[ -n "${braces_stack[(r)A]}" ]]; then
         (( next_word = 2 ))
       else
         (( next_word = 1 ))
