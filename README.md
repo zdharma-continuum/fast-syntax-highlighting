@@ -46,13 +46,13 @@ other too, and also install with `Oh My Zsh` (by copying directory to
 
 ### [Zplugin](https://github.com/psprint/zplugin)
 
-Add `zplugin load psprint/fast-syntax-highlighting` to your `.zshrc` file. Zplugin will handle
+Add `zplugin load zdharma/fast-syntax-highlighting` to your `.zshrc` file. Zplugin will handle
 cloning the plugin for you automatically the next time you start zsh. To update
-issue `zplugin update psprint/fast-syntax-highlighting` (`update-all` can also be used).
+issue `zplugin update zdharma/fast-syntax-highlighting` (`update-all` can also be used).
 
 ### Antigen
 
-Add `antigen bundle psprint/fast-syntax-highlighting` to your `.zshrc` file. Antigen will handle
+Add `antigen bundle zdharma/fast-syntax-highlighting` to your `.zshrc` file. Antigen will handle
 cloning the plugin for you automatically the next time you start zsh.
 
 ### Oh-My-Zsh
@@ -63,5 +63,5 @@ cloning the plugin for you automatically the next time you start zsh.
 
 ### Zgen
 
-Add `zgen load psprint/fast-syntax-highlighting` to your `.zshrc` file in the same place you're doing
+Add `zgen load zdharma/fast-syntax-highlighting` to your `.zshrc` file in the same place you're doing
 your other `zgen load` calls in.
