@@ -144,6 +144,14 @@ typeset -gA FAST_HIGHLIGHT
 
   [[ -z "$REPLY" ]] && REPLY="${$(LC_ALL=C builtin type -w -- $1 2>/dev/null)##*: }"
 
+  [[ "$REPLY" = "none" ]] && {
+    [[ -d "$1" ]] && REPLY="dirpath" || {
+      for cdpath_dir in $cdpath; do
+        [[ -e "$cdpath_dir/$1" ]] && { REPLY="dirpath"; break; }
+      done
+    }
+  }
+
   __fast_highlight_main__command_type_cache[(e)$1]=$REPLY
 
   }
@@ -435,6 +443,7 @@ typeset -gA FAST_HIGHLIGHT
         function)       style=function;;
         command)        style=command;;
         hashed)         style=hashed-command;;
+        dirpath)        style=path;;
         none)           # Assign?
                         if [[ $arg == [[:alpha:]_][[:alnum:]_]#(|\[[^\]]#\])(|[+])=* ]] || [[ $arg == [0-9]##(|[+])=* ]]; then
                           style=assign
