@@ -147,7 +147,7 @@ typeset -gA FAST_HIGHLIGHT
   [[ "$REPLY" = "none" ]] && {
     [[ -d "$1" ]] && REPLY="dirpath" || {
       for cdpath_dir in $cdpath; do
-        [[ -e "$cdpath_dir/$1" ]] && { REPLY="dirpath"; break; }
+        [[ -d "$cdpath_dir/$1" ]] && { REPLY="dirpath"; break; }
       done
     }
   }
