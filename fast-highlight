@@ -58,9 +58,9 @@ typeset -gA FAST_HIGHLIGHT_STYLES
 : ${FAST_HIGHLIGHT_STYLES[variable]:=none}
 
 
-typeset -gA __HSMW_HIGHLIGHT_TOKENS_TYPES
+typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
 
-__HSMW_HIGHLIGHT_TOKENS_TYPES=(
+__FAST_HIGHLIGHT_TOKEN_TYPES=(
 
   # Precommand
 
@@ -318,7 +318,7 @@ typeset -gA FAST_HIGHLIGHT
       ((end_pos=start_pos+${#arg}))
 
       # No-hit will result in value 0
-      arg_type=${__HSMW_HIGHLIGHT_TOKENS_TYPES[$arg]}
+      arg_type=${__FAST_HIGHLIGHT_TOKEN_TYPES[$arg]}
     fi
 
     proc_buf="${proc_buf[offset + $#arg + 1,len]}"
@@ -436,7 +436,7 @@ typeset -gA FAST_HIGHLIGHT
                           else
                             style=alias
                             zmodload -e zsh/parameter && alias_target=${aliases[$arg]} || alias_target="${"$(alias -- $arg)"#*=}"
-                            [[ ${__HSMW_HIGHLIGHT_TOKENS_TYPES[$alias_target]} = "1" && "$arg_type" != "1" ]] && __HSMW_HIGHLIGHT_TOKENS_TYPES[$arg]="1"
+                            [[ ${__FAST_HIGHLIGHT_TOKEN_TYPES[$alias_target]} = "1" && "$arg_type" != "1" ]] && __FAST_HIGHLIGHT_TOKEN_TYPES[$arg]="1"
                           fi
                         ;;
         builtin)        style=builtin;;
