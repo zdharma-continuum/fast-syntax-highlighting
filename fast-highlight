@@ -27,7 +27,8 @@
 
 typeset -gA __fast_highlight_main__command_type_cache
 
-# Define default styles.
+# Define default styles. You can set this after loading the plugin in
+# Zshrc and use 256 via numbers, like: fg=150
 typeset -gA FAST_HIGHLIGHT_STYLES
 : ${FAST_HIGHLIGHT_STYLES[default]:=none}
 : ${FAST_HIGHLIGHT_STYLES[unknown-token]:=fg=red,bold}
