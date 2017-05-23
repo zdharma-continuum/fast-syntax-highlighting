@@ -1,3 +1,5 @@
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D6XDCHDSBDSDG)
+
 # Zshell Fast Syntax Highlighting
 
 60 commits that optimized standard `zsh-syntax-highlighting` to the point that it can edit `10 kB`
