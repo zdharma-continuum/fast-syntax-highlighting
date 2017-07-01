@@ -193,7 +193,6 @@ typeset -gA FAST_HIGHLIGHT
   setopt extendedglob bareglobqual nonomatch noksharrays
 
   [[ $CONTEXT == "select" ]] && return 1
-  [[ ${#BUFFER} -gt 10000 ]] && return 1 # Limit based on n-history length
 
   (( FAST_HIGHLIGHT[path_dirs_was_set] )) && setopt PATH_DIRS
   (( FAST_HIGHLIGHT[ointeractive_comments] )) && local interactive_comments= # _set_ to empty
