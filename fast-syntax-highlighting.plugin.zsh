@@ -101,6 +101,7 @@ _zsh_highlight()
 
   } always {
     typeset -g _ZSH_HIGHLIGHT_PRIOR_BUFFER="$BUFFER"
+    typeset -g _ZSH_HIGHLIGHT_PRIOR_RACTIVE="$REGION_ACTIVE"
     typeset -gi _ZSH_HIGHLIGHT_PRIOR_CURSOR=$CURSOR
   }
 }
@@ -151,7 +152,7 @@ _zsh_highlight_apply_zle_highlight() {
 # Returns 0 if the buffer has changed since _zsh_highlight was last called.
 _zsh_highlight_buffer_modified()
 {
-  [[ "${_ZSH_HIGHLIGHT_PRIOR_BUFFER:-}" != "$BUFFER" ]]
+  [[ "${_ZSH_HIGHLIGHT_PRIOR_BUFFER:-}" != "$BUFFER" ]] || [[ "$REGION_ACTIVE" != "$_ZSH_HIGHLIGHT_PRIOR_RACTIVE" ]]
 }
 
 # Whether the cursor has moved or not.
