@@ -192,7 +192,7 @@ typeset -gA FAST_HIGHLIGHT
   emulate -L zsh
   setopt extendedglob bareglobqual nonomatch noksharrays
 
-  [[ $CONTEXT == "select" ]] && return 1
+  [[ $CONTEXT == "select" ]] && return 0
 
   (( FAST_HIGHLIGHT[path_dirs_was_set] )) && setopt PATH_DIRS
   (( FAST_HIGHLIGHT[ointeractive_comments] )) && local interactive_comments= # _set_ to empty
