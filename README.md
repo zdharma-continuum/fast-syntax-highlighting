@@ -50,7 +50,7 @@ other too, and also install with `Oh My Zsh` (by copying directory to
 
 Add `zplugin load zdharma/fast-syntax-highlighting` to your `.zshrc` file. Zplugin will handle
 cloning the plugin for you automatically the next time you start zsh. To update
-issue `zplugin update zdharma/fast-syntax-highlighting` (`update-all` can also be used).
+issue `zplugin update zdharma/fast-syntax-highlighting` (`update --all` can also be used).
 
 ### Antigen
 
