@@ -111,7 +111,7 @@ typeset -gA FAST_HIGHLIGHT
 
 # Exposing tokens found on command position,
 # for other scripts to process
-typeset -ga FAST_LAST_COMMANDS
+typeset -ga ZLAST_COMMANDS
 
 # Get the type of a command.
 #
@@ -254,7 +254,7 @@ typeset -ga FAST_LAST_COMMANDS
   #
 
   # Command exposure for other scripts
-  FAST_LAST_COMMANDS=()
+  ZLAST_COMMANDS=()
 
   # Processing buffer
   local proc_buf="$buf" needle
@@ -330,7 +330,7 @@ typeset -ga FAST_LAST_COMMANDS
       arg_type=${__FAST_HIGHLIGHT_TOKEN_TYPES[$arg]}
     fi
 
-    (( this_word & 1 )) && FAST_LAST_COMMANDS+=( "$arg" );
+    (( this_word & 1 )) && ZLAST_COMMANDS+=( "$arg" );
 
     proc_buf="${proc_buf[offset + $#arg + 1,len]}"
 
