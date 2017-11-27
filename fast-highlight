@@ -109,6 +109,10 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
 # A hash instead of multiple globals
 typeset -gA FAST_HIGHLIGHT
 
+# Exposing tokens found on command position,
+# for other scripts to process
+typeset -ga FAST_LAST_COMMANDS
+
 # Get the type of a command.
 #
 # Uses the zsh/parameter module if available to avoid forks, and a
@@ -249,6 +253,9 @@ typeset -gA FAST_HIGHLIGHT
   # the operator is discarded.
   #
 
+  # Command exposure for other scripts
+  FAST_LAST_COMMANDS=()
+
   # Processing buffer
   local proc_buf="$buf" needle
   for arg in ${interactive_comments-${(z)buf}} \
@@ -322,6 +329,8 @@ typeset -gA FAST_HIGHLIGHT
       # No-hit will result in value 0
       arg_type=${__FAST_HIGHLIGHT_TOKEN_TYPES[$arg]}
     fi
+
+    (( this_word & 1 )) && FAST_LAST_COMMANDS+=( "$arg" );
 
     proc_buf="${proc_buf[offset + $#arg + 1,len]}"
 
