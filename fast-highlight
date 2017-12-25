@@ -553,6 +553,13 @@ typeset -ga ZLAST_COMMANDS
                  -fast-highlight-string
                  already_added=1
                  ;;
+        [^\'\\]##([\\][\\])#\'*)
+                 # ADD
+                 local ctmp="'"
+                 integer itmp=${arg[(i)$ctmp]}-1
+                 (( start=start_pos-${#PREBUFFER}+itmp, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
+                 already_added=1
+                 ;;
         \$\'*)
                  # ADD
                  (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[dollar-quoted-argument]}")
