@@ -546,8 +546,6 @@ typeset -ga ZLAST_COMMANDS
                  already_added=1
                  ;;
         [^\"\\]##([\\][\\])#\"*)
-                 # First node matches even number of backslashes
-                 # Second node matches not backlashed double quote
                  # ADD
                  local ctmp="\""
                  integer itmp=${arg[(i)$ctmp]}-1
