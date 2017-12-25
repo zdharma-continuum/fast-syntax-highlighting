@@ -545,7 +545,7 @@ typeset -ga ZLAST_COMMANDS
                  -fast-highlight-string
                  already_added=1
                  ;;
-        [^\"\\]##([\\][\\])#\"*|[^\"]##[^\\]\"*)
+        [^\"\\]##([\\][\\])#\"*)
                  # First node matches even number of backslashes
                  # Second node matches not backlashed double quote
                  # ADD
