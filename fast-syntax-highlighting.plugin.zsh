@@ -171,10 +171,7 @@ _zsh_highlight_cursor_moved()
 # $1 is name of widget to call
 _zsh_highlight_call_widget()
 {
-    # Changed for compatibility with zsh-autosuggestions
-    # Was: builtin zle "$@" && _zsh_highlight
-    builtin zle "$@"
-    _zsh_highlight
+  builtin zle "$@" && _zsh_highlight
 }
 
 # Rebind all ZLE widgets to make them invoke _zsh_highlights.
