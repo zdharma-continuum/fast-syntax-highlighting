@@ -661,7 +661,16 @@ typeset -ga ZLAST_COMMANDS
   return 1
 }
 
-# Highlight special chars inside double-quoted strings
+# Highlight special blocks inside double-quoted strings
+#
+# The while [[ ... ]] pattern is logically ((A)|(B)|(C)|(D))(*), where:
+# - A matches $var[abc]
+# - B matches ${(...)var[abc]}
+# - C matches \$ or \" or \'
+# - D matches \*
+#
+# and the first condition -n ${match[7] uses D to continue searching when
+# backslash-something (not ['"$]) is occured.
 -fast-highlight-string()
 {
   mybuf="$arg"
