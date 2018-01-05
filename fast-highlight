@@ -664,26 +664,41 @@ typeset -ga ZLAST_COMMANDS
 # Highlight special chars inside double-quoted strings
 -fast-highlight-string()
 {
-  mybuf="$arg"
-  idx=start_pos
+  local i j k style
+  # Starting quote is at 1, so start parsing at offset 2 in the string.
+  for (( i = 2 ; i < end_pos - start_pos ; i += 1 )) ; do
+    (( j = i + start_pos - 1 ))
+    (( k = j + 1 ))
+    case "$arg[$i]" in
+      '$' ) style=back-or-dollar-double-quoted-argument
+            # Look for an alphanumeric parameter name.
+            if [[ ${arg:$i} = (#b)(([[:alpha:]_][[:alnum:]_]#|[[:digit:]]##)(\[[^[:space:]]#\])(#c0,1))* ]] ; then
+              (( k += ${#match[1]} )) # highlight the parameter name
+              (( i += ${#match[1]} )) # skip past it
+            elif [[ ${arg:$i} = (#b)([{](\([a-zA-Z0@%#]##\))(#c0,1)([[:alpha:]_][[:alnum:]_]#|[[:digit:]]##)(\[[^[:space:]]#\])(#c0,1)[}])* ]]; then
+              (( k += ${#match[1]} )) # highlight the parameter name and braces
+              (( i += ${#match[1]} )) # skip past it
+            else
+              continue
+            fi
+            ;;
+      "\\") style=back-or-dollar-double-quoted-argument
+            if [[ \\\`\"\$ == *$arg[$i+1]* ]]; then
+              (( k += 1 )) # Color following char too.
+              (( i += 1 )) # Skip parsing the escaped char.
+            else
+              continue
+            fi
+            ;;
+      *) continue ;;
 
-  while [[ "$mybuf" = (#b)[^\$\\]#((\$(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](\([a-zA-Z0@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|[\\][\'\"\$]|[\\](*))(*) ]]; do
-    [[ -n "${match[7]}" ]] && {
-      # Skip following char – it is quoted. Choice is
-      # made to not highlight such quoting
-      idx+=${mbegin[1]}+1
-      mybuf="${match[7]:1}"
-    } || {
-      idx+=${mbegin[1]}-1
-      end_idx=idx+${mend[1]}-${mbegin[1]}+1
-      mybuf="${match[8]}"
+    esac
 
-      # ADD
-      (( start=idx-${#PREBUFFER}, end=end_idx-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]}")
-
-      idx=end_idx
-    }
+    # ADD
+    reply+=("$j $k ${FAST_HIGHLIGHT_STYLES[$style]}")
   done
+
+  return 0
 }
 
 # Highlight special chars inside dollar-quoted strings
