@@ -59,6 +59,9 @@ typeset -gA FAST_HIGHLIGHT_STYLES
 : ${FAST_HIGHLIGHT_STYLES[redirection]:=none}
 : ${FAST_HIGHLIGHT_STYLES[comment]:=fg=black,bold}
 : ${FAST_HIGHLIGHT_STYLES[variable]:=none}
+: ${FAST_HIGHLIGHT_STYLES[mathvar]:=fg=blue,bold}
+: ${FAST_HIGHLIGHT_STYLES[mathnum]:=fg=magenta}
+: ${FAST_HIGHLIGHT_STYLES[matherr]:=fg=red}
 
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
@@ -483,7 +486,7 @@ typeset -ga ZLAST_COMMANDS
                           # ADD
                           (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $(( start + 2 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                           already_added=1
-                          -fast-highlight-string
+                          -fast-highlight-math-string
                           # ADD
                           [[ $arg[-2,-1] == '))' ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 2 )) $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                         elif [[ $arg == '()' ]]; then
@@ -569,7 +572,7 @@ typeset -ga ZLAST_COMMANDS
                  ;;
         \$\(\(*)
                  already_added=1
-                 -fast-highlight-string
+                 -fast-highlight-math-string
                  # ADD
                  (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( start + 1 )) $(( start + 3 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                  # ADD
@@ -672,7 +675,7 @@ typeset -ga ZLAST_COMMANDS
 
 # Highlight special blocks inside double-quoted strings
 #
-# The while [[ ... ]] pattern is logically ((A)|(B)|(C)|(D))(*), where:
+# The while [[ ... ]] pattern is logically ((A)|(B)|(C)|(D)|(E))(*), where:
 # - A matches $var[abc]
 # - B matches ${(...)var[abc]}
 # - C matches $
@@ -703,6 +706,42 @@ typeset -ga ZLAST_COMMANDS
 
       idx=end_idx
     }
+  done
+}
+
+# Highlight math and non-math context variables inside $(( )) and (( ))
+#
+# The while [[ ... ]] pattern is logically ((A)|(B)|(C)|(D))(*), where:
+# - A matches $var[abc]
+# - B matches ${(...)var[abc]}
+# - C matches $
+# - D matches words [a-zA-Z]## (variables)
+-fast-highlight-math-string()
+{
+  mybuf="$arg"
+  idx=start_pos
+  local stle
+
+  #                                                                                                                                                                                                                       7
+  while [[ "$mybuf" = (#b)[^\$a-zA-Z0-9]#((\$(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[a-zA-Z][a-zA-Z0-9]#|[0-9]##)(*) ]]; do
+    idx+=${mbegin[1]}-1
+    end_idx=idx+${mend[1]}-${mbegin[1]}+1
+    mybuf="${match[7]}"
+
+    [[ "${match[1][1]}" = [0-9] ]] && style=${FAST_HIGHLIGHT_STYLES[mathnum]} || { 
+      [[ "${match[1][1]}" = [a-zA-Z] ]] && {
+        [[ -n "${(P)match[1]}" ]] && style=${FAST_HIGHLIGHT_STYLES[mathvar]} || style=${FAST_HIGHLIGHT_STYLES[matherr]}
+      } || {
+        [[ "${match[1][1]}" = "$" ]] && {
+          [[ "${match[1]}" = "$" || -n "${(P)${match[1]:1}}" ]] && style=${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]} || style=${FAST_HIGHLIGHT_STYLES[matherr]}
+        }
+      }
+    }
+
+    # ADD
+    [[ "$style" != "none" ]] && (( start=idx-${#PREBUFFER}, end=end_idx-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end $style")
+
+    idx=end_idx
   done
 }
 
