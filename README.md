@@ -58,9 +58,16 @@ other too, and also install with `Oh My Zsh` (by copying directory to
 
 ### [Zplugin](https://github.com/psprint/zplugin)
 
-Add `zplugin load zdharma/fast-syntax-highlighting` to your `.zshrc` file. Zplugin will handle
+Add `zplugin light zdharma/fast-syntax-highlighting` to your `.zshrc` file. Zplugin will handle
 cloning the plugin for you automatically the next time you start zsh. To update
 issue `zplugin update zdharma/fast-syntax-highlighting` (`update --all` can also be used).
+
+Zplugin can load f-sy-h in turbo-mode, i.e. after prompt, to speed-up `.zshrc` processing:
+
+```zsh
+zplugin ice wait"1" # 1 second after prompt
+zplugin light zdharma/fast-syntax-highlighting
+```
 
 ### Antigen
 
