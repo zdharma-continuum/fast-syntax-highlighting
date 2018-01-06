@@ -8,28 +8,38 @@ functions with `zed`/`vared` (optimizations done in
 
 1. Variable highlighting
 
-    ![variables](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/parameter.png)
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/parameter.png)
 
-1. Colorizing of `${(a)parameter[...]}` inside strings (normally only `$parameter` is colorized)
+2. Colorizing of `${(a)parameter[...]}` inside strings (normally only `$parameter` is colorized)
 
-    ![in-string](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/in_string.png)
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/in_string.png)
 
-1. Fixed colorizing of function definition, like `abc() { ... }` – `abc` will not be red
+3. Fixed colorizing of function definition, like `abc() { ... }` – `abc` will not be red
 
-    ![function](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/function.png)
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/function.png)
 
-1. Fixed colorizing of complex conditions inside `[[`, like `[[ "$a" || "$b" ]]`
+4. Fixed colorizing of complex conditions inside `[[`, like `[[ "$a" || "$b" ]]`
 
-    ![complex conditions](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/cplx_cond.png)
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/cplx_cond.png)
 
-1. Closing `]]` and `]` are highlighted (see above)
+5. Closing `]]` and `]` are highlighted (see above)
 
-1. Paths from `$CDPATH` aren't colorized unless the command is `cd`
+6. Paths from `$CDPATH` aren't colorized unless the command is `cd`
 
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
+# Updates (2018)
+**2018-01-06**
+
+Math mode is highlighted – expressions `(( ... ))` and `$(( ... ))`. Empty variables are colorized as red.
+There are 3 style names (fields of
+[FAST_HIGHLIGHT_STYLES](https://github.com/zdharma/fast-syntax-highlighting/blob/master/fast-highlight#L34)
+hash) for math-variable, number and empty variable (error): `mathvar`, `mathnum`, `matherr`. You can set
+them (like the animation below shows) to change colors.
+
+![animation](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/math.gif)
 
 ## Installation
 
