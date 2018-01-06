@@ -483,6 +483,7 @@ typeset -ga ZLAST_COMMANDS
                           # ADD
                           (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $(( start + 2 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                           already_added=1
+                          -fast-highlight-string
                           # ADD
                           [[ $arg[-2,-1] == '))' ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 2 )) $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                         elif [[ $arg == '()' ]]; then
