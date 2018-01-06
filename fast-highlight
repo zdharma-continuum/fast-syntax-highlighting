@@ -567,7 +567,15 @@ typeset -ga ZLAST_COMMANDS
                  -fast-highlight-dollar-string
                  already_added=1
                  ;;
-        \$[^\(]*)
+        \$\(\(*)
+                 already_added=1
+                 -fast-highlight-string
+                 # ADD
+                 (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( start + 1 )) $(( start + 3 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                 # ADD
+                 [[ $arg[-2,-1] == '))' ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 2 )) $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                 ;;
+        \$*)
                  style=variable
                  ;;
         '`'*)    style=back-quoted-argument;;
@@ -667,8 +675,9 @@ typeset -ga ZLAST_COMMANDS
 # The while [[ ... ]] pattern is logically ((A)|(B)|(C)|(D))(*), where:
 # - A matches $var[abc]
 # - B matches ${(...)var[abc]}
-# - C matches \$ or \" or \'
-# - D matches \*
+# - C matches $
+# - D matches \$ or \" or \'
+# - E matches \*
 #
 # and the first condition -n ${match[7] uses D to continue searching when
 # backslash-something (not ['"$]) is occured.
@@ -677,7 +686,8 @@ typeset -ga ZLAST_COMMANDS
   mybuf="$arg"
   idx=start_pos
 
-  while [[ "$mybuf" = (#b)[^\$\\]#((\$(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|[\\][\'\"\$]|[\\](*))(*) ]]; do
+  #                                                                                                                                                                                                    7   8
+  while [[ "$mybuf" = (#b)[^\$\\]#((\$(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[\\][\'\"\$]|[\\](*))(*) ]]; do
     [[ -n "${match[7]}" ]] && {
       # Skip following char – it is quoted. Choice is
       # made to not highlight such quoting
