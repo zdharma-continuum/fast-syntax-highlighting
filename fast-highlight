@@ -473,7 +473,11 @@ typeset -ga ZLAST_COMMANDS
                               (( iitmp <= asize - 1 )) && (( jjtmp > asize && (jjtmp = asize), 1 > 0 )) && \
                                   (( start=start_pos-${#PREBUFFER}+iitmp, end=start_pos-${#PREBUFFER}+jjtmp, start >= 0 )) && \
                                       reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[single-quoted-argument]}")
-                          }
+                          } || \
+                            {
+                                { itmp="${arg[(i)=]}"; arg="${arg[itmp,asize]}"; (( start_pos += itmp - 1 ));
+                                  -fast-highlight-string; (( start_pos = start_pos - itmp + 1, 1 > 0 )); }
+                            }
                         elif [[ $arg[1] = $histchars[1] && -n "${arg[2]}" ]]; then
                           style=history-expansion
                         elif [[ $arg[1] == $histchars[2] ]]; then
