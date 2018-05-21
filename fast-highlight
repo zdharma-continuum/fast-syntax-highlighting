@@ -267,17 +267,12 @@ typeset -ga ZLAST_COMMANDS
     (( in_redirection )) && (( --in_redirection ))
     (( in_redirection == 0 )) && next_word=2 # else Stall $next_word.
 
-    # Initialize per-"simple command" [zshmisc(1)] variables:
     #
     #   $already_added       (see next paragraph)
     #   $style               how to highlight $arg
     #   $in_array_assignment boolean flag for "between '(' and ')' of array assignment"
     #   $highlight_glob      boolean flag for "'noglob' is in effect"
     #
-    # $already_added is set to 1 to disable adding an entry to region_highlight
-    # for this iteration.  Currently, that is done for "" and $'' strings,
-    # which add the entry early so escape sequences within the string override
-    # the string's color.
     already_added=0
     style=unknown-token
     if (( this_word & 1 )); then
@@ -459,11 +454,26 @@ typeset -ga ZLAST_COMMANDS
         hashed)         style=hashed-command;;
         dirpath)        style=path;;
         none)           # Assign?
-                        if [[ $arg == [[:alpha:]_][[:alnum:]_]#(|\[[^\]]#\])(|[+])=* ]] || [[ $arg == [0-9]##(|[+])=* ]]; then
+                        if [[ $arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[+])=* || $arg == [0-9]##(|[+])=* ]]; then
                           style=assign
                           # Assignment to a scalar parameter or to array
                           # (For array assignments, the command doesn't start until the ")" token.)
                           [[ $arg[-1] == '(' ]] && in_array_assignment=1 || (( next_word = next_word | 1 ))
+
+                          # Highlight ...
+                          local ctmp="\"" dtmp="'"
+                          integer itmp=${arg[(i)$ctmp]}-1 iitmp=${arg[(i)$dtmp]}-1 asize=${#arg}
+                          integer jtmp=${arg[(b:itmp+2:i)$ctmp]} jjtmp=${arg[(b:iitmp+2:i)$dtmp]}
+                          (( itmp < iitmp && itmp <= asize - 1 )) && (( jtmp > asize && (jtmp = asize), 1 > 0 )) && \
+                              (( start=start_pos-${#PREBUFFER}+itmp, end=start_pos-${#PREBUFFER}+jtmp, start >= 0 )) && \
+                                  reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}") && \
+                                      { itmp="${arg[(i)=]}"; arg="${arg[itmp,asize]}"; (( start_pos += itmp - 1 ));
+                                        -fast-highlight-string; (( start_pos = start_pos - itmp + 1, 1 > 0 )); } || \
+                          {
+                              (( iitmp <= asize - 1 )) && (( jjtmp > asize && (jjtmp = asize), 1 > 0 )) && \
+                                  (( start=start_pos-${#PREBUFFER}+iitmp, end=start_pos-${#PREBUFFER}+jjtmp, start >= 0 )) && \
+                                      reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[single-quoted-argument]}")
+                          }
                         elif [[ $arg[1] = $histchars[1] && -n "${arg[2]}" ]]; then
                           style=history-expansion
                         elif [[ $arg[1] == $histchars[2] ]]; then
@@ -525,7 +535,7 @@ typeset -ga ZLAST_COMMANDS
                  style=reserved-word
                  braces_stack='R'"$braces_stack"
                  ;;
-        $'\x29') # subshell or end of array assignment
+        $'\x29') # ')' - subshell or end of array assignment
                  if (( in_array_assignment )); then
                    style=assign
                    in_array_assignment=0
@@ -534,7 +544,7 @@ typeset -ga ZLAST_COMMANDS
                    braces_stack[1]=""
                    style=reserved-word
                  fi;;
-        $'\x28\x29') # possibly a function definition
+        $'\x28\x29') # '()' - possibly a function definition
                  # || false # TODO: or if the previous word was a command word
                  (( FAST_HIGHLIGHT[multi_func_def] )) && (( next_word = next_word | 1 ))
                  style=reserved-word
@@ -709,6 +719,7 @@ typeset -ga ZLAST_COMMANDS
       idx=end_idx
     }
   done
+  return 0
 }
 
 # Highlight math and non-math context variables inside $(( )) and (( ))
