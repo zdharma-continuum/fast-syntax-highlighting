@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------------------------------
 # Copyright (c) 2010-2016 zsh-syntax-highlighting contributors
-# Copyright (c) 2016-2017 Sebastian Gniazdowski (modifications)
+# Copyright (c) 2016-2018 Sebastian Gniazdowski (modifications)
 # All rights reserved.
 #
 # The only licensing for this file follows.
@@ -553,7 +553,8 @@ typeset -ga ZLAST_COMMANDS
                  # ADD
                  local ctmp="\""
                  integer itmp=${arg[(i)$ctmp]}-1
-                 (( start=start_pos-${#PREBUFFER}+itmp, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
+                 integer jtmp=${arg[(b:itmp+2:i)$ctmp]}
+                 (( start=start_pos-${#PREBUFFER}+itmp, end=start_pos-${#PREBUFFER}+jtmp, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
                  -fast-highlight-string
                  already_added=1
                  ;;
@@ -561,7 +562,8 @@ typeset -ga ZLAST_COMMANDS
                  # ADD
                  local ctmp="'"
                  integer itmp=${arg[(i)$ctmp]}-1
-                 (( start=start_pos-${#PREBUFFER}+itmp, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
+                 integer jtmp=${arg[(b:itmp+2:i)$ctmp]}
+                 (( start=start_pos-${#PREBUFFER}+itmp, end=start_pos-${#PREBUFFER}+jtmp, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
                  already_added=1
                  ;;
         \$\'*)
