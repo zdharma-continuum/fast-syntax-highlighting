@@ -475,8 +475,12 @@ typeset -ga ZLAST_COMMANDS
                                       reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[single-quoted-argument]}")
                           } || \
                             {
-                                { itmp="${arg[(i)=]}"; arg="${arg[itmp,asize]}"; (( start_pos += itmp - 1 ));
-                                  -fast-highlight-string; (( start_pos = start_pos - itmp + 1, 1 > 0 )); }
+                                itmp="${arg[(i)=]}"; arg="${arg[itmp,asize]}"; (( start_pos += itmp - 1 ));
+                                [[ "${arg[2,4]}" = '$((' ]] && { -fast-highlight-math-string;
+                                   (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( start + 2 )) $(( start + 4 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                                   (( jtmp = ${arg[(I)\)\)]}-1, jtmp > 0 )) && (( start=start_pos-${#PREBUFFER}+jtmp, end=start+2, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                                } || -fast-highlight-string;
+                                (( start_pos = start_pos - itmp + 1, 1 > 0 ))
                             }
                         elif [[ $arg[1] = $histchars[1] && -n "${arg[2]}" ]]; then
                           style=history-expansion
