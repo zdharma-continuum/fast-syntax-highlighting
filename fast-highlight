@@ -62,6 +62,7 @@ typeset -gA FAST_HIGHLIGHT_STYLES
 : ${FAST_HIGHLIGHT_STYLES[mathvar]:=fg=blue,bold}
 : ${FAST_HIGHLIGHT_STYLES[mathnum]:=fg=magenta}
 : ${FAST_HIGHLIGHT_STYLES[matherr]:=fg=red}
+: ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]:=fg=green}
 
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
@@ -458,7 +459,10 @@ typeset -ga ZLAST_COMMANDS
                           style=assign
                           # Assignment to a scalar parameter or to array
                           # (For array assignments, the command doesn't start until the ")" token.)
-                          [[ $arg[-1] == '(' ]] && in_array_assignment=1 || (( next_word = next_word | 1 ))
+                          [[ $arg[-1] == '(' ]] && {
+                              (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 1 )) $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
+                              in_array_assignment=1
+                          } || (( next_word = next_word | 1 ))
 
                           # Highlight ...
                           local ctmp="\"" dtmp="'"
@@ -548,6 +552,7 @@ typeset -ga ZLAST_COMMANDS
                    style=assign
                    in_array_assignment=0
                    (( next_word = next_word | 1 ))
+                   (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
                  elif [[ $braces_stack[1] == "R" ]]; then
                    braces_stack[1]=""
                    style=reserved-word

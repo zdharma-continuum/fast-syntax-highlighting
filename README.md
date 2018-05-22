@@ -33,6 +33,12 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 # Updates (2018)
 **2018-05-22**
 
+Array assignments were still boring, so I throwed in bracked colorizing:
+
+![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/array-assign.png)
+
+**2018-05-22**
+
 Assignments are no more one-colour default-white. When used in assignment, highlighted are:
 
 - variables (outside strings),
