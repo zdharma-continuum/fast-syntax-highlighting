@@ -31,6 +31,16 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-05-22**
+
+Assignments are no more one-colour default-white. When used in assignment, highlighted are:
+
+- variables (outside strings),
+- strings (double-quoted and single-quoted),
+- math-mode (`val=$(( ... ))`).
+
+![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/assign.png)
+
 **2018-01-06**
 
 Math mode is highlighted – expressions `(( ... ))` and `$(( ... ))`. Empty variables are colorized as red.
