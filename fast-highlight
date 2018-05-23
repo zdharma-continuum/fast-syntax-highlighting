@@ -275,6 +275,12 @@ typeset -ga ZLAST_COMMANDS
   # Restart observing of assigns
   FAST_ASSIGNS_SEEN=()
 
+  [[ -n "$ZCALC_ACTIVE" ]] && {
+    start_pos=0; end_pos=len; arg="$buf"
+    -fast-highlight-math-string
+    return 0
+  }
+
   # Processing buffer
   local proc_buf="$buf" needle
   for arg in ${interactive_comments-${(z)buf}} \
