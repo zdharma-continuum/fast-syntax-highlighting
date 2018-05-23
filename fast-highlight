@@ -123,6 +123,9 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
 # A hash instead of multiple globals
 typeset -gA FAST_HIGHLIGHT
 
+# Assignments seen, to know if math parameter exists
+typeset -gA FAST_ASSIGNS_SEEN
+
 # Exposing tokens found on command position,
 # for other scripts to process
 typeset -ga ZLAST_COMMANDS
@@ -269,6 +272,8 @@ typeset -ga ZLAST_COMMANDS
 
   # Command exposure for other scripts
   ZLAST_COMMANDS=()
+  # Restart observing of assigns
+  FAST_ASSIGNS_SEEN=()
 
   # Processing buffer
   local proc_buf="$buf" needle
@@ -474,6 +479,7 @@ typeset -ga ZLAST_COMMANDS
         none)           # Assign?
                         if [[ $arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[+])=* || $arg == [0-9]##(|[+])=* || "${braces_stack[1]}" = 'T' ]]; then
                           style=assign
+                          [[ "$arg" = *[=]* ]] && FAST_ASSIGNS_SEEN[${arg%%=*}]=1
 
                           # Handle array assignment
                           integer itmp=${arg[(i)=\(]}-1+1 iitmp=${arg[(i)\)]}-1 asize=${#arg}
@@ -775,7 +781,7 @@ typeset -ga ZLAST_COMMANDS
 
     [[ "${match[1][1]}" = [0-9] ]] && style=${FAST_HIGHLIGHT_STYLES[mathnum]} || { 
       [[ "${match[1][1]}" = [a-zA-Z] ]] && {
-        [[ -n "${(P)match[1]}" ]] && style=${FAST_HIGHLIGHT_STYLES[mathvar]} || style=${FAST_HIGHLIGHT_STYLES[matherr]}
+        [[ -n "${(P)match[1]}" || ${FAST_ASSIGNS_SEEN[${match[1]}]} = 1 ]] && style=${FAST_HIGHLIGHT_STYLES[mathvar]} || style=${FAST_HIGHLIGHT_STYLES[matherr]}
       } || {
         [[ "${match[1][1]}" = "$" ]] && {
           [[ "${match[1]}" = "$" || -n "${(P)${match[1]:1}}" ]] && style=${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]} || style=${FAST_HIGHLIGHT_STYLES[matherr]}
