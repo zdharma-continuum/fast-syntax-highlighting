@@ -428,7 +428,7 @@ typeset -ga ZLAST_COMMANDS
 
       case $REPLY in
         reserved)       # reserved word
-                        style=reserved-word
+                        [[ "$arg" = "[[" ]] && style=builtin || style=reserved-word
                         if [[ $arg == $'\x7b' ]]; then # {
                           braces_stack='Y'"$braces_stack"
                         elif [[ $arg == $'\x7d' && $braces_stack[1] == "Y" ]]; then # }
@@ -555,7 +555,7 @@ typeset -ga ZLAST_COMMANDS
    then # $arg is a non-command word
       case $arg in
         ']]')
-                 style=reserved-word
+                 style=builtin
                  [[ $braces_stack[1] == "A" ]] && braces_stack[1]=""
                  ;;
         ']')
