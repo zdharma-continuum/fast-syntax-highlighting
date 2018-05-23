@@ -37,6 +37,11 @@ Assign colorizing now spans to variables defined by `typeset`, `export`, `local`
 
 ![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/typeset.png)
 
+Also, `zcalc` has a separate math mode and specialized highlighting – no more light-red colors because of
+treating `zcalc` like a regular command-line:
+
+![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/zcalc.png)
+
 **2018-05-22**
 
 Array assignments were still boring, so I throwed in bracked colorizing:
