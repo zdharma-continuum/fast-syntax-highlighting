@@ -108,6 +108,16 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
   '&|'  3
   # ### 'case' syntax, but followed by a pattern, not by a command
   # ';;' ';&' ';|'
+
+  # Assign-capability starters
+
+  typeset  4
+  declare  4
+  local    4
+  float    4
+  integer  4
+  export   4
+  readonly 4
 )
 
 # A hash instead of multiple globals
@@ -283,6 +293,8 @@ typeset -ga ZLAST_COMMANDS
 
     # Compute the new $start_pos and $end_pos, skipping over whitespace in $buf.
     if [[ $arg == ';' ]] ; then
+      [[ "${braces_stack[1]}" = 'T' ]] && braces_stack[1]=""
+
       # We're looking for either a semicolon or a newline, whichever comes
       # first.  Both of these are rendered as a ";" (SEPER) by the ${(z)..}
       # flag.
@@ -389,7 +401,7 @@ typeset -ga ZLAST_COMMANDS
      # try-always construct
      style=reserved-word # de facto a reserved word, although not de jure
      (( next_word = 1 ))
-   elif (( this_word & 1 )) && (( in_redirection == 0 )); then # $arg is the command word
+   elif (( this_word & 1 )) && (( in_redirection == 0 )) || [[ "${braces_stack[1]}" = 'T' ]]; then
      cur_cmd="$arg"
      if (( arg_type == 1 )); then
       style=precommand
@@ -407,6 +419,8 @@ typeset -ga ZLAST_COMMANDS
        # parameters that refer to commands, functions, and builtins.
        if [[ ${arg[1]} == \$ ]] && (( ${+parameters} )) && [[ ${arg:1} = (#m)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##) ]] && (( ${+parameters[${MATCH}]} )); then
          -fast-highlight-main-type ${(P)MATCH}
+       elif [[ "${braces_stack[1]}" = 'T' ]]; then
+         REPLY=none
        else
          : ${expanded_path::=${(Q)~arg}}
          -fast-highlight-main-type $expanded_path
@@ -415,9 +429,9 @@ typeset -ga ZLAST_COMMANDS
       case $REPLY in
         reserved)       # reserved word
                         style=reserved-word
-                        if [[ $arg == $'\x7b' ]]; then
+                        if [[ $arg == $'\x7b' ]]; then # {
                           braces_stack='Y'"$braces_stack"
-                        elif [[ $arg == $'\x7d' && $braces_stack[1] == "Y" ]]; then
+                        elif [[ $arg == $'\x7d' && $braces_stack[1] == "Y" ]]; then # }
                           # We're at command word, so no need to check right_brace_is_recognised_everywhere
                           braces_stack[1]=""
                           style=reserved-word
@@ -449,24 +463,29 @@ typeset -ga ZLAST_COMMANDS
                             [[ ${__FAST_HIGHLIGHT_TOKEN_TYPES[$alias_target]} = "1" && "$arg_type" != "1" ]] && __FAST_HIGHLIGHT_TOKEN_TYPES[$arg]="1"
                           fi
                         ;;
-        builtin)        style=builtin;;
+        builtin)        style=builtin
+                        # T - typeset, etc. mode
+                        [[ "$arg" = (typeset|declare|local|float|integer|export|readonly) ]] && braces_stack='T'"$braces_stack"
+                        ;;
         function)       style=function;;
         command)        style=command;;
         hashed)         style=hashed-command;;
         dirpath)        style=path;;
         none)           # Assign?
-                        if [[ $arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[+])=* || $arg == [0-9]##(|[+])=* ]]; then
+                        if [[ $arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[+])=* || $arg == [0-9]##(|[+])=* || "${braces_stack[1]}" = 'T' ]]; then
                           style=assign
-                          # Assignment to a scalar parameter or to array
-                          # (For array assignments, the command doesn't start until the ")" token.)
-                          [[ $arg[-1] == '(' ]] && {
-                              (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 1 )) $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
-                              in_array_assignment=1
-                          } || (( next_word = next_word | 1 ))
 
-                          # Highlight ...
+                          # Handle array assignment
+                          integer itmp=${arg[(i)=\(]}-1+1 iitmp=${arg[(i)\)]}-1 asize=${#arg}
+                          (( itmp <= asize - 1 )) && {
+                              (( start=start_pos-${#PREBUFFER}+itmp, end=start+1, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
+                              (( iitmp <= asize - 1 )) && (( start=start_pos-${#PREBUFFER}+iitmp, end=start+1, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
+                              in_array_assignment=1
+                          } || { [[ "${braces_stack[1]}" != 'T' ]] && (( next_word = next_word | 1 )); }
+
+                          # Handle no-string highlight, string "/' highlight, math mode highlight
                           local ctmp="\"" dtmp="'"
-                          integer itmp=${arg[(i)$ctmp]}-1 iitmp=${arg[(i)$dtmp]}-1 asize=${#arg}
+                          itmp=${arg[(i)$ctmp]}-1 iitmp=${arg[(i)$dtmp]}-1
                           integer jtmp=${arg[(b:itmp+2:i)$ctmp]} jjtmp=${arg[(b:iitmp+2:i)$dtmp]}
                           (( itmp < iitmp && itmp <= asize - 1 )) && (( jtmp > asize && (jtmp = asize), 1 > 0 )) && \
                               (( start=start_pos-${#PREBUFFER}+itmp, end=start_pos-${#PREBUFFER}+jtmp, start >= 0 )) && \
