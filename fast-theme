@@ -35,6 +35,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list || { ec
     return 0
 }
 
+[[ -z "$1" ]] && { print -u2 "Provide a theme (its name) to switch to, aborting (see -h/--help)"; return 1; }
 [[ ! -f "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
 [[ ! -r "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
 
