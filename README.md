@@ -36,6 +36,7 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 Hash holding paths that shouldn't be grepped (globbed) – blacklist for slow disks, mounts, etc.:
 
 ```zsh
+typeset -gA FAST_BLIST_PATTERNS
 FAST_BLIST_PATTERNS[/mount/nfs1/*]=1
 FAST_BLIST_PATTERNS[/mount/disk2/*]=1
 ```
