@@ -58,7 +58,7 @@ Array assignments were still boring, so I throwed in bracked colorizing:
 
 ![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/array-assign.png)
 
-**2018-05-22**
+**2018-05-22**<a name="assign-update"></a>
 
 Assignments are no more one-colour default-white. When used in assignment, highlighted are:
 
