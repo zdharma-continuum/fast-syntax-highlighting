@@ -3,7 +3,38 @@
 # Theme support using ini-files.
 #
 
-[[ "$1" = "-r" || "$1" = "--reset" ]] && { command rm -f "$FAST_BASE_DIR"/current_theme.zsh; print "Done (no theme is set)"; return 0; }
+zmodload zsh/zutil 2>/dev/null
+
+local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST
+local -A opthash
+zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list || { echo "Improper options given, see help (-h/--help)"; return 1; }
+
+(( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
+(( ${+opthash[-v]} + ${+opthash[--verbose]} )) && OPT_VERBOSE="-v"
+(( ${+opthash[-q]} + ${+opthash[--quiet]} ))   && OPT_QUIET="-q"
+(( ${+opthash[-r]} + ${+opthash[--reset]} ))   && OPT_RESET="-n"
+(( ${+opthash[-l]} + ${+opthash[--list]} ))    && OPT_LIST="-n"
+
+[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/current_theme.zsh; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set)"; return 0; }
+
+[[ -n "$OPT_LIST" ]] && {
+    print -r -- "Available themes:"
+    print -rl -- "$FAST_BASE_DIR"/themes/*.ini(:t:r)
+    return 0
+}
+
+[[ -n "$OPT_HELP" ]] && {
+    print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] <theme-name>"
+    print -r -- "       fast-theme [-r/--reset] [-l/--list]"
+    print -r -- ""
+    print -r -- "Default action (after providing <theme-name>) is to switch current session"
+    print -r -- "and any future sessions to the new theme."
+    print -r -- ""
+    print -r -- "-r/--reset     - unset any theme, use default highlighting (requires restart)"
+    print -r -- "-l/--list      - list names of available themes"
+    return 0
+}
+
 [[ ! -f "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
 [[ ! -r "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
 
@@ -54,6 +85,8 @@ order=(
     mathnum matherr assign-array-bracket 
 )
 
+[[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
+
 # Named colors
 local -a color
 color=( red green blue yellow cyan magenta black white )
@@ -88,6 +121,6 @@ for k in "${order[@]}"; do
     FAST_HIGHLIGHT_STYLES[$k]="$result"
 done
 
-print "Switched to theme \`$1' (current session, and future sessions)"
+[[ -z "$OPT_QUIET" ]] && print "Switched to theme \`$1' (current session, and future sessions)"
 
 # vim:ft=zsh:et:sw=4:sts=4
