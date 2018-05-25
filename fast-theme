@@ -1,0 +1,93 @@
+# Copyright (c) 2018 Sebastian Gniazdowski
+#
+# Theme support using ini-files.
+#
+
+[[ "$1" = "-r" || "$1" = "--reset" ]] && { command rm -f "$FAST_BASE_DIR"/current_theme.zsh; print "Done (no theme is set)"; return 0; }
+[[ ! -f "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
+[[ ! -r "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
+
+# FAST_HIGHLIGHT_STYLES key onto ini-file key
+local -A map
+map=(
+    default                     -
+    unknown-token               -
+    reserved-word               -
+    alias                       -
+    suffix-alias                -
+    builtin                     -
+    function                    -
+    command                     -
+    precommand                  -
+    commandseparator            -
+    hashed-command              -
+    path                        -
+    path_pathseparator          pathseparator
+    globbing                    -
+    history-expansion           -
+    single-hyphen-option        -
+    double-hyphen-option        -
+    back-quoted-argument        -
+    single-quoted-argument      -
+    double-quoted-argument      -
+    dollar-quoted-argument      -
+    back-or-dollar-double-quoted-argument   -
+    back-dollar-quoted-argument             -
+    assign                      -
+    redirection                 -
+    comment                     -
+    variable                    -
+    mathvar                     -
+    mathnum                     -
+    matherr                     -
+    assign-array-bracket        -
+)
+
+# In which order to generate entries in current_theme.zsh
+local -a order
+order=( 
+    default unknown-token reserved-word alias suffix-alias builtin function command precommand 
+    commandseparator hashed-command path path_pathseparator globbing history-expansion 
+    single-hyphen-option double-hyphen-option back-quoted-argument single-quoted-argument 
+    double-quoted-argument dollar-quoted-argument back-or-dollar-double-quoted-argument 
+    back-dollar-quoted-argument assign redirection comment variable mathvar 
+    mathnum matherr assign-array-bracket 
+)
+
+# Named colors
+local -a color
+color=( red green blue yellow cyan magenta black white )
+
+#
+# Execution starts here
+#
+
+local -A out
+fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
+
+command rm -f "$FAST_BASE_DIR"/current_theme.zsh
+
+# Generate current_theme.zsh, traversing ini-file associative array
+local k kk
+local inikey inival result
+for k in "${order[@]}"; do
+    [[ "${map[$k]}" = "-" ]] && kk="$k" || kk="${map[$k]}"
+    inikey="${out[(i)<*>_${kk}]}"
+    inival="${out[$inikey]}"
+    if [[ "$inival" = bg:* ]]; then
+        result="bg=${inival#bg:}"
+    else
+        if [[ "$inival" = (${(~j:|:)color})* || "$inival" = [0-9]##* ]]; then
+            result="fg=$inival"
+        else
+            result="$inival"
+        fi
+    fi
+
+    print -r -- ': ${FAST_HIGHLIGHT_STYLES['"$k"']:='"$result"'}' >>! "$FAST_BASE_DIR"/current_theme.zsh
+    FAST_HIGHLIGHT_STYLES[$k]="$result"
+done
+
+print "Switched to theme \`$1' (current session, and future sessions)"
+
+# vim:ft=zsh:et:sw=4:sts=4

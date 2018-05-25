@@ -32,6 +32,10 @@ typeset -gA __fast_highlight_main__command_type_cache FAST_BLIST_PATTERNS
 # Define default styles. You can set this after loading the plugin in
 # Zshrc and use 256 via numbers, like: fg=150
 typeset -gA FAST_HIGHLIGHT_STYLES
+if [[ -e "$FAST_BASE_DIR"/current_theme.zsh ]]; then
+  source "$FAST_BASE_DIR"/current_theme.zsh
+else
+# built-in theme
 : ${FAST_HIGHLIGHT_STYLES[default]:=none}
 : ${FAST_HIGHLIGHT_STYLES[unknown-token]:=fg=red,bold}
 : ${FAST_HIGHLIGHT_STYLES[reserved-word]:=fg=yellow}
@@ -63,7 +67,7 @@ typeset -gA FAST_HIGHLIGHT_STYLES
 : ${FAST_HIGHLIGHT_STYLES[mathnum]:=fg=magenta}
 : ${FAST_HIGHLIGHT_STYLES[matherr]:=fg=red}
 : ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]:=fg=green}
-
+fi
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
 

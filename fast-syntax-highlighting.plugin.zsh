@@ -31,6 +31,7 @@
 
 # Set $ZERO to the expected value, regardless of functionargzero.
 typeset -g ZERO=${(%):-%N}
+typeset -g FAST_BASE_DIR="${ZERO:h}"
 
 # Invokes each highlighter that needs updating.
 # This function is supposed to be called whenever the ZLE state changes.
@@ -257,7 +258,7 @@ _zsh_highlight_preexec_hook()
   typeset -gi _ZSH_HIGHLIGHT_PRIOR_CURSOR=0
 }
 
-autoload -U add-zsh-hook
+autoload -Uz add-zsh-hook
 add-zsh-hook preexec _zsh_highlight_preexec_hook 2>/dev/null || {
     print -r -- >&2 'zsh-syntax-highlighting: failed loading add-zsh-hook.'
 }
@@ -267,7 +268,7 @@ ZSH_HIGHLIGHT_MAXLENGTH=10000
 # Load zsh/parameter module if available
 zmodload zsh/parameter 2>/dev/null
 
-autoload -U is-at-least
+autoload -Uz is-at-least fast-theme fast-read-ini-file
 source "${ZERO:h}/fast-highlight"
 
 [[ "${+termcap[Co]}" = 1 && "${termcap[Co]}" = "256" ]] && FAST_HIGHLIGHT_STYLES[variable]="fg=112"
