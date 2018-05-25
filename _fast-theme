@@ -1,0 +1,13 @@
+#compdef fast-theme
+
+local arguments
+
+arguments=(
+  {-h,--help}'[display help text]'
+  {-l,--list}'[list available themes]'
+  {-r,--reset}'[unset any theme (revert to default highlighting)]'
+  {-q,--quiet}'[no default messages]'
+  {-v,--verbose}'[more messages during operation]'
+)
+
+_arguments -s $arguments
