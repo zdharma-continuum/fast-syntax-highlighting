@@ -31,6 +31,15 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-05-25**
+
+Hash holding paths that shouldn't be grepped (globbed) – blacklist for slow disks, mounts, etc.:
+
+```zsh
+FAST_BLIST_PATTERNS[/mount/nfs1/*]=1
+FAST_BLIST_PATTERNS[/mount/disk2/*]=1
+```
+
 **2018-05-23**
 
 Assign colorizing now spans to variables defined by `typeset`, `export`, `local`, etc.:
