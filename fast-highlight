@@ -228,12 +228,12 @@ typeset -ga ZLAST_COMMANDS
   # Variable declarations and initializations
   # in_array_assignment true between 'a=(' and the matching ')'
   # braces_stack: "R" for round, "Q" for square, "Y" for curly
-  # mybuf, cdpath_dir are used in sub-functions
-  local start_pos=0 end_pos start end highlight_glob=1 arg style in_array_assignment=0 MATCH expanded_path braces_stack buf="$PREBUFFER$BUFFER" mybuf cdpath_dir cur_cmd alias_target
+  # _mybuf, cdpath_dir are used in sub-functions
+  local _start_pos=0 _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$PREBUFFER$BUFFER" _mybuf cdpath_dir cur_cmd alias_target
   # arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
-  # idx and end_idx are used in sub-functions
+  # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
-  integer arg_type=0 MBEGIN MEND in_redirection len=${#buf} already_added offset idx end_idx this_word=1 next_word=0 insane_alias pos
+  integer arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos
   local -a match mbegin mend
 
   # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16
@@ -241,7 +241,7 @@ typeset -ga ZLAST_COMMANDS
   # State machine
   #
   # The states are:
-  # - :start:      Command word
+  # - :__start:      Command word
   # - :sudo_opt:   A leading-dash option to sudo (such as "-u" or "-i")
   # - :sudo_arg:   The argument to a sudo leading-dash option that takes one,
   #                when given as a separate word; i.e., "foo" in "-u foo" (two
@@ -252,11 +252,11 @@ typeset -ga ZLAST_COMMANDS
   #
   # When the kind of a word is not yet known, $this_word / $next_word may contain
   # multiple states.  For example, after "sudo -i", the next word may be either
-  # another --flag or a command name, hence the state would include both :start:
+  # another --flag or a command name, hence the state would include both :__start:
   # and :sudo_opt:.
   #
   # The tokens are always added with both leading and trailing colons to serve as
-  # word delimiters (an improvised array); [[ $x == *:foo:* ]] and x=${x//:foo:/} 
+  # word delimiters (an improvised array); [[ $x == *:foo:* ]] and x=${x//:foo:/}
   # will DTRT regardless of how many elements or repetitions $x has..
   #
   # Handling of redirections: upon seeing a redirection token, we must stall
@@ -281,65 +281,65 @@ typeset -ga ZLAST_COMMANDS
   FAST_ASSIGNS_SEEN=()
 
   [[ -n "$ZCALC_ACTIVE" ]] && {
-    start_pos=0; end_pos=len; arg="$buf"
+    _start_pos=0; _end_pos=__len; __arg="$__buf"
     -fast-highlight-math-string
     return 0
   }
 
   # Processing buffer
-  local proc_buf="$buf" needle
-  for arg in ${interactive_comments-${(z)buf}} \
-             ${interactive_comments+${(zZ+c+)buf}}; do
+  local proc_buf="$__buf" needle
+  for __arg in ${interactive_comments-${(z)__buf}} \
+             ${interactive_comments+${(zZ+c+)__buf}}; do
     # Initialize $next_word to its default value?
     (( in_redirection )) && (( --in_redirection ))
     (( in_redirection == 0 )) && next_word=2 # else Stall $next_word.
 
     #
     #   $already_added       (see next paragraph)
-    #   $style               how to highlight $arg
+    #   $__style               how to highlight $__arg
     #   $in_array_assignment boolean flag for "between '(' and ')' of array assignment"
     #   $highlight_glob      boolean flag for "'noglob' is in effect"
     #
     already_added=0
-    style=unknown-token
+    __style=unknown-token
     if (( this_word & 1 )); then
       in_array_assignment=0
-      [[ $arg == 'noglob' ]] && highlight_glob=0
+      [[ $__arg == 'noglob' ]] && highlight_glob=0
     fi
 
-    # Compute the new $start_pos and $end_pos, skipping over whitespace in $buf.
-    if [[ $arg == ';' ]] ; then
+    # Compute the new $_start_pos and $_end_pos, skipping over whitespace in $__buf.
+    if [[ $__arg == ';' ]] ; then
       [[ "${braces_stack[1]}" = 'T' ]] && braces_stack[1]=""
 
       # We're looking for either a semicolon or a newline, whichever comes
       # first.  Both of these are rendered as a ";" (SEPER) by the ${(z)..}
       # flag.
       #
-      # We can't use the (Z+n+) flag because that elides the end-of-command
+      # We can't use the (Z+n+) flag because that elides the __end-of-command
       # token altogether, so 'echo foo\necho bar' (two commands) becomes
       # indistinguishable from 'echo foo echo bar' (one command with three
       # words for arguments).
       needle=$'[;\n]'
       offset=$(( ${proc_buf[(i)$needle]} - 1 ))
-      (( start_pos += offset ))
-      (( end_pos = start_pos + $#arg ))
+      (( _start_pos += offset ))
+      (( _end_pos = _start_pos + $#__arg ))
 
       # Do not run default code for case when there is a new line
       # It shouldn't be treated as ';', i.e. shouldn't be highlighted
-      # as unknown-token when appears after command-starting arg like "{"
+      # as unknown-token when appears after command-starting __arg like "{"
       if [[ "${proc_buf[offset+1]}" = $'\n' ]]; then
         (( in_array_assignment )) && (( this_word = 2 )) || { (( this_word = 1 )); highlight_glob=1; }
         in_redirection=0
-        proc_buf="${proc_buf[offset + $#arg + 1,len]}"
-        start_pos=$end_pos
+        proc_buf="${proc_buf[offset + $#__arg + 1,__len]}"
+        _start_pos=$_end_pos
         continue
       else
         # One more short path – for ';' command separator
         (( in_array_assignment )) && (( this_word = 2 )) || { (( this_word = 1 )); highlight_glob=1; }
         in_redirection=0
-        [[ "${FAST_HIGHLIGHT_STYLES[commandseparator]}" != "none" ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[commandseparator]}")
-        proc_buf="${proc_buf[offset + $#arg + 1,len]}"
-        start_pos=$end_pos
+        [[ "${FAST_HIGHLIGHT_STYLES[commandseparator]}" != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[commandseparator]}")
+        proc_buf="${proc_buf[offset + $#__arg + 1,__len]}"
+        _start_pos=$_end_pos
         continue
       fi
 
@@ -350,47 +350,47 @@ typeset -ga ZLAST_COMMANDS
           # The first, outer parenthesis
           offset="${mend[1]}"
       fi
-      ((start_pos+=offset))
-      ((end_pos=start_pos+${#arg}))
+      ((_start_pos+=offset))
+      ((_end_pos=_start_pos+${#__arg}))
 
       # No-hit will result in value 0
-      arg_type=${__FAST_HIGHLIGHT_TOKEN_TYPES[$arg]}
+      arg_type=${__FAST_HIGHLIGHT_TOKEN_TYPES[$__arg]}
     fi
 
-    (( this_word & 1 )) && ZLAST_COMMANDS+=( "$arg" );
+    (( this_word & 1 )) && ZLAST_COMMANDS+=( "$__arg" );
 
-    proc_buf="${proc_buf[offset + $#arg + 1,len]}"
+    proc_buf="${proc_buf[offset + $#__arg + 1,__len]}"
 
     # Handle the INTERACTIVE_COMMENTS option.
     #
-    # We use the (Z+c+) flag so the entire comment is presented as one token in $arg.
-    if [[ -n ${interactive_comments+'set'} && $arg[1] == $histchars[3] ]]; then
+    # We use the (Z+c+) flag so the entire comment is presented as one token in $__arg.
+    if [[ -n ${interactive_comments+'set'} && $__arg[1] == $histchars[3] ]]; then
       if (( this_word & 3 )); then
-        style=comment
+        __style=comment
       else
-        style=unknown-token # prematurely terminated
+        __style=unknown-token # prematurely terminated
       fi
       # ADD
-      (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[$style]}")
-      start_pos=$end_pos
+      (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
+      _start_pos=$_end_pos
       continue
     fi
 
     # Analyse the current word.
-    if [[ $arg == (<0-9>|)(\<|\>)* ]] && [[ $arg != (\<|\>)$'\x28'* ]]; then
+    if [[ $__arg == (<0-9>|)(\<|\>)* ]] && [[ $__arg != (\<|\>)$'\x28'* ]]; then
       # A '<' or '>', possibly followed by a digit
       in_redirection=2
     fi
 
     # Special-case the first word after 'sudo'.
     if (( ! in_redirection )); then
-      if (( this_word & 4 )) && [[ $arg != -* ]]; then
+      if (( this_word & 4 )) && [[ $__arg != -* ]]; then
         (( this_word = this_word ^ 4 ))
       fi
 
       # Parse the sudo command line
       if (( this_word & 4 )); then
-        case "$arg" in
+        case "$__arg" in
           # Flag that requires an argument
           '-'[Cgprtu])
                        (( this_word & 1 )) && (( this_word = this_word ^ 1 ))
@@ -413,16 +413,16 @@ typeset -ga ZLAST_COMMANDS
    expanded_path=""
 
    # The Great Fork: is this a command word?  Is this a non-command word?
-   if (( this_word & 16 )) && [[ $arg == 'always' ]]; then
+   if (( this_word & 16 )) && [[ $__arg == 'always' ]]; then
      # try-always construct
-     style=reserved-word # de facto a reserved word, although not de jure
+     __style=reserved-word # de facto a reserved word, although not de jure
      (( next_word = 1 ))
    elif (( this_word & 1 )) && (( in_redirection == 0 )) || [[ "${braces_stack[1]}" = 'T' ]]; then
-     cur_cmd="$arg"
+     cur_cmd="$__arg"
      if (( arg_type == 1 )); then
-      style=precommand
-     elif [[ "$arg" = "sudo" ]]; then
-      style=precommand
+      __style=precommand
+     elif [[ "$__arg" = "sudo" ]]; then
+      __style=precommand
       (( next_word & 2 )) && (( next_word = next_word ^ 2 ))
       (( next_word = next_word | 4 ))
       (( next_word = next_word | 1 ))
@@ -433,33 +433,33 @@ typeset -ga ZLAST_COMMANDS
        # word, the parameter expansion will be highlighted as a reserved word --- but that
        # incorrectness is outweighed by the usability improvement of permitting the use of
        # parameters that refer to commands, functions, and builtins.
-       if [[ ${arg[1]} == \$ ]] && (( ${+parameters} )) && [[ ${arg:1} = (#m)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##) ]] && (( ${+parameters[${MATCH}]} )); then
+       if [[ ${__arg[1]} == \$ ]] && (( ${+parameters} )) && [[ ${__arg:1} = (#m)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##) ]] && (( ${+parameters[${MATCH}]} )); then
          -fast-highlight-main-type ${(P)MATCH}
        elif [[ "${braces_stack[1]}" = 'T' ]]; then
          REPLY=none
        else
-         : ${expanded_path::=${(Q)~arg}}
+         : ${expanded_path::=${(Q)~__arg}}
          -fast-highlight-main-type $expanded_path
        fi
 
       case $REPLY in
         reserved)       # reserved word
-                        [[ "$arg" = "[[" ]] && style=builtin || style=reserved-word
-                        if [[ $arg == $'\x7b' ]]; then # {
+                        [[ "$__arg" = "[[" ]] && __style=builtin || __style=reserved-word
+                        if [[ $__arg == $'\x7b' ]]; then # {
                           braces_stack='Y'"$braces_stack"
-                        elif [[ $arg == $'\x7d' && $braces_stack[1] == "Y" ]]; then # }
+                        elif [[ $__arg == $'\x7d' && $braces_stack[1] == "Y" ]]; then # }
                           # We're at command word, so no need to check right_brace_is_recognised_everywhere
                           braces_stack[1]=""
-                          style=reserved-word
+                          __style=reserved-word
                           (( next_word = next_word | 16 ))
-                        elif [[ $arg == "[[" ]]; then
+                        elif [[ $__arg == "[[" ]]; then
                           braces_stack='A'"$braces_stack"
                         fi
                         ;;
-        'suffix alias') style=suffix-alias;;
+        'suffix alias') __style=suffix-alias;;
         alias)
                           insane_alias=0
-                          case $arg in 
+                          case $__arg in
                             # Issue #263: aliases with '=' on their LHS.
                             #
                             # There are three cases:
@@ -472,65 +472,65 @@ typeset -ga ZLAST_COMMANDS
                             (*) :;;
                           esac
                           if (( insane_alias )); then
-                            style=unknown-token
+                            __style=unknown-token
                           else
-                            style=alias
-                            zmodload -e zsh/parameter && alias_target=${aliases[$arg]} || alias_target="${"$(alias -- $arg)"#*=}"
-                            [[ ${__FAST_HIGHLIGHT_TOKEN_TYPES[$alias_target]} = "1" && "$arg_type" != "1" ]] && __FAST_HIGHLIGHT_TOKEN_TYPES[$arg]="1"
+                            __style=alias
+                            zmodload -e zsh/parameter && alias_target=${aliases[$__arg]} || alias_target="${"$(alias -- $__arg)"#*=}"
+                            [[ ${__FAST_HIGHLIGHT_TOKEN_TYPES[$alias_target]} = "1" && "$arg_type" != "1" ]] && __FAST_HIGHLIGHT_TOKEN_TYPES[$__arg]="1"
                           fi
                         ;;
-        builtin)        style=builtin
+        builtin)        __style=builtin
                         # T - typeset, etc. mode
-                        [[ "$arg" = (typeset|declare|local|float|integer|export|readonly) ]] && braces_stack='T'"$braces_stack"
+                        [[ "$__arg" = (typeset|declare|local|float|integer|export|readonly) ]] && braces_stack='T'"$braces_stack"
                         ;;
-        function)       style=function;;
-        command)        style=command;;
-        hashed)         style=hashed-command;;
-        dirpath)        style=path;;
+        function)       __style=function;;
+        command)        __style=command;;
+        hashed)         __style=hashed-command;;
+        dirpath)        __style=path;;
         none)           # Assign?
-                        if [[ $arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[+])=* || $arg == [0-9]##(|[+])=* || "${braces_stack[1]}" = 'T' ]]; then
-                          style=assign
-                          [[ "$arg" = *[=]* ]] && FAST_ASSIGNS_SEEN[${arg%%=*}]=1
+                        if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || "${braces_stack[1]}" = 'T' ]]; then
+                          __style=assign
+                          [[ "$__arg" = *[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
                           # Handle array assignment
-                          integer itmp=${arg[(i)=\(]}-1+1 iitmp=${arg[(i)\)]}-1 asize=${#arg}
+                          integer itmp=${__arg[(i)=\(]}-1+1 iitmp=${__arg[(i)\)]}-1 asize=${#__arg}
                           (( itmp <= asize - 1 )) && {
-                              (( start=start_pos-${#PREBUFFER}+itmp, end=start+1, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
-                              (( iitmp <= asize - 1 )) && (( start=start_pos-${#PREBUFFER}+iitmp, end=start+1, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
+                              (( __start=_start_pos-${#PREBUFFER}+itmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
+                              (( iitmp <= asize - 1 )) && (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
                               in_array_assignment=1
                           } || { [[ "${braces_stack[1]}" != 'T' ]] && (( next_word = next_word | 1 )); }
 
                           # Handle no-string highlight, string "/' highlight, math mode highlight
                           local ctmp="\"" dtmp="'"
-                          itmp=${arg[(i)$ctmp]}-1 iitmp=${arg[(i)$dtmp]}-1
-                          integer jtmp=${arg[(b:itmp+2:i)$ctmp]} jjtmp=${arg[(b:iitmp+2:i)$dtmp]}
+                          itmp=${__arg[(i)$ctmp]}-1 iitmp=${__arg[(i)$dtmp]}-1
+                          integer jtmp=${__arg[(b:itmp+2:i)$ctmp]} jjtmp=${__arg[(b:iitmp+2:i)$dtmp]}
                           (( itmp < iitmp && itmp <= asize - 1 )) && (( jtmp > asize && (jtmp = asize), 1 > 0 )) && \
-                              (( start=start_pos-${#PREBUFFER}+itmp, end=start_pos-${#PREBUFFER}+jtmp, start >= 0 )) && \
-                                  reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}") && \
-                                      { itmp="${arg[(i)=]}"; arg="${arg[itmp,asize]}"; (( start_pos += itmp - 1 ));
-                                        -fast-highlight-string; (( start_pos = start_pos - itmp + 1, 1 > 0 )); } || \
+                              (( __start=_start_pos-${#PREBUFFER}+itmp, __end=_start_pos-${#PREBUFFER}+jtmp, __start >= 0 )) && \
+                                  reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}") && \
+                                      { itmp="${__arg[(i)=]}"; __arg="${__arg[itmp,asize]}"; (( _start_pos += itmp - 1 ));
+                                        -fast-highlight-string; (( _start_pos = _start_pos - itmp + 1, 1 > 0 )); } || \
                           {
                               (( iitmp <= asize - 1 )) && (( jjtmp > asize && (jjtmp = asize), 1 > 0 )) && \
-                                  (( start=start_pos-${#PREBUFFER}+iitmp, end=start_pos-${#PREBUFFER}+jjtmp, start >= 0 )) && \
-                                      reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[single-quoted-argument]}")
+                                  (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=_start_pos-${#PREBUFFER}+jjtmp, __start >= 0 )) && \
+                                      reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[single-quoted-argument]}")
                           } || \
                             {
-                                itmp="${arg[(i)=]}"; arg="${arg[itmp,asize]}"; (( start_pos += itmp - 1 ));
-                                [[ "${arg[2,4]}" = '$((' ]] && { -fast-highlight-math-string;
-                                   (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( start + 2 )) $(( start + 4 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
-                                   (( jtmp = ${arg[(I)\)\)]}-1, jtmp > 0 )) && (( start=start_pos-${#PREBUFFER}+jtmp, end=start+2, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                                itmp="${__arg[(i)=]}"; __arg="${__arg[itmp,asize]}"; (( _start_pos += itmp - 1 ));
+                                [[ "${__arg[2,4]}" = '$((' ]] && { -fast-highlight-math-string;
+                                   (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __start + 2 )) $(( __start + 4 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                                   (( jtmp = ${__arg[(I)\)\)]}-1, jtmp > 0 )) && (( __start=_start_pos-${#PREBUFFER}+jtmp, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                                 } || -fast-highlight-string;
-                                (( start_pos = start_pos - itmp + 1, 1 > 0 ))
+                                (( _start_pos = _start_pos - itmp + 1, 1 > 0 ))
                             }
-                        elif [[ $arg[1] = $histchars[1] && -n "${arg[2]}" ]]; then
-                          style=history-expansion
-                        elif [[ $arg[1] == $histchars[2] ]]; then
-                          style=history-expansion
+                        elif [[ $__arg[1] = $histchars[1] && -n "${__arg[2]}" ]]; then
+                          __style=history-expansion
+                        elif [[ $__arg[1] == $histchars[2] ]]; then
+                          __style=history-expansion
                         elif (( arg_type == 3 )); then
                           # This highlights empty commands (semicolon follows nothing) as an error.
                           # Zsh accepts them, though.
-                          (( this_word & 2 )) && style=commandseparator
-                        elif [[ $arg[1,2] == '((' ]]; then
+                          (( this_word & 2 )) && __style=commandseparator
+                        elif [[ $__arg[1,2] == '((' ]]; then
                           # Arithmetic evaluation.
                           #
                           # Note: prior to zsh-5.1.1-52-g4bed2cf (workers/36669), the ${(z)...}
@@ -542,92 +542,92 @@ typeset -ga ZLAST_COMMANDS
                           # is how [[ ... ]] is highlighted, too.
 
                           # ADD
-                          (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $(( start + 2 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                          (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $(( __start + 2 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                           already_added=1
                           -fast-highlight-math-string
                           # ADD
-                          [[ $arg[-2,-1] == '))' ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 2 )) $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
-                        elif [[ $arg == '()' ]]; then
+                          [[ $__arg[-2,-1] == '))' ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __end - 2 )) $__end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                        elif [[ $__arg == '()' ]]; then
                           # anonymous function
-                          style=reserved-word
-                        elif [[ $arg == $'\x28' ]]; then
+                          __style=reserved-word
+                        elif [[ $__arg == $'\x28' ]]; then
                           # subshell
-                          style=reserved-word
+                          __style=reserved-word
                           braces_stack='R'"$braces_stack"
-                        elif [[ $arg == $'\x29' ]]; then
-                          [[ $braces_stack[1] == "R" ]] && { braces_stack[1]=""; style=reserved-word; }
+                        elif [[ $__arg == $'\x29' ]]; then
+                          [[ $braces_stack[1] == "R" ]] && { braces_stack[1]=""; __style=reserved-word; }
                         elif (( this_word & 14 )); then
-                          style=default
+                          __style=default
                         fi
                         ;;
         *)
                         # ADD
-                        # (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end commandtypefromthefuture-$REPLY")
+                        # (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end commandtypefromthefuture-$REPLY")
                         already_added=1
                         ;;
       esac
      fi
    # in_redirection || BIT_regular || BIT_sudo_opt || BIT_sudo_arg
    elif (( in_redirection + this_word & 14 ))
-   then # $arg is a non-command word
-      case $arg in
+   then # $__arg is a non-command word
+      case $__arg in
         ']]')
-                 style=builtin
+                 __style=builtin
                  [[ $braces_stack[1] == "A" ]] && braces_stack[1]=""
                  ;;
         ']')
-                 style=builtin
+                 __style=builtin
                  ;;
         $'\x28')
                  # '(' inside [[
-                 style=reserved-word
+                 __style=reserved-word
                  braces_stack='R'"$braces_stack"
                  ;;
-        $'\x29') # ')' - subshell or end of array assignment
+        $'\x29') # ')' - subshell or __end of array assignment
                  if (( in_array_assignment )); then
-                   style=assign
+                   __style=assign
                    in_array_assignment=0
                    (( next_word = next_word | 1 ))
-                   (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
+                   (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
                  elif [[ $braces_stack[1] == "R" ]]; then
                    braces_stack[1]=""
-                   style=reserved-word
+                   __style=reserved-word
                  fi;;
         $'\x28\x29') # '()' - possibly a function definition
                  # || false # TODO: or if the previous word was a command word
                  (( FAST_HIGHLIGHT[multi_func_def] )) && (( next_word = next_word | 1 ))
-                 style=reserved-word
-                 # Remove possible annoying unknown-token style, or misleading function style
+                 __style=reserved-word
+                 # Remove possible annoying unknown-token __style, or misleading function __style
                  reply[-1]=()
                  ;;
-        '--'*)   style=double-hyphen-option;;
-        '-'*)    style=single-hyphen-option;;
-        "'"*)    style=single-quoted-argument;;
+        '--'*)   __style=double-hyphen-option;;
+        '-'*)    __style=single-hyphen-option;;
+        "'"*)    __style=single-quoted-argument;;
         '"'*)
-                 (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
+                 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
                  -fast-highlight-string
                  already_added=1
                  ;;
         [^\"\\]##([\\][\\])#\"*)
                  # ADD
                  local ctmp="\""
-                 integer itmp=${arg[(i)$ctmp]}-1
-                 integer jtmp=${arg[(b:itmp+2:i)$ctmp]}
-                 (( start=start_pos-${#PREBUFFER}+itmp, end=start_pos-${#PREBUFFER}+jtmp, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
+                 integer itmp=${__arg[(i)$ctmp]}-1
+                 integer jtmp=${__arg[(b:itmp+2:i)$ctmp]}
+                 (( __start=_start_pos-${#PREBUFFER}+itmp, __end=_start_pos-${#PREBUFFER}+jtmp, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
                  -fast-highlight-string
                  already_added=1
                  ;;
         [^\'\\]##([\\][\\])#\'*)
                  # ADD
                  local ctmp="'"
-                 integer itmp=${arg[(i)$ctmp]}-1
-                 integer jtmp=${arg[(b:itmp+2:i)$ctmp]}
-                 (( start=start_pos-${#PREBUFFER}+itmp, end=start_pos-${#PREBUFFER}+jtmp, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
+                 integer itmp=${__arg[(i)$ctmp]}-1
+                 integer jtmp=${__arg[(b:itmp+2:i)$ctmp]}
+                 (( __start=_start_pos-${#PREBUFFER}+itmp, __end=_start_pos-${#PREBUFFER}+jtmp, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
                  already_added=1
                  ;;
         \$\'*)
                  # ADD
-                 (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[dollar-quoted-argument]}")
+                 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[dollar-quoted-argument]}")
                  -fast-highlight-dollar-string
                  already_added=1
                  ;;
@@ -635,45 +635,45 @@ typeset -ga ZLAST_COMMANDS
                  already_added=1
                  -fast-highlight-math-string
                  # ADD
-                 (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( start + 1 )) $(( start + 3 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __start + 1 )) $(( __start + 3 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                  # ADD
-                 [[ $arg[-2,-1] == '))' ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( end - 2 )) $end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
+                 [[ $__arg[-2,-1] == '))' ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __end - 2 )) $__end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                  ;;
         \$*)
-                 style=variable
+                 __style=variable
                  ;;
-        '`'*)    style=back-quoted-argument;;
+        '`'*)    __style=back-quoted-argument;;
         [*?]*|*[^\\][*?]*)
-                 (( highlight_glob )) && style=globbing || style=default;;
-        *)       if [[ $arg = $'\x7d' && $braces_stack[1] == "Y" && "$FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]" = "1" ]]; then
+                 (( highlight_glob )) && __style=globbing || __style=default;;
+        *)       if [[ $__arg = $'\x7d' && $braces_stack[1] == "Y" && "$FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]" = "1" ]]; then
                    # right brace
                    # Parsing rule: # {
                    #
                    #     Additionally, `tt(})' is recognized in any position if neither the
                    #     tt(IGNORE_BRACES) option nor the tt(IGNORE_CLOSE_BRACES) option is set."""
                    braces_stack[1]=""
-                   style=reserved-word
+                   __style=reserved-word
                    (( next_word = next_word | 16 ))
-                 elif [[ $arg[1] = $histchars[1] && -n "${arg[2]}" ]]; then
-                   style=history-expansion
+                 elif [[ $__arg[1] = $histchars[1] && -n "${__arg[2]}" ]]; then
+                   __style=history-expansion
                  elif (( arg_type == 3 )); then
-                   style=commandseparator
+                   __style=commandseparator
                  elif (( in_redirection == 2 )); then
-                   style=redirection
+                   __style=redirection
                  else
                    if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]] && -fast-highlight-check-path; then
                      # ADD
-                     (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[path]}")
+                     (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[path]}")
                      already_added=1
 
                      [[ -n "$FAST_HIGHLIGHT_STYLES[path_pathseparator]" && "$FAST_HIGHLIGHT_STYLES[path]" != "$FAST_HIGHLIGHT_STYLES[path_pathseparator]" ]] && {
-                       for (( pos = start_pos; pos <= end_pos; pos++ )) ; do
+                       for (( __pos = _start_pos; __pos <= _end_pos; __pos++ )) ; do
                          # ADD
-                         [[ ${buf[pos]} == "/" ]] && (( start=pos-${#PREBUFFER}, start >= 0 )) && reply+=("$(( start - 1 )) $start ${FAST_HIGHLIGHT_STYLES[path_pathseparator]}")
+                         [[ ${__buf[__pos]} == "/" ]] && (( __start=__pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __start - 1 )) $__start ${FAST_HIGHLIGHT_STYLES[path_pathseparator]}")
                        done
                      }
                    else
-                     style=default
+                     __style=default
                    fi
                  fi
                  ;;
@@ -681,10 +681,10 @@ typeset -ga ZLAST_COMMANDS
     fi
 
     # ADD
-    (( already_added == 0 )) && [[ "${FAST_HIGHLIGHT_STYLES[$style]}" != "none" ]] && (( start=start_pos-${#PREBUFFER}, end=end_pos-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[$style]}")
+    (( already_added == 0 )) && [[ "${FAST_HIGHLIGHT_STYLES[$__style]}" != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
     if (( arg_type == 3 )); then
-      if [[ $arg == ';' ]] && (( in_array_assignment )); then
+      if [[ $__arg == ';' ]] && (( in_array_assignment )); then
         # literal newline inside an array assignment
         (( next_word = 2 ))
       elif [[ -n "${braces_stack[(r)A]}" ]]; then
@@ -695,7 +695,7 @@ typeset -ga ZLAST_COMMANDS
       fi
     elif (( arg_type == 1 || arg_type == 2 )) && (( this_word & 1 )); then
          (( next_word = 1 ))
-    elif [[ $arg == "repeat" ]] && (( this_word & 1 )); then
+    elif [[ $__arg == "repeat" ]] && (( this_word & 1 )); then
       # skip the repeat-count word
       in_redirection=2
       # The redirection mechanism assumes $this_word describes the word
@@ -707,7 +707,7 @@ typeset -ga ZLAST_COMMANDS
       # The repeat-count word will be handled like a redirection target.
       (( this_word = 3 ))
     fi
-    start_pos=$end_pos
+    _start_pos=$_end_pos
     # This is the default/common codepath.
     (( in_redirection == 0 )) && (( this_word = next_word )) #else # Stall $this_word.
   done
@@ -715,12 +715,12 @@ typeset -ga ZLAST_COMMANDS
   return 0
 }
 
-# Check if $arg is a path.
-# If yes, return 0 and in $REPLY the style to use.
+# Check if $__arg is a path.
+# If yes, return 0 and in $REPLY the __style to use.
 # Else, return non-zero (and the contents of $REPLY is undefined).
 -fast-highlight-check-path()
 {
-  : ${expanded_path:=${(Q)~arg}}
+  : ${expanded_path:=${(Q)~__arg}}
   [[ -n "${FAST_BLIST_PATTERNS[(k)$expanded_path]}" ]] && return 1
 
   [[ -z $expanded_path ]] && return 1
@@ -748,25 +748,25 @@ typeset -ga ZLAST_COMMANDS
 # backslash-something (not ['"$]) is occured.
 -fast-highlight-string()
 {
-  mybuf="$arg"
-  idx=start_pos
+  _mybuf="$__arg"
+  __idx=_start_pos
 
   #                                                                                                                                                                                                    7   8
-  while [[ "$mybuf" = (#b)[^\$\\]#((\$(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[\\][\'\"\$]|[\\](*))(*) ]]; do
+  while [[ "$_mybuf" = (#b)[^\$\\]#((\$(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[\\][\'\"\$]|[\\](*))(*) ]]; do
     [[ -n "${match[7]}" ]] && {
       # Skip following char – it is quoted. Choice is
       # made to not highlight such quoting
-      idx+=${mbegin[1]}+1
-      mybuf="${match[7]:1}"
+      __idx+=${mbegin[1]}+1
+      _mybuf="${match[7]:1}"
     } || {
-      idx+=${mbegin[1]}-1
-      end_idx=idx+${mend[1]}-${mbegin[1]}+1
-      mybuf="${match[8]}"
+      __idx+=${mbegin[1]}-1
+      _end_idx=__idx+${mend[1]}-${mbegin[1]}+1
+      _mybuf="${match[8]}"
 
       # ADD
-      (( start=idx-${#PREBUFFER}, end=end_idx-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]}")
+      (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]}")
 
-      idx=end_idx
+      __idx=_end_idx
     }
   done
   return 0
@@ -781,49 +781,48 @@ typeset -ga ZLAST_COMMANDS
 # - D matches words [a-zA-Z]## (variables)
 -fast-highlight-math-string()
 {
-  mybuf="$arg"
-  idx=start_pos
-  local stle
+  _mybuf="$__arg"
+  __idx=_start_pos
 
   #                                                                                                                                                                                                                       7
-  while [[ "$mybuf" = (#b)[^\$a-zA-Z0-9]#((\$(#B)(+|)(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](#B)(+|)(#b)(\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(*) ]]; do
-    idx+=${mbegin[1]}-1
-    end_idx=idx+${mend[1]}-${mbegin[1]}+1
-    mybuf="${match[7]}"
+  while [[ "$_mybuf" = (#b)[^\$a-zA-Z0-9]#((\$(#B)(+|)(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](#B)(+|)(#b)(\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(*) ]]; do
+    __idx+=${mbegin[1]}-1
+    _end_idx=__idx+${mend[1]}-${mbegin[1]}+1
+    _mybuf="${match[7]}"
 
-    [[ "${match[1][1]}" = [0-9] ]] && style=${FAST_HIGHLIGHT_STYLES[mathnum]} || { 
+    [[ "${match[1][1]}" = [0-9] ]] && __style=${FAST_HIGHLIGHT_STYLES[mathnum]} || {
       [[ "${match[1][1]}" = [a-zA-Z] ]] && {
-        [[ -n "${(P)match[1]}" || ${FAST_ASSIGNS_SEEN[${match[1]}]} = 1 ]] && style=${FAST_HIGHLIGHT_STYLES[mathvar]} || style=${FAST_HIGHLIGHT_STYLES[matherr]}
+        [[ -n "${(P)match[1]}" || ${FAST_ASSIGNS_SEEN[${match[1]}]} = 1 ]] && __style=${FAST_HIGHLIGHT_STYLES[mathvar]} || __style=${FAST_HIGHLIGHT_STYLES[matherr]}
       } || {
         [[ "${match[1][1]}" = "$" ]] && {
-          [[ "${match[1]}" = "$" || -n "${(P)${match[1]:1}}" ]] && style=${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]} || style=${FAST_HIGHLIGHT_STYLES[matherr]}
+          [[ "${match[1]}" = "$" || -n "${(P)${match[1]:1}}" ]] && __style=${FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]} || __style=${FAST_HIGHLIGHT_STYLES[matherr]}
         }
       }
     }
 
     # ADD
-    [[ "$style" != "none" ]] && (( start=idx-${#PREBUFFER}, end=end_idx-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end $style")
+    [[ "$__style" != "none" ]] && (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end $__style")
 
-    idx=end_idx
+    __idx=_end_idx
   done
 }
 
 # Highlight special chars inside dollar-quoted strings
 -fast-highlight-dollar-string()
 {
-  local i j k style
+  local i j k __style
   local AA
   integer c
-  # Starting dollar-quote is at 1:2, so start parsing at offset 3 in the string.
-  for (( i = 3 ; i < end_pos - start_pos ; i += 1 )) ; do
-    (( j = i + start_pos - 1 ))
+  # Starting dollar-quote is at 1:2, so __start parsing at offset 3 in the string.
+  for (( i = 3 ; i < _end_pos - _start_pos ; i += 1 )) ; do
+    (( j = i + _start_pos - 1 ))
     (( k = j + 1 ))
-    case "$arg[$i]" in
-      "\\") style=back-dollar-quoted-argument
-            for (( c = i + 1 ; c <= end_pos - start_pos ; c += 1 )); do
-              [[ "$arg[$c]" != ([0-9xXuUa-fA-F]) ]] && break
+    case "$__arg[$i]" in
+      "\\") __style=back-dollar-quoted-argument
+            for (( c = i + 1 ; c <= _end_pos - _start_pos ; c += 1 )); do
+              [[ "$__arg[$c]" != ([0-9xXuUa-fA-F]) ]] && break
             done
-            AA=$arg[$i+1,$c-1]
+            AA=$__arg[$i+1,$c-1]
             # Matching for HEX and OCT values like \0xA6, \xA6 or \012
             if [[    "$AA" =~ "^(x|X)[0-9a-fA-F]{1,2}"
                   || "$AA" =~ "^[0-7]{1,3}"
@@ -833,9 +832,9 @@ typeset -ga ZLAST_COMMANDS
               (( k += $#MATCH ))
               (( i += $#MATCH ))
             else
-              if (( $#arg > $i+1 )) && [[ $arg[$i+1] == [xXuU] ]]; then
+              if (( $#__arg > $i+1 )) && [[ $__arg[$i+1] == [xXuU] ]]; then
                 # \x not followed by hex digits is probably an error
-                style=unknown-token
+                __style=unknown-token
               fi
               (( k += 1 )) # Color following char too.
               (( i += 1 )) # Skip parsing the escaped char.
@@ -845,7 +844,7 @@ typeset -ga ZLAST_COMMANDS
 
     esac
     # ADD
-    (( start=j-${#PREBUFFER}, end=k-${#PREBUFFER}, start >= 0 )) && reply+=("$start $end ${FAST_HIGHLIGHT_STYLES[$style]}")
+    (( __start=j-${#PREBUFFER}, __end=k-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
   done
 }
 
