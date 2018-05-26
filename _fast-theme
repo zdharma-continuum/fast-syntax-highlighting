@@ -1,6 +1,14 @@
 #compdef fast-theme
 
-local arguments
+#
+# Copyright (c) 2018 Sebastian Gniazdowski
+#
+# Completion for theme-switching function, fast-theme,
+# part of zdharma/fast-syntax-highlighting.
+#
+
+integer ret=1
+local -a arguments
 
 arguments=(
   {-h,--help}'[display help text]'
@@ -10,4 +18,11 @@ arguments=(
   {-v,--verbose}'[more messages during operation]'
 )
 
-_arguments -s $arguments
+typeset -a themes
+themes=( "$FAST_BASE_DIR"/themes/*.ini(:t:r) )
+
+_wanted themes expl "Themes" \
+    compadd "$@" -a - themes && ret=0
+_arguments -s $arguments && ret=0
+
+return $ret
