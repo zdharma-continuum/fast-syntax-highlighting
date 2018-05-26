@@ -5,15 +5,18 @@
 
 zmodload zsh/zutil 2>/dev/null
 
-local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST
+setopt localoptions extendedglob
+
+local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST
 local -A opthash
-zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list || { echo "Improper options given, see help (-h/--help)"; return 1; }
+zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test || { echo "Improper options given, see help (-h/--help)"; return 1; }
 
 (( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
 (( ${+opthash[-v]} + ${+opthash[--verbose]} )) && OPT_VERBOSE="-v"
 (( ${+opthash[-q]} + ${+opthash[--quiet]} ))   && OPT_QUIET="-q"
-(( ${+opthash[-r]} + ${+opthash[--reset]} ))   && OPT_RESET="-n"
-(( ${+opthash[-l]} + ${+opthash[--list]} ))    && OPT_LIST="-n"
+(( ${+opthash[-r]} + ${+opthash[--reset]} ))   && OPT_RESET="-r"
+(( ${+opthash[-l]} + ${+opthash[--list]} ))    && OPT_LIST="-l"
+(( ${+opthash[-t]} + ${+opthash[--test]} ))    && OPT_TEST="-t"
 
 [[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/current_theme.zsh; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set)"; return 0; }
 
@@ -128,4 +131,23 @@ done
 
 [[ -z "$OPT_QUIET" ]] && print "Switched to theme \`$1' (current session, and future sessions)"
 
+[[ -n "$OPT_TEST" ]] && {
+    print -zr '
+# This is an example code that is diverse and allows to test a theme
+text="An example quite long string $with variable in it"
+local param1="text $variable" param2='"'"'other $variable'"'"'
+math=$(( 10 + HISTSIZ + HISTSIZE + $SAVEHIST )) size=$(( 0 ))
+
+for (( ii = 1; ii <= size; ++ ii )); do
+    if [[ "${cmds[ii]} string" = "| string" ]]
+    then
+        sidx=${buffer[(in:ii:)\$\(?#[^\\\\]\)]} # find opening $(
+        (( sidx <= len )) && {
+            eidx=${buffer[(b:sidx:ii)[^\\\\]\)]} # find closing )
+        }
+    fi
+done
+
+'
+}
 # vim:ft=zsh:et:sw=4:sts=4
