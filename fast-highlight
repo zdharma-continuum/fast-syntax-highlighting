@@ -496,8 +496,7 @@ typeset -ga ZLAST_COMMANDS
                           integer itmp=${__arg[(i)=\(]}-1+1 iitmp=${__arg[(i)\)]}-1 asize=${#__arg}
                           (( itmp <= asize - 1 )) && {
                               (( __start=_start_pos-${#PREBUFFER}+itmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
-                              (( iitmp <= asize - 1 )) && (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
-                              in_array_assignment=1
+                              (( iitmp <= asize - 1 )) && (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}") || in_array_assignment=1
                           } || { [[ "${braces_stack[1]}" != 'T' ]] && (( next_word = next_word | 1 )); }
 
                           # Handle no-string highlight, string "/' highlight, math mode highlight
