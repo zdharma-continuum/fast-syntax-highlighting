@@ -36,6 +36,7 @@ if [[ -e "$FAST_BASE_DIR"/current_theme.zsh ]]; then
   source "$FAST_BASE_DIR"/current_theme.zsh
 else
 # built-in theme
+zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[default]:=none}
 : ${FAST_HIGHLIGHT_STYLES[unknown-token]:=fg=red,bold}
 : ${FAST_HIGHLIGHT_STYLES[reserved-word]:=fg=yellow}
