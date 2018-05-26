@@ -268,9 +268,13 @@ ZSH_HIGHLIGHT_MAXLENGTH=10000
 # Load zsh/parameter module if available
 zmodload zsh/parameter 2>/dev/null
 
+local varble="${FAST_HIGHLIGHT_STYLES[variable]}"
+
 autoload -Uz is-at-least fast-theme fast-read-ini-file
 source "${ZERO:h}/fast-highlight"
 
-[[ "${+termcap[Co]}" = 1 && "${termcap[Co]}" = "256" ]] && FAST_HIGHLIGHT_STYLES[variable]="fg=112"
+[[ "${+termcap[Co]}" = 1 && "${termcap[Co]}" = "256" ]] && \
+    [[ "${FAST_HIGHLIGHT_STYLES[variable]}" = "none" && -z "$varble" ]] && \
+    FAST_HIGHLIGHT_STYLES[variable]="fg=113"
 
 -fast-highlight-fill-option-variables
