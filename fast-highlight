@@ -63,7 +63,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[assign]:=none}
 : ${FAST_HIGHLIGHT_STYLES[redirection]:=none}
 : ${FAST_HIGHLIGHT_STYLES[comment]:=fg=black,bold}
-: ${FAST_HIGHLIGHT_STYLES[variable]:=none}
+: ${FAST_HIGHLIGHT_STYLES[variable]:=fg=113}
 : ${FAST_HIGHLIGHT_STYLES[mathvar]:=fg=blue,bold}
 : ${FAST_HIGHLIGHT_STYLES[mathnum]:=fg=magenta}
 : ${FAST_HIGHLIGHT_STYLES[matherr]:=fg=red}
