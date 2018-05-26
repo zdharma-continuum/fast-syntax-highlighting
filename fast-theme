@@ -101,6 +101,10 @@ fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
 
 command rm -f "$FAST_BASE_DIR"/current_theme.zsh
 
+# Set a zstyle to carry theme name
+print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$1"'"' >>! "$FAST_BASE_DIR"/current_theme.zsh
+zstyle :plugin:fast-syntax-highlighting theme "$1"
+
 # Generate current_theme.zsh, traversing ini-file associative array
 local k kk
 local inikey inival result
