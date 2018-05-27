@@ -31,6 +31,12 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-05-27**
+
+Added support for 256-color themes. There are six themes shipped with FSH. The command to
+switch theme is `fast-theme {theme-name}`, it has a completion which lists available themes
+and options.
+
 **2018-05-25**
 
 Hash holding paths that shouldn't be grepped (globbed) – blacklist for slow disks, mounts, etc.:
