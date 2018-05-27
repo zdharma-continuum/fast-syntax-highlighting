@@ -27,7 +27,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 }
 
 [[ -n "$OPT_HELP" ]] && {
-    print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] <theme-name>"
+    print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] [-t/--test] <theme-name>"
     print -r -- "       fast-theme [-r/--reset] [-l/--list]"
     print -r -- ""
     print -r -- "Default action (after providing <theme-name>) is to switch current session"
@@ -35,6 +35,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
     print -r -- ""
     print -r -- "-r/--reset     - unset any theme, use default highlighting (requires restart)"
     print -r -- "-l/--list      - list names of available themes"
+    print -r -- "-t/--test      - show test block of code after switching theme"
     return 0
 }
 
