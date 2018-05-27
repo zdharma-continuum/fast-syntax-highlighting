@@ -423,7 +423,7 @@ typeset -ga ZLAST_COMMANDS
       __style=precommand
      elif [[ "$__arg" = "sudo" ]]; then
       __style=precommand
-      (( next_word & 2 )) && (( next_word = next_word ^ 2 ))
+      (( next_word = next_word & ~2 ))
       (( next_word = next_word | 4 ))
       (( next_word = next_word | 1 ))
      else
