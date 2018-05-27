@@ -35,7 +35,8 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 
 Added support for 256-color themes. There are six themes shipped with FSH. The command to
 switch theme is `fast-theme {theme-name}`, it has a completion which lists available themes
-and options.
+and options. Checkout [asciinema recording](https://asciinema.org/a/183814) that presents
+the themes.
 
 **2018-05-25**
 
