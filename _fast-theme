@@ -16,7 +16,7 @@ arguments=(
   {-r,--reset}'[unset any theme (revert to default highlighting)]'
   {-q,--quiet}'[no default messages]'
   {-v,--verbose}'[more messages during operation]'
-  {-t,--test}'[test theme after setting it]'
+  {-t,--test}'[test theme after setting it (show example code)]'
 )
 
 typeset -a themes
