@@ -393,12 +393,12 @@ typeset -ga ZLAST_COMMANDS
         case "$__arg" in
           # Flag that requires an argument
           '-'[Cgprtu])
-                       (( this_word & 1 )) && (( this_word = this_word ^ 1 ))
+                       (( this_word = this_word & ~1 ))
                        (( next_word = 8 ))
                        ;;
           # This prevents misbehavior with sudo -u -otherargument
           '-'*)
-                       (( this_word & 1 )) && (( this_word = this_word ^ 1 ))
+                       (( this_word = this_word & ~1 ))
                        (( next_word = next_word | 1 ))
                        (( next_word = next_word | 4 ))
                        ;;
