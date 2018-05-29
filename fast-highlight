@@ -650,9 +650,6 @@ typeset -ga ZLAST_COMMANDS
                  # ADD
                  [[ $__arg[-2,-1] == '))' ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __end - 2 )) $__end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                  ;;
-        \$*)
-                 __style=variable
-                 ;;
         '`'*)    __style=back-quoted-argument;;
         '((')    # 'F' - (( after for
                  (( this_word & 32 )) && braces_stack='F'"$braces_stack" && __style=builtin
@@ -697,6 +694,8 @@ typeset -ga ZLAST_COMMANDS
                    already_added=1
                  elif [[ "$__arg" = ([*?]*|*[^\\][*?]*) ]]; then
                    (( highlight_glob )) && __style=globbing || __style=default
+                 elif [[ "$__arg" = \$* ]]; then
+                   __style=variable
                  elif [[ $__arg = $'\x7d' && $braces_stack[1] == "Y" && "$FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]" = "1" ]]; then
                    # right brace
                    # Parsing rule: # {
