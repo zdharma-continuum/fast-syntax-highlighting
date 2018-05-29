@@ -77,6 +77,10 @@ map=(
     mathnum                     -
     matherr                     -
     assign-array-bracket        -
+    for-loop-variable           forvar
+    for-loop-number             fornum
+    for-loop-operator           foroper
+    for-loop-separator          forsep
 )
 
 # In which order to generate entries in current_theme.zsh
@@ -87,7 +91,8 @@ order=(
     single-hyphen-option double-hyphen-option back-quoted-argument single-quoted-argument 
     double-quoted-argument dollar-quoted-argument back-or-dollar-double-quoted-argument 
     back-dollar-quoted-argument assign redirection comment variable mathvar 
-    mathnum matherr assign-array-bracket 
+    mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
+    for-loop-separator
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
