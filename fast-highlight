@@ -68,6 +68,10 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[mathnum]:=fg=magenta}
 : ${FAST_HIGHLIGHT_STYLES[matherr]:=fg=red}
 : ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]:=fg=green}
+: ${FAST_HIGHLIGHT_STYLES[for-loop-variable]:=none}
+: ${FAST_HIGHLIGHT_STYLES[for-loop-operator]:=fg=yellow}
+: ${FAST_HIGHLIGHT_STYLES[for-loop-number]:=fg=magenta}
+: ${FAST_HIGHLIGHT_STYLES[for-loop-separator]:=fg=yellow,bold}
 fi
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
@@ -236,7 +240,8 @@ typeset -ga ZLAST_COMMANDS
   integer arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos
   local -a match mbegin mend
 
-  # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16
+  # This comment explains the numbers:
+  # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16 BIT_for=32
 
   # State machine
   #
@@ -454,6 +459,8 @@ typeset -ga ZLAST_COMMANDS
                           (( next_word = next_word | 16 ))
                         elif [[ $__arg == "[[" ]]; then
                           braces_stack='A'"$braces_stack"
+                        elif [[ $__arg == "for" ]]; then
+                          (( next_word = next_word | 32 )) # BIT_for
                         fi
                         ;;
         'suffix alias') __style=suffix-alias;;
@@ -591,6 +598,11 @@ typeset -ga ZLAST_COMMANDS
                  elif [[ $braces_stack[1] == "R" ]]; then
                    braces_stack[1]=""
                    __style=reserved-word
+                 # Zsh doesn't tokenize final ) if it's just single ')',
+                 # but logically what's below is correct, so it is kept
+                 # in case Zsh will be changed / fixed, etc.
+                 elif [[ "${braces_stack[1]}" = "F" ]]; then
+                   __style=builtin
                  fi;;
         $'\x28\x29') # '()' - possibly a function definition
                  # || false # TODO: or if the previous word was a command word
@@ -642,9 +654,50 @@ typeset -ga ZLAST_COMMANDS
                  __style=variable
                  ;;
         '`'*)    __style=back-quoted-argument;;
-        [*?]*|*[^\\][*?]*)
-                 (( highlight_glob )) && __style=globbing || __style=default;;
-        *)       if [[ $__arg = $'\x7d' && $braces_stack[1] == "Y" && "$FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]" = "1" ]]; then
+        '((')    # 'F' - (( after for
+                 (( this_word & 32 )) && braces_stack='F'"$braces_stack" && __style=builtin
+                 ;;
+        '))')    # 'F' - (( after for
+                 [[ "${braces_stack[1]}" = "F" ]] && braces_stack[1]="" && __style=builtin
+                 ;;
+        *)       if [[ "${braces_stack[1]}" = "F" ]]; then
+                   -fast-highlight-string
+                   _mybuf="$__arg"
+                   __idx=_start_pos
+                   while [[ "$_mybuf" = (#b)[^a-zA-Z\{\$]#([a-zA-Z][a-zA-Z0-9]#)(*) ]]; do
+                     (( __start=__idx-${#PREBUFFER}+${mbegin[1]}-1, __end=__idx-${#PREBUFFER}+${mend[1]}+1-1, __start >= 0 )) && \
+                       reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[for-loop-variable]}")
+                     __idx+=${mend[1]}
+                     _mybuf="${match[2]}"
+                   done
+
+                   _mybuf="$__arg"
+                   __idx=_start_pos
+                   while [[ "$_mybuf" = (#b)[^+\<\>=:\*\|\&\^\~-]#([+\<\>=:\*\|\&\^\~-]##)(*) ]]; do
+                     (( __start=__idx-${#PREBUFFER}+${mbegin[1]}-1, __end=__idx-${#PREBUFFER}+${mend[1]}+1-1, __start >= 0 )) && \
+                       reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[for-loop-operator]}")
+                     __idx+=${mend[1]}
+                     _mybuf="${match[2]}"
+                   done
+
+                   _mybuf="$__arg"
+                   __idx=_start_pos
+                   while [[ "$_mybuf" = (#b)[^0-9]#([0-9]##)(*) ]]; do
+                     (( __start=__idx-${#PREBUFFER}+${mbegin[1]}-1, __end=__idx-${#PREBUFFER}+${mend[1]}+1-1, __start >= 0 )) && \
+                       reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[for-loop-number]}")
+                     __idx+=${mend[1]}
+                     _mybuf="${match[2]}"
+                   done
+
+                   if [[ "$__arg" = (#b)[^\;]#(\;)[\ ]# ]]; then
+                     (( __start=_start_pos-${#PREBUFFER}+${mbegin[1]}-1, __end=_start_pos-${#PREBUFFER}+${mend[1]}+1-1, __start >= 0 )) && \
+                       reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[for-loop-separator]}")
+                   fi
+
+                   already_added=1
+                 elif [[ "$__arg" = ([*?]*|*[^\\][*?]*) ]]; then
+                   (( highlight_glob )) && __style=globbing || __style=default
+                 elif [[ $__arg = $'\x7d' && $braces_stack[1] == "Y" && "$FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]" = "1" ]]; then
                    # right brace
                    # Parsing rule: # {
                    #
