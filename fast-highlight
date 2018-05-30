@@ -241,7 +241,9 @@ typeset -ga ZLAST_COMMANDS
   local -a match mbegin mend
 
   # This comment explains the numbers:
-  # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16 BIT_for=32
+  # BIT_for - word after reserved-word-recognized `for'
+  # BIT_afpcmd - word after a precommand that can take options, like `command' and `exec'
+  # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16 BIT_for=32 BIT_afpcmd=64
 
   # State machine
   #
@@ -412,6 +414,9 @@ typeset -ga ZLAST_COMMANDS
       elif (( this_word & 8 )); then
         (( next_word = next_word | 4 ))
         (( next_word = next_word | 1 ))
+      elif (( this_word & 64 )); then
+        [[ "$__arg" = -* && "$__arg" = [pvV-]## && "$cur_cmd" = "command" ]] && (( this_word = (this_word & ~1) | 2, next_word = next_word | 1 ))
+        [[ "$__arg" = -* && "$__arg" = [cla-]## && "$cur_cmd" = "exec" ]] && (( this_word = (this_word & ~1) | 2, next_word = next_word | 1 ))
       fi
    fi
 
@@ -426,6 +431,7 @@ typeset -ga ZLAST_COMMANDS
      cur_cmd="$__arg"
      if (( arg_type == 1 )); then
       __style=precommand
+      [[ "$__arg" = "command" || "$__arg" = "exec" ]] && (( next_word = next_word | 64 ))
      elif [[ "$__arg" = "sudo" ]]; then
       __style=precommand
       (( next_word = next_word & ~2 ))
@@ -747,7 +753,7 @@ typeset -ga ZLAST_COMMANDS
         highlight_glob=1
       fi
     elif (( (arg_type & 3) * (this_word & 1) )); then # (( arg_type == 1 || arg_type == 2 )) && (( this_word & 1 ))
-         (( next_word = 1 ))
+        (( next_word = 1 | (next_word & 64) ))
     elif [[ $__arg == "repeat" ]] && (( this_word & 1 )); then
       # skip the repeat-count word
       in_redirection=2
