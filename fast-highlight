@@ -233,7 +233,7 @@ typeset -ga ZLAST_COMMANDS
   # in_array_assignment true between 'a=(' and the matching ')'
   # braces_stack: "R" for round, "Q" for square, "Y" for curly
   # _mybuf, cdpath_dir are used in sub-functions
-  local _start_pos=0 _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$PREBUFFER$BUFFER" _mybuf cdpath_dir cur_cmd alias_target
+  local _start_pos=0 _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$PREBUFFER$BUFFER" _mybuf cdpath_dir cur_cmd alias_target _was_double_hyphen=0
   # arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
@@ -613,8 +613,8 @@ typeset -ga ZLAST_COMMANDS
                  # Remove possible annoying unknown-token __style, or misleading function __style
                  reply[-1]=()
                  ;;
-        '--'*)   __style=double-hyphen-option;;
-        '-'*)    __style=single-hyphen-option;;
+        '--'*)   [[ "$__arg" == "--" ]] && { _was_double_hyphen=1; __style=double-hyphen-option; } || { (( !_was_double_hyphen )) && __style=double-hyphen-option || __style=default; };;
+        '-'*)    (( !_was_double_hyphen )) && __style=single-hyphen-option || __style=default;;
         "'"*)    __style=single-quoted-argument;;
         '"'*)
                  (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}")
