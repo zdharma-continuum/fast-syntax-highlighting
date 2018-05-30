@@ -31,6 +31,12 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-05-30**
+
+For-loop is highlighted, it has separate settings in [theme file](https://github.com/zdharma/fast-syntax-highlighting/blob/master/themes/free.ini).
+
+![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/for-loop.png)
+
 **2018-05-27**
 
 Added support for 256-color themes. There are six themes shipped with FSH. The command to
