@@ -438,8 +438,10 @@ typeset -ga ZLAST_COMMANDS
        # word, the parameter expansion will be highlighted as a reserved word --- but that
        # incorrectness is outweighed by the usability improvement of permitting the use of
        # parameters that refer to commands, functions, and builtins.
-       if [[ ${__arg[1]} == \$ ]] && (( ${+parameters} )) && [[ ${__arg:1} = (#m)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##) ]] && (( ${+parameters[${MATCH}]} )); then
-         -fast-highlight-main-type ${(P)MATCH}
+       if [[ ${__arg[1]} == \$ ]] && (( ${+parameters} )) && \
+         [[ ${__arg:1} = (#b)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##) || ${__arg:1} = (#b)\{([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)\} ]] && \
+         (( ${+parameters[${match[1]}]} )); then
+         -fast-highlight-main-type ${(P)match[1]}
        elif [[ "${braces_stack[1]}" = 'T' ]]; then
          REPLY=none
        else
