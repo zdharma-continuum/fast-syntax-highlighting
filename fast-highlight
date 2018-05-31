@@ -237,7 +237,7 @@ typeset -ga ZLAST_COMMANDS
   # arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
-  integer arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos
+  integer arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize
   local -a match mbegin mend
 
   # This comment explains the numbers:
@@ -314,6 +314,8 @@ typeset -ga ZLAST_COMMANDS
       [[ $__arg == 'noglob' ]] && highlight_glob=0
     fi
 
+    __asize=${#__arg}
+
     # Compute the new $_start_pos and $_end_pos, skipping over whitespace in $__buf.
     if [[ $__arg == ';' ]] ; then
       [[ "${braces_stack[1]}" = 'T' ]] && braces_stack[1]=""
@@ -329,7 +331,7 @@ typeset -ga ZLAST_COMMANDS
       needle=$'[;\n]'
       offset=$(( ${proc_buf[(i)$needle]} - 1 ))
       (( _start_pos += offset ))
-      (( _end_pos = _start_pos + $#__arg ))
+      (( _end_pos = _start_pos + __asize ))
 
       # Do not run default code for case when there is a new line
       # It shouldn't be treated as ';', i.e. shouldn't be highlighted
@@ -337,7 +339,7 @@ typeset -ga ZLAST_COMMANDS
       if [[ "${proc_buf[offset+1]}" = $'\n' ]]; then
         (( in_array_assignment )) && (( this_word = 2 )) || { (( this_word = 1 )); highlight_glob=1; }
         in_redirection=0
-        proc_buf="${proc_buf[offset + $#__arg + 1,__len]}"
+        proc_buf="${proc_buf[offset + __asize + 1,__len]}"
         _start_pos=$_end_pos
         continue
       else
@@ -345,7 +347,7 @@ typeset -ga ZLAST_COMMANDS
         (( in_array_assignment )) && (( this_word = 2 )) || { (( this_word = 1 )); highlight_glob=1; }
         in_redirection=0
         [[ "${FAST_HIGHLIGHT_STYLES[commandseparator]}" != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[commandseparator]}")
-        proc_buf="${proc_buf[offset + $#__arg + 1,__len]}"
+        proc_buf="${proc_buf[offset + __asize + 1,__len]}"
         _start_pos=$_end_pos
         continue
       fi
@@ -358,7 +360,7 @@ typeset -ga ZLAST_COMMANDS
           offset="${mend[1]}"
       fi
       ((_start_pos+=offset))
-      ((_end_pos=_start_pos+${#__arg}))
+      ((_end_pos=_start_pos+__asize))
 
       # No-hit will result in value 0
       arg_type=${__FAST_HIGHLIGHT_TOKEN_TYPES[$__arg]}
@@ -366,7 +368,7 @@ typeset -ga ZLAST_COMMANDS
 
     (( this_word & 1 )) && ZLAST_COMMANDS+=( "$__arg" );
 
-    proc_buf="${proc_buf[offset + $#__arg + 1,__len]}"
+    proc_buf="${proc_buf[offset + __asize + 1,__len]}"
 
     # Handle the INTERACTIVE_COMMENTS option.
     #
@@ -509,28 +511,28 @@ typeset -ga ZLAST_COMMANDS
                           [[ "$__arg" = *[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
                           # Handle array assignment
-                          integer itmp=${__arg[(i)=\(]}-1+1 iitmp=${__arg[(i)\)]}-1 asize=${#__arg}
-                          (( itmp <= asize - 1 )) && {
+                          integer itmp=${__arg[(i)=\(]}-1+1 iitmp=${__arg[(i)\)]}-1
+                          (( itmp <= __asize - 1 )) && {
                               (( __start=_start_pos-${#PREBUFFER}+itmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}")
-                              (( iitmp <= asize - 1 )) && (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}") || in_array_assignment=1
+                              (( iitmp <= __asize - 1 )) && (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[assign-array-bracket]}") || in_array_assignment=1
                           } || { [[ "${braces_stack[1]}" != 'T' ]] && (( next_word = next_word | 1 )); }
 
                           # Handle no-string highlight, string "/' highlight, math mode highlight
                           local ctmp="\"" dtmp="'"
                           itmp=${__arg[(i)$ctmp]}-1 iitmp=${__arg[(i)$dtmp]}-1
                           integer jtmp=${__arg[(b:itmp+2:i)$ctmp]} jjtmp=${__arg[(b:iitmp+2:i)$dtmp]}
-                          (( itmp < iitmp && itmp <= asize - 1 )) && (( jtmp > asize && (jtmp = asize), 1 > 0 )) && \
+                          (( itmp < iitmp && itmp <= __asize - 1 )) && (( jtmp > __asize && (jtmp = __asize), 1 > 0 )) && \
                               (( __start=_start_pos-${#PREBUFFER}+itmp, __end=_start_pos-${#PREBUFFER}+jtmp, __start >= 0 )) && \
                                   reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[double-quoted-argument]}") && \
-                                      { itmp="${__arg[(i)=]}"; __arg="${__arg[itmp,asize]}"; (( _start_pos += itmp - 1 ));
+                                      { itmp="${__arg[(i)=]}"; __arg="${__arg[itmp,__asize]}"; (( _start_pos += itmp - 1 ));
                                         -fast-highlight-string; (( _start_pos = _start_pos - itmp + 1, 1 > 0 )); } || \
                           {
-                              (( iitmp <= asize - 1 )) && (( jjtmp > asize && (jjtmp = asize), 1 > 0 )) && \
+                              (( iitmp <= __asize - 1 )) && (( jjtmp > __asize && (jjtmp = __asize), 1 > 0 )) && \
                                   (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=_start_pos-${#PREBUFFER}+jjtmp, __start >= 0 )) && \
                                       reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[single-quoted-argument]}")
                           } || \
                             {
-                                itmp="${__arg[(i)=]}"; __arg="${__arg[itmp,asize]}"; (( _start_pos += itmp - 1 ));
+                                itmp="${__arg[(i)=]}"; __arg="${__arg[itmp,__asize]}"; (( _start_pos += itmp - 1 ));
                                 [[ "${__arg[2,4]}" = '$((' ]] && { -fast-highlight-math-string;
                                    (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __start + 2 )) $(( __start + 4 )) ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
                                    (( jtmp = ${__arg[(I)\)\)]}-1, jtmp > 0 )) && (( __start=_start_pos-${#PREBUFFER}+jtmp, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[reserved-word]}")
@@ -892,7 +894,7 @@ typeset -ga ZLAST_COMMANDS
               (( k += $#MATCH ))
               (( i += $#MATCH ))
             else
-              if (( $#__arg > $i+1 )) && [[ $__arg[$i+1] == [xXuU] ]]; then
+              if (( __asize > i+1 )) && [[ $__arg[i+1] == [xXuU] ]]; then
                 # \x not followed by hex digits is probably an error
                 __style=unknown-token
               fi
