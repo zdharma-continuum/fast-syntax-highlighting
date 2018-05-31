@@ -62,7 +62,7 @@ _zsh_highlight()
   # may need to remove path_prefix highlighting when the line ends
   if [[ $WIDGET == zle-line-finish ]] || _zsh_highlight_buffer_modified; then
       -fast-highlight-init
-      -fast-highlight-process && region_highlight=( $reply ) || region_highlight=()
+      -fast-highlight-process "$PREBUFFER" "$BUFFER" 0 && region_highlight=( $reply ) || region_highlight=()
   fi
 
   {
