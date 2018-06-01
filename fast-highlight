@@ -386,7 +386,7 @@ typeset -ga ZLAST_COMMANDS
     fi
 
     # Analyse the current word.
-    if [[ $__arg == (<0-9>|)(\<|\>)* ]] && [[ $__arg != (\<|\>)$'\x28'* ]]; then
+    if [[ $__arg == (<0-9>|)(\<|\>)* ]] && [[ $__arg != (\<|\>)$'\x28'* ]] && [[ "$__arg" != "<<<" ]]; then
       # A '<' or '>', possibly followed by a digit
       in_redirection=2
     fi
@@ -673,6 +673,11 @@ typeset -ga ZLAST_COMMANDS
         '))')    # 'F' - (( after for
                  [[ "${braces_stack[1]}" = "F" ]] && braces_stack[1]="" && __style=${FAST_THEME_NAME}builtin
                  ;;
+        '<<<')
+                 (( next_word = 128 ))
+                 [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-tri]} != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-tri]}")
+                 already_added=1
+                 ;;
         *)       if [[ "${braces_stack[1]}" = "F" ]]; then
                    -fast-highlight-string
                    _mybuf="$__arg"
@@ -745,6 +750,12 @@ typeset -ga ZLAST_COMMANDS
                  fi
                  ;;
       esac
+    elif (( this_word & 128 ))
+    then
+      (( next_word = 2 ))
+      [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]} != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]}")
+      -fast-highlight-string "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]:#none}"
+      already_added=1
     fi
 
     # ADD
@@ -831,6 +842,8 @@ typeset -ga ZLAST_COMMANDS
 #
 # and the first condition -n ${match[7] uses D to continue searching when
 # backslash-something (not ['"$]) is occured.
+#
+# $1 - additional style to glue-in to added style
 -fast-highlight-string()
 {
   _mybuf="$__arg"
@@ -849,7 +862,7 @@ typeset -ga ZLAST_COMMANDS
       _mybuf="${match[8]}"
 
       # ADD
-      (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}")
+      (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}${1:+,$1}")
 
       __idx=_end_idx
     }

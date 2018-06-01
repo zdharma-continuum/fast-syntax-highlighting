@@ -83,6 +83,8 @@ map=(
     for-loop-operator           foroper
     for-loop-separator          forsep
     exec-descriptor             -
+    here-string-tri             -
+    here-string-word            -
     secondary                   -
 )
 
@@ -95,7 +97,7 @@ order=(
     double-quoted-argument dollar-quoted-argument back-or-dollar-double-quoted-argument 
     back-dollar-quoted-argument assign redirection comment variable mathvar 
     mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
-    for-loop-separator exec-descriptor secondary
+    for-loop-separator exec-descriptor here-string-tri here-string-word secondary
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
