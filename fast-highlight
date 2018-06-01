@@ -233,12 +233,12 @@ typeset -ga ZLAST_COMMANDS
   # in_array_assignment true between 'a=(' and the matching ')'
   # braces_stack: "R" for round, "Q" for square, "Y" for curly
   # _mybuf, cdpath_dir are used in sub-functions
-  local _start_pos="$3" _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$1$2" _mybuf cdpath_dir cur_cmd alias_target _was_double_hyphen=0
+  local _start_pos="$3" _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$1$2" _mybuf cdpath_dir cur_cmd alias_target _was_double_hyphen=0 __nul=$'\0'
   # arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
   integer arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize
-  local -a match mbegin mend
+  local -a match mbegin mend __inputs
 
   # This comment explains the numbers:
   # BIT_for - word after reserved-word-recognized `for'
@@ -773,6 +773,15 @@ typeset -ga ZLAST_COMMANDS
     # This is the default/common codepath.
     (( this_word = in_redirection == 0 ? next_word : this_word )) #else # Stall $this_word.
   done
+
+  __inputs=( ${(0)${(S)__buf[1,110]//(#b)*\$\((?#)([^\\\"]\)|(#e))/${mbegin[1]};${match[1]}${match[2]%\)}${__nul}}%$__nul*} )
+  if [[ "${__inputs[1]}" != "$__buf" ]]; then
+    for _mybuf in $__inputs; do
+      # Also replace last not-\) with not-\, because above solution
+      # (${match[2]%\)}) frankly doesn't always work
+      -fast-highlight-process "$PREBUFFER" "${${_mybuf#*;}/(#b)([^\\\"])\)(#e)/${match[1]}}" "$(( ${_mybuf%%;*} - 1 ))"
+    done
+  fi
 
   return 0
 }
