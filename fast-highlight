@@ -775,7 +775,7 @@ typeset -ga ZLAST_COMMANDS
   done
 
   __inputs=( ${(0)${(S)__buf[1,110]//(#b)*\$\((?#)([^\\\"]\)|(#e))/${mbegin[1]};${match[1]}${match[2]%\)}${__nul}}%$__nul*} )
-  if [[ "${__inputs[1]}" != "$__buf" ]]; then
+  if [[ "${__inputs[1]}" != "${__buf[1,110]}" ]]; then
     for _mybuf in $__inputs; do
       # Also replace last not-\) with not-\, because above solution
       # (${match[2]%\)}) frankly doesn't always work
