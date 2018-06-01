@@ -7,9 +7,9 @@ zmodload zsh/zutil 2>/dev/null
 
 setopt localoptions extendedglob
 
-local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST
+local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY
 local -A opthash
-zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test || { echo "Improper options given, see help (-h/--help)"; return 1; }
+zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test -secondary || { echo "Improper options given, see help (-h/--help)"; return 1; }
 
 (( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
 (( ${+opthash[-v]} + ${+opthash[--verbose]} )) && OPT_VERBOSE="-v"
@@ -17,8 +17,9 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 (( ${+opthash[-r]} + ${+opthash[--reset]} ))   && OPT_RESET="-r"
 (( ${+opthash[-l]} + ${+opthash[--list]} ))    && OPT_LIST="-l"
 (( ${+opthash[-t]} + ${+opthash[--test]} ))    && OPT_TEST="-t"
+(( ${+opthash[--secondary]} )) && OPT_SECONDARY="--secondary"
 
-[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/current_theme.zsh; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set)"; return 0; }
+[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set)"; return 0; }
 
 [[ -n "$OPT_LIST" ]] && {
     print -r -- "Available themes:"
@@ -81,9 +82,10 @@ map=(
     for-loop-number             fornum
     for-loop-operator           foroper
     for-loop-separator          forsep
+    secondary                   -
 )
 
-# In which order to generate entries in current_theme.zsh
+# In which order to generate entries
 local -a order
 order=( 
     default unknown-token reserved-word alias suffix-alias builtin function command precommand 
@@ -92,7 +94,7 @@ order=(
     double-quoted-argument dollar-quoted-argument back-or-dollar-double-quoted-argument 
     back-dollar-quoted-argument assign redirection comment variable mathvar 
     mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
-    for-loop-separator
+    for-loop-separator secondary
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
@@ -108,19 +110,29 @@ color=( red green blue yellow cyan magenta black white )
 local -A out
 fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
 
-command rm -f "$FAST_BASE_DIR"/current_theme.zsh
+[[ -z "$OPT_SECONDARY" ]] && local outfile="current_theme.zsh" || local outfile="secondary_theme.zsh"
+command rm -f "$FAST_BASE_DIR"/"$outfile"
 
-# Set a zstyle to carry theme name
-print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$1"'"' >>! "$FAST_BASE_DIR"/current_theme.zsh
-zstyle :plugin:fast-syntax-highlighting theme "$1"
+# Set a zstyle and a parameter to carry theme name
+if [[ -z "$OPT_SECONDARY" ]]; then
+    print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$1"'"' >>! "$FAST_BASE_DIR"/"$outfile"
+    print -r -- 'typeset -g FAST_THEME_NAME="'"$1"'"' >>! "$FAST_BASE_DIR"/"$outfile"
+    zstyle :plugin:fast-syntax-highlighting theme "$1"
+    FAST_THEME_NAME="$1"
+else
+    local FAST_THEME_NAME="$1"
+fi
 
-# Generate current_theme.zsh, traversing ini-file associative array
+# Generate current_theme.zsh or secondary_theme.zsh, traversing ini-file associative array
 local k kk
 local inikey inival result
 for k in "${order[@]}"; do
     [[ "${map[$k]}" = "-" ]] && kk="$k" || kk="${map[$k]}"
     inikey="${out[(i)<*>_${kk}]}"
     inival="${out[$inikey]}"
+    if [[ "$k" = "secondary" && -z "$OPT_SECONDARY" && -n "$inival" ]]; then
+        fast-theme -q --secondary "$inival"
+    fi
     if [[ "$inival" = bg:* ]]; then
         result="bg=${inival#bg:}"
     else
@@ -131,8 +143,8 @@ for k in "${order[@]}"; do
         fi
     fi
 
-    print -r -- ': ${FAST_HIGHLIGHT_STYLES['"$k"']:='"$result"'}' >>! "$FAST_BASE_DIR"/current_theme.zsh
-    FAST_HIGHLIGHT_STYLES[$k]="$result"
+    print -r -- ': ${FAST_HIGHLIGHT_STYLES['"${FAST_THEME_NAME}$k"']:='"$result"'}' >>! "$FAST_BASE_DIR"/"$outfile"
+    FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
 done
 
 [[ -z "$OPT_QUIET" ]] && print "Switched to theme \`$1' (current session, and future sessions)"
