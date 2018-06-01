@@ -37,6 +37,9 @@ Highlighting of command substitution (i.e. `$(...)`) with alternate theme – tw
 
 ![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/cmdsubst.png)
 
+To select which theme to use for `$(...)` set the key `secondary=` in [theme ini file](https://github.com/zdharma/fast-syntax-highlighting/blob/master/themes/free.ini#L7).
+All shipped themes have this key set (only the `default` theme doesn't use second theme).
+
 **2018-05-30**
 
 For-loop is highlighted, it has separate settings in [theme file](https://github.com/zdharma/fast-syntax-highlighting/blob/master/themes/free.ini).
