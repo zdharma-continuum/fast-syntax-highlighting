@@ -26,6 +26,10 @@ functions with `zed`/`vared` (optimizations done in
 
 6. Paths from `$CDPATH` aren't colorized unless the command is `cd`
 
+7. Five 256-color themes, switched with `fast-theme {theme-name}` (also try `-t` option to obtain the below snippet):
+
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/theme.png)
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
