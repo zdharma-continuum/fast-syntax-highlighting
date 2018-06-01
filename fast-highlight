@@ -419,6 +419,12 @@ typeset -ga ZLAST_COMMANDS
       elif (( this_word & 64 )); then
         [[ "$__arg" = -[pvV]## && "$cur_cmd" = "command" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
         [[ "$__arg" = -[cla]## && "$cur_cmd" = "exec" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
+        [[ "$__arg" = \{[a-zA-Z][a-zA-Z0-9]#\} && "$cur_cmd" = "exec" ]] && {
+          # Highlight {descriptor} passed to exec
+          (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
+          (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}exec-descriptor]}")
+          already_added=1
+        }
       fi
    fi
 
