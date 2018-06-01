@@ -30,6 +30,10 @@ functions with `zed`/`vared` (optimizations done in
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/theme.png)
 
+8. Correct highlighting of descriptor-variables passed to `exec`:
+
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/execfd_cmp.png)
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
@@ -43,6 +47,10 @@ Highlighting of command substitution (i.e. `$(...)`) with alternate theme – tw
 
 To select which theme to use for `$(...)` set the key `secondary=` in [theme ini file](https://github.com/zdharma/fast-syntax-highlighting/blob/master/themes/free.ini#L7).
 All shipped themes have this key set (only the `default` theme doesn't use second theme).
+
+Also added correct highlighting of descriptor-variables passed to `exec`:
+
+![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/execfd.png)
 
 **2018-05-30**
 
