@@ -72,6 +72,8 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[for-loop-operator]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[for-loop-number]:=fg=magenta}
 : ${FAST_HIGHLIGHT_STYLES[for-loop-separator]:=fg=yellow,bold}
+: ${FAST_HIGHLIGHT_STYLES[here-string-tri]:=fg=yellow}
+: ${FAST_HIGHLIGHT_STYLES[here-string-word]:=bg=blue}
 fi
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
