@@ -776,11 +776,20 @@ typeset -ga ZLAST_COMMANDS
 
   __inputs=( ${(0)${(S)__buf[1,110]//(#b)*\$\((?#)([^\\\"]\)|(#e))/${mbegin[1]};${match[1]}${match[2]%\)}${__nul}}%$__nul*} )
   if [[ "${__inputs[1]}" != "${__buf[1,110]}" ]]; then
+    if [[ -n "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}" ]]; then
+      __idx=1
+      __buf="$FAST_THEME_NAME"
+      FAST_THEME_NAME="${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}"
+      (( ${+FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}default]} )) || source "$FAST_BASE_DIR/secondary_theme.zsh"
+    else
+      __idx=0
+    fi
     for _mybuf in $__inputs; do
       # Also replace last not-\) with not-\, because above solution
       # (${match[2]%\)}) frankly doesn't always work
       -fast-highlight-process "$PREBUFFER" "${${_mybuf#*;}/(#b)([^\\\"])\)(#e)/${match[1]}}" "$(( ${_mybuf%%;*} - 1 ))"
     done
+    (( __idx )) && FAST_THEME_NAME="$__buf"
   fi
 
   return 0
