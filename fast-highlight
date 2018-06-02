@@ -523,7 +523,7 @@ typeset -ga ZLAST_COMMANDS
                           (( itmp <= __asize - 1 )) && {
                               (( __start=_start_pos-${#PREBUFFER}+itmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}")
                               (( iitmp <= __asize - 1 )) && (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}") || in_array_assignment=1
-                          } || { [[ "${braces_stack[1]}" != 'T' ]] && (( next_word = next_word | 1 )); }
+                          } || { [[ "${braces_stack[1]}" != 'T' ]] && (( next_word = (next_word | 1) & ~2 )); }
 
                           # Handle no-string highlight, string "/' highlight, math mode highlight
                           local ctmp="\"" dtmp="'"
@@ -576,10 +576,11 @@ typeset -ga ZLAST_COMMANDS
                           # anonymous function
                           __style=${FAST_THEME_NAME}reserved-word
                         elif [[ $__arg == $'\x28' ]]; then
-                          # subshell
+                          # subshell (
                           __style=${FAST_THEME_NAME}reserved-word
                           braces_stack='R'"$braces_stack"
                         elif [[ $__arg == $'\x29' ]]; then
+                          # )
                           [[ $braces_stack[1] == "R" ]] && { braces_stack[1]=""; __style=${FAST_THEME_NAME}reserved-word; }
                         elif (( this_word & 14 )); then
                           __style=${FAST_THEME_NAME}default
@@ -608,7 +609,7 @@ typeset -ga ZLAST_COMMANDS
                  __style=${FAST_THEME_NAME}reserved-word
                  braces_stack='R'"$braces_stack"
                  ;;
-        $'\x29') # ')' - subshell or __end of array assignment
+        $'\x29') # ')' - subshell or end of array assignment
                  if (( in_array_assignment )); then
                    __style=${FAST_THEME_NAME}assign
                    in_array_assignment=0
@@ -738,7 +739,7 @@ typeset -ga ZLAST_COMMANDS
                  elif [[ "$__arg" = \$* ]]; then
                    __style=${FAST_THEME_NAME}variable
                  elif [[ $__arg = $'\x7d' && $braces_stack[1] == "Y" && "$FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]" = "1" ]]; then
-                   # right brace
+                   # right brace, i.e. $'\x7d' == }
                    # Parsing rule: # {
                    #
                    #     Additionally, `tt(})' is recognized in any position if neither the
