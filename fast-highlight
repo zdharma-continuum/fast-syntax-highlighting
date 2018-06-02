@@ -715,7 +715,7 @@ typeset -ga ZLAST_COMMANDS
                    fi
 
                    already_added=1
-                 elif [[ "$__arg" = ([*?]*|*[^\\][*?]*) ]]; then
+                 elif [[ "$__arg" = ([*?]*|*[^\\][*?]*|*[\#][\#]*) ]]; then
                    (( highlight_glob )) && __style=${FAST_THEME_NAME}globbing || __style=${FAST_THEME_NAME}default
                  elif [[ "$__arg" = \$* ]]; then
                    __style=${FAST_THEME_NAME}variable
