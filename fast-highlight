@@ -247,6 +247,8 @@ typeset -ga ZLAST_COMMANDS
   # BIT_afpcmd - word after a precommand that can take options, like `command' and `exec'
   # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16 BIT_for=32 BIT_afpcmd=64
 
+  integer BIT_case_preamble=512 BIT_case_item=1024 BIT_case_nempty_item=2048 BIT_case_code=4096
+
   # Braces stack
   # T - typeset, local, etc.
 
@@ -305,6 +307,7 @@ typeset -ga ZLAST_COMMANDS
     # Initialize $next_word to its default value?
     (( in_redirection = in_redirection > 0 ? in_redirection - 1 : in_redirection ));
     (( next_word = (in_redirection == 0) ? 2 : next_word )) # else Stall $next_word.
+    (( next_word = next_word | (this_word & BIT_case_code) ))
 
     #
     #   $already_added       (see next paragraph)
@@ -342,14 +345,14 @@ typeset -ga ZLAST_COMMANDS
       # It shouldn't be treated as ';', i.e. shouldn't be highlighted
       # as unknown-token when appears after command-starting __arg like "{"
       if [[ "${proc_buf[offset+1]}" = $'\n' ]]; then
-        (( in_array_assignment )) && (( this_word = 2 )) || { (( this_word = 1 )); highlight_glob=1; }
+        (( this_word & BIT_case_item )) || { (( in_array_assignment )) && (( this_word = 2 | (this_word & BIT_case_code) )) || { (( this_word = 1 | (this_word & BIT_case_code) )); highlight_glob=1; }; }
         in_redirection=0
         proc_buf="${proc_buf[offset + __asize + 1,__len]}"
         _start_pos=$_end_pos
         continue
       else
         # One more short path – for ';' command separator
-        (( in_array_assignment )) && (( this_word = 2 )) || { (( this_word = 1 )); highlight_glob=1; }
+        (( this_word & BIT_case_item )) || { (( in_array_assignment )) && (( this_word = 2 | (this_word & BIT_case_code) )) || { (( this_word = 1 | (this_word & BIT_case_code) )); highlight_glob=1; }; }
         in_redirection=0
         [[ "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}commandseparator]}" != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}commandseparator]}")
         proc_buf="${proc_buf[offset + __asize + 1,__len]}"
@@ -482,6 +485,8 @@ typeset -ga ZLAST_COMMANDS
                           braces_stack='A'"$braces_stack"
                         elif [[ $__arg == "for" ]]; then
                           (( next_word = next_word | 32 )) # BIT_for
+                        elif [[ $__arg == "case" ]]; then
+                          (( next_word = BIT_case_preamble ))
                         fi
                         ;;
         'suffix alias') __style=${FAST_THEME_NAME}suffix-alias;;
@@ -586,6 +591,9 @@ typeset -ga ZLAST_COMMANDS
                           # )
                           [[ $braces_stack[1] == "R" ]] && { braces_stack[1]=""; __style=${FAST_THEME_NAME}reserved-word; }
                         elif (( this_word & 14 )); then
+                          __style=${FAST_THEME_NAME}default
+                        elif [[ "$__arg" = ';;' ]] && (( this_word & BIT_case_code )); then
+                          (( next_word = (next_word | BIT_case_item) & ~(BIT_case_code+3) ))
                           __style=${FAST_THEME_NAME}default
                         fi
                         ;;
@@ -750,6 +758,9 @@ typeset -ga ZLAST_COMMANDS
                    braces_stack[1]=""
                    __style=${FAST_THEME_NAME}reserved-word
                    (( next_word = next_word | 16 ))
+                 elif [[ "$__arg" = ';;' ]] && (( this_word & BIT_case_code )); then
+                   (( next_word = (next_word | BIT_case_item) & ~(BIT_case_code+3) ))
+                   __style=${FAST_THEME_NAME}default
                  elif [[ $__arg[1] = $histchars[1] && -n "${__arg[2]}" ]]; then
                    __style=${FAST_THEME_NAME}history-expansion
                  elif (( arg_type == 3 )); then
@@ -780,23 +791,45 @@ typeset -ga ZLAST_COMMANDS
       [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]} != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]}")
       -fast-highlight-string "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]:#none}"
       already_added=1
+    elif (( this_word & (BIT_case_preamble + BIT_case_item) ))
+    then
+      if (( this_word & BIT_case_preamble )); then
+        [[ "$__arg" = "in" ]] && {
+          __style=${FAST_THEME_NAME}reserved-word
+          (( next_word = BIT_case_item ))
+        } || {
+          __style=${FAST_THEME_NAME}path
+          (( next_word = BIT_case_preamble ))
+        }
+      else
+        if (( this_word & BIT_case_nempty_item == 0 )) && [[ "$__arg" = "esac" ]]; then
+          (( next_word = 1 ))
+          __style=${FAST_THEME_NAME}reserved-word
+        elif [[ "$__arg" = [\)\(] ]]; then
+          __style=${FAST_THEME_NAME}builtin
+          [[ "$__arg" = \) ]] && (( next_word = BIT_case_code | 1 )) || (( next_word = BIT_case_item | BIT_case_nempty_item ))
+        else
+          (( next_word = BIT_case_item | BIT_case_nempty_item ))
+          __style=${FAST_THEME_NAME}here-string-word
+        fi
+      fi
     fi
 
     # ADD
     (( already_added == 0 )) && [[ "${FAST_HIGHLIGHT_STYLES[$__style]}" != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
-    if (( arg_type == 3 )); then
+    if (( arg_type == 3 && this_word & (BIT_case_preamble|BIT_case_item) == 0 )); then
       if [[ $__arg == ';' ]] && (( in_array_assignment )); then
         # literal newline inside an array assignment
-        (( next_word = 2 ))
+        (( next_word = 2 | (next_word & BIT_case_code) ))
       elif [[ -n "${braces_stack[(r)A]}" ]]; then
-        (( next_word = 2 ))
+        (( next_word = 2 | (next_word & BIT_case_code) ))
       else
-        (( next_word = 1 ))
+        (( next_word = 1 | (next_word & BIT_case_code) ))
         highlight_glob=1
       fi
     elif (( (arg_type & 3) * (this_word & 1) )); then # (( arg_type == 1 || arg_type == 2 )) && (( this_word & 1 ))
-        (( next_word = 1 | (next_word & 64) ))
+        (( next_word = 1 | (next_word & (64 | BIT_case_code)) ))
     elif [[ $__arg == "repeat" ]] && (( this_word & 1 )); then
       # skip the repeat-count word
       in_redirection=2
