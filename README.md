@@ -34,6 +34,10 @@ functions with `zed`/`vared` (optimizations done in
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/execfd_cmp.png)
 
+9. Recursive `eval` and `$( )` highlighting, with secondary theme (two themes active at the same time!):
+
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/eval_cmp.png)
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
