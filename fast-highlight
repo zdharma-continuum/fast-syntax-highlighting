@@ -895,7 +895,7 @@ typeset -ga ZLAST_COMMANDS
         [[ -n "${(P)match[1]}" || ${FAST_ASSIGNS_SEEN[${match[1]}]} = 1 ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathvar]} || __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}
       } || {
         [[ "${match[1][1]}" = "$" ]] && {
-          match[1]="${match[1]//[\{\}]/}"
+          match[1]="${match[1]//[\{\}\+]/}"
           [[ "${match[1]}" = "$" || -n "${(P)${match[1]:1}}" || ${FAST_ASSIGNS_SEEN[${match[1]:1}]} = 1 ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]} || __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}
         }
       }
