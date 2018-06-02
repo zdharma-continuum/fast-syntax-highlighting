@@ -86,6 +86,9 @@ map=(
     here-string-tri             -
     here-string-word            -
     secondary                   -
+    case-input                  -
+    case-parentheses            -
+    case-condition              -
 )
 
 # In which order to generate entries
@@ -98,6 +101,7 @@ order=(
     back-dollar-quoted-argument assign redirection comment variable mathvar 
     mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
     for-loop-separator exec-descriptor here-string-tri here-string-word secondary
+    case-input case-parentheses case-condition
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"

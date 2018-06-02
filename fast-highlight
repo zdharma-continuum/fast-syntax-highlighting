@@ -74,6 +74,9 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[for-loop-separator]:=fg=yellow,bold}
 : ${FAST_HIGHLIGHT_STYLES[here-string-tri]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[here-string-word]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[case-input]:=fg=green}
+: ${FAST_HIGHLIGHT_STYLES[case-parentheses]:=fg=yellow}
+: ${FAST_HIGHLIGHT_STYLES[case-condition]:=bg=blue}
 fi
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
@@ -798,7 +801,7 @@ typeset -ga ZLAST_COMMANDS
           __style=${FAST_THEME_NAME}reserved-word
           (( next_word = BIT_case_item ))
         } || {
-          __style=${FAST_THEME_NAME}path
+          __style=${FAST_THEME_NAME}case-input
           (( next_word = BIT_case_preamble ))
         }
       else
@@ -806,11 +809,11 @@ typeset -ga ZLAST_COMMANDS
           (( next_word = 1 ))
           __style=${FAST_THEME_NAME}reserved-word
         elif [[ "$__arg" = [\)\(] ]]; then
-          __style=${FAST_THEME_NAME}builtin
+          __style=${FAST_THEME_NAME}case-parentheses
           [[ "$__arg" = \) ]] && (( next_word = BIT_case_code | 1 )) || (( next_word = BIT_case_item | BIT_case_nempty_item ))
         else
           (( next_word = BIT_case_item | BIT_case_nempty_item ))
-          __style=${FAST_THEME_NAME}here-string-word
+          __style=${FAST_THEME_NAME}case-condition
         fi
       fi
     fi
