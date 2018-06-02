@@ -614,10 +614,10 @@ typeset -ga ZLAST_COMMANDS
                  ;;
         $'\x29') # ')' - subshell or end of array assignment
                  if (( in_array_assignment )); then
-                   __style=${FAST_THEME_NAME}assign
                    in_array_assignment=0
                    (( next_word = next_word | 1 ))
                    (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}")
+                   already_added=1
                  elif [[ $braces_stack[1] == "R" ]]; then
                    braces_stack[1]=""
                    __style=${FAST_THEME_NAME}reserved-word
