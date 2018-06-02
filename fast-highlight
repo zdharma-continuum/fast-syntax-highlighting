@@ -698,7 +698,7 @@ typeset -ga ZLAST_COMMANDS
                  [[ "${braces_stack[1]}" = "F" ]] && braces_stack[1]="" && __style=${FAST_THEME_NAME}builtin
                  ;;
         '<<<')
-                 (( next_word = 128 ))
+                 (( next_word = (next_word | 128) & ~3 ))
                  [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-tri]} != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-tri]}")
                  already_added=1
                  ;;
@@ -776,7 +776,7 @@ typeset -ga ZLAST_COMMANDS
       esac
     elif (( this_word & 128 ))
     then
-      (( next_word = 2 ))
+      (( next_word = (next_word | 2) & ~129 ))
       [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]} != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]}")
       -fast-highlight-string "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]:#none}"
       already_added=1
