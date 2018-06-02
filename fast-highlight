@@ -792,6 +792,9 @@ typeset -ga ZLAST_COMMANDS
     (( this_word = in_redirection == 0 ? next_word : this_word )) #else # Stall $this_word.
   done
 
+  # Do we have whole buffer? I.e. start at zero
+  [[ "$3" != 0 ]] && return 0
+
   __inputs=( ${(0)${(S)__buf[1,110]//(#b)*\$\((?#)([^\\\"]\)|(#e))/${mbegin[1]};${match[1]}${match[2]%\)}${__nul}}%$__nul*} )
   if [[ "${__inputs[1]}" != "${__buf[1,110]}" ]]; then
     if [[ -n "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}" ]]; then
