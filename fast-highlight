@@ -238,7 +238,7 @@ typeset -ga ZLAST_COMMANDS
   # in_array_assignment true between 'a=(' and the matching ')'
   # braces_stack: "R" for round, "Q" for square, "Y" for curly
   # _mybuf, cdpath_dir are used in sub-functions
-  local _start_pos="$3" _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$1$2" _mybuf cdpath_dir cur_cmd alias_target _was_double_hyphen=0 __nul=$'\0'
+  local _start_pos="$3" _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$1$2" _mybuf cdpath_dir active_command alias_target _was_double_hyphen=0 __nul=$'\0'
   # arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
@@ -428,9 +428,9 @@ typeset -ga ZLAST_COMMANDS
         (( next_word = next_word | 4 ))
         (( next_word = next_word | 1 ))
       elif (( this_word & 64 )); then
-        [[ "$__arg" = -[pvV-]## && "$cur_cmd" = "command" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
-        [[ "$__arg" = -[cla-]## && "$cur_cmd" = "exec" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
-        [[ "$__arg" = \{[a-zA-Z][a-zA-Z0-9]#\} && "$cur_cmd" = "exec" ]] && {
+        [[ "$__arg" = -[pvV-]## && "$active_command" = "command" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
+        [[ "$__arg" = -[cla-]## && "$active_command" = "exec" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
+        [[ "$__arg" = \{[a-zA-Z][a-zA-Z0-9]#\} && "$active_command" = "exec" ]] && {
           # Highlight {descriptor} passed to exec
           (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
           (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}exec-descriptor]}")
@@ -447,7 +447,7 @@ typeset -ga ZLAST_COMMANDS
      __style=${FAST_THEME_NAME}reserved-word # de facto a reserved word, although not de jure
      (( next_word = 1 | (this_word & BIT_case_code) ))
    elif (( this_word & 1 )) && (( in_redirection == 0 )) || [[ "${braces_stack[1]}" = 'T' ]]; then
-     cur_cmd="$__arg"
+     active_command="$__arg"
      if (( arg_type == 1 )); then
       __style=${FAST_THEME_NAME}precommand
       [[ "$__arg" = "command" || "$__arg" = "exec" ]] && (( next_word = next_word | 64 ))
@@ -886,7 +886,7 @@ typeset -ga ZLAST_COMMANDS
   [[ -e $expanded_path ]] && return 0
 
   # Search the path in CDPATH, only for CD command
-  [[ "$cur_cmd" = "cd" ]] && for cdpath_dir in $cdpath ; do
+  [[ "$active_command" = "cd" ]] && for cdpath_dir in $cdpath ; do
     [[ -e "$cdpath_dir/$expanded_path" ]] && return 0
   done
 
