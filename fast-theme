@@ -1,3 +1,4 @@
+# -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
 # Copyright (c) 2018 Sebastian Gniazdowski
 #
 # Theme support using ini-files.
@@ -175,4 +176,6 @@ done
 
 '
 }
+
+return 0
 # vim:ft=zsh:et:sw=4:sts=4
