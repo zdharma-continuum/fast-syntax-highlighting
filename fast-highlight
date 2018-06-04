@@ -414,7 +414,7 @@ typeset -ga ZLAST_COMMANDS
           # Flag that requires an argument
           '-'[Cgprtu])
                        (( this_word = this_word & ~1 ))
-                       (( next_word = 8 ))
+                       (( next_word = 8 | (this_word & BIT_case_code) ))
                        ;;
           # This prevents misbehavior with sudo -u -otherargument
           '-'*)
@@ -445,7 +445,7 @@ typeset -ga ZLAST_COMMANDS
    if (( this_word & 16 )) && [[ $__arg == 'always' ]]; then
      # try-always construct
      __style=${FAST_THEME_NAME}reserved-word # de facto a reserved word, although not de jure
-     (( next_word = 1 ))
+     (( next_word = 1 | (this_word & BIT_case_code) ))
    elif (( this_word & 1 )) && (( in_redirection == 0 )) || [[ "${braces_stack[1]}" = 'T' ]]; then
      cur_cmd="$__arg"
      if (( arg_type == 1 )); then
