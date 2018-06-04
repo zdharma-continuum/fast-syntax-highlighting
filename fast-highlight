@@ -138,6 +138,10 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
 # A hash instead of multiple globals
 typeset -gA FAST_HIGHLIGHT
 
+FAST_HIGHLIGHT+=(
+  chroma-git    chroma/-git.ch
+)
+
 # Assignments seen, to know if math parameter exists
 typeset -gA FAST_ASSIGNS_SEEN
 
@@ -251,7 +255,7 @@ typeset -ga ZLAST_COMMANDS
   # BIT_afpcmd - word after a precommand that can take options, like `command' and `exec'
   # integer BIT_start=1 BIT_regular=2 BIT_sudo_opt=4 BIT_sudo_arg=8 BIT_always=16 BIT_for=32 BIT_afpcmd=64
 
-  integer BIT_case_preamble=512 BIT_case_item=1024 BIT_case_nempty_item=2048 BIT_case_code=4096
+  integer BIT_case_preamble=512 BIT_case_item=1024 BIT_case_nempty_item=2048 BIT_case_code=4096 BIT_chroma=8192
 
   # Braces stack
   # T - typeset, local, etc.
@@ -311,7 +315,7 @@ typeset -ga ZLAST_COMMANDS
     # Initialize $next_word to its default value?
     (( in_redirection = in_redirection > 0 ? in_redirection - 1 : in_redirection ));
     (( next_word = (in_redirection == 0) ? 2 : next_word )) # else Stall $next_word.
-    (( next_word = next_word | (this_word & BIT_case_code) ))
+    (( next_word = next_word | (this_word & (BIT_case_code|BIT_chroma)) ))
 
     #
     #   $already_added       (see next paragraph)
@@ -439,6 +443,16 @@ typeset -ga ZLAST_COMMANDS
         }
       fi
    fi
+
+   (( this_word & 1 )) && {
+     active_command="$__arg"
+     [[ -n ${FAST_HIGHLIGHT[chroma-$active_command]} ]] && {
+       (( next_word = next_word | BIT_chroma ))  # lasting state
+       ${FAST_HIGHLIGHT[chroma-$active_command]} 1 "$__arg" "$_start_pos" "$_end_pos" && continue
+     }
+   } || {
+     (( this_word & BIT_chroma )) && ${FAST_HIGHLIGHT[chroma-$active_command]} 0 "$__arg" "$_start_pos" "$_end_pos" && continue
+   }
 
    expanded_path=""
 
@@ -1020,4 +1034,3 @@ typeset -ga ZLAST_COMMANDS
 }
 
 # vim:ft=zsh:sw=2:sts=2
-# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
