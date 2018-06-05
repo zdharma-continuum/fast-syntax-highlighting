@@ -35,6 +35,7 @@ local -a __lines_list
             __style=${FAST_THEME_NAME}reserved-word
             (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
         else
+            __wrd="${${(Q)__wrd}#[\"\']}"
             if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
                 if (( __idx == 3 )); then
                     -fast-run-git-command "git remote" "chroma-git-remotes" ""
