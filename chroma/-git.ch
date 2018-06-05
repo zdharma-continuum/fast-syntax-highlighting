@@ -17,14 +17,11 @@ local -a __lines_list
     FAST_HIGHLIGHT[chroma-git-got-subcommand]=0
     FAST_HIGHLIGHT[chroma-git-subcommand]=""
     __style=${FAST_THEME_NAME}command
-    (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 } || {
     if [[ "$__wrd" = --* ]]; then
         __style=${FAST_THEME_NAME}double-hyphen-option
-        (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
     elif [[ "$__wrd" = -* ]]; then
         __style=${FAST_THEME_NAME}single-hyphen-option
-        (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
     else
         # Increase position counter, save it in handy parameter __idx
         (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx = FAST_HIGHLIGHT[chroma-git-counter] ))
@@ -33,25 +30,24 @@ local -a __lines_list
             FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
             __style=${FAST_THEME_NAME}reserved-word
-            (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
         else
             __wrd="${${(Q)__wrd}#[\"\']}"
             if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
                 if (( __idx == 3 )); then
                     -fast-run-git-command "git remote" "chroma-git-remotes" ""
                     [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}unknown-token || __style=${FAST_THEME_NAME}reserved-word
-                    (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
                 elif (( __idx == 4 )); then
                     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" \
                             "chroma-git-branches" \
                             "refs/heads"
                     [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}unknown-token || __style=${FAST_THEME_NAME}reserved-word
-                    (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
                 fi
             fi
         fi
     fi
 }
+
+[[ -n "$__style" ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
 # We aren't passing-through, do obligatory things ourselves
 (( this_word = next_word ))
