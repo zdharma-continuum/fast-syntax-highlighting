@@ -22,6 +22,9 @@ local -a __lines_list
 
 (( __first_call )) && {
     # Called for the first time - new command
+    # FAST_HIGHLIGHT is used because it survives between calls, and
+    # allows to use a single global hash only, instead of multiple
+    # global variables
     FAST_HIGHLIGHT[chroma-git-counter]=0
     FAST_HIGHLIGHT[chroma-git-got-subcommand]=0
     FAST_HIGHLIGHT[chroma-git-subcommand]=""
@@ -83,6 +86,7 @@ local -a __lines_list
     fi
 }
 
+# Add region_highlight entry (via `reply' array)
 [[ -n "$__style" ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
 # We aren't passing-through, do obligatory things ourselves
