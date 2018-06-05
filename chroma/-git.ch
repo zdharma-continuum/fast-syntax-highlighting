@@ -10,7 +10,7 @@
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 local __style
 integer __idx
-local -a list
+local -a __lines_list
 
 (( __first_call )) && {
     FAST_HIGHLIGHT[chroma-git-counter]=1
@@ -37,44 +37,14 @@ local -a list
         else
             if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
                 if (( __idx == 3 )); then
-                    if [[ -z "${FAST_HIGHLIGHT[chroma-git-remotes-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[chroma-git-remotes-cache-born-at] )) -gt 5 ]]; then
-                        FAST_HIGHLIGHT[chroma-git-remotes-cache-born-at]=$EPOCHSECONDS
-                        if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
-                            list=( ${(f)"$(git remote 2>/dev/null)"} )
-                        else
-                            list=()
-                        fi
-                        FAST_HIGHLIGHT[chroma-git-remotes-cache]="${(j:;:)list};"
-                    else
-                        list=( "${(s:;:)FAST_HIGHLIGHT[chroma-git-remotes-cache]}" )
-                    fi
-
-                    if [[ -z ${list[(r)$__wrd]} ]]; then
-                        __style=${FAST_THEME_NAME}unknown-token
-                    else
-                        __style=${FAST_THEME_NAME}reserved-word
-                    fi
-
+                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                    [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}unknown-token || __style=${FAST_THEME_NAME}reserved-word
                     (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
                 elif (( __idx == 4 )); then
-                    if [[ -z "${FAST_HIGHLIGHT[chroma-git-branches-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[chroma-git-branches-cache-born-at] )) -gt 5 ]]; then
-                        FAST_HIGHLIGHT[chroma-git-branches-cache-born-at]=$EPOCHSECONDS
-                        if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
-                            list=( ${${(f)"$(git for-each-ref --format='%(refname:short)' refs/heads 2>/dev/null)"}#refs/heads/} )
-                        else
-                            list=()
-                        fi
-                        FAST_HIGHLIGHT[chroma-git-branches-cache]="${(j:;:)list};"
-                    else
-                        list=( "${(@s:;:)FAST_HIGHLIGHT[chroma-git-branches-cache]}" )
-                    fi
-
-                    if [[ -z ${list[(r)$__wrd]} ]]; then
-                        __style=${FAST_THEME_NAME}unknown-token
-                    else
-                        __style=${FAST_THEME_NAME}reserved-word
-                    fi
-
+                    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" \
+                            "chroma-git-branches" \
+                            "refs/heads"
+                    [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}unknown-token || __style=${FAST_THEME_NAME}reserved-word
                     (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
                 fi
             fi
