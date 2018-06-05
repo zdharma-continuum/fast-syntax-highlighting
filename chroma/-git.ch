@@ -4,6 +4,14 @@
 # Chroma function for command `git'. It colorizes the part of command
 # line that holds `git' invocation.
 #
+# $1 - 0 or 1, denoting if it's first call to the chroma, or following one
+# $2 - the current token, also accessible by $__arg from the above scope -
+#      basically a private copy of $__arg
+# $3 - a private copy of $_start_pos, i.e. the position of the token in the
+#      command line buffer, used to add region_highlight entry (see man),
+#      because Zsh colorizes by *ranges* in command line buffer
+# $4 - a private copy of $_end_pos from the above scope
+#
 
 (( next_word = 2 | 8192 ))
 
@@ -13,12 +21,15 @@ integer __idx1 __idx2
 local -a __lines_list
 
 (( __first_call )) && {
+    # Called for the first time - new command
     FAST_HIGHLIGHT[chroma-git-counter]=0
     FAST_HIGHLIGHT[chroma-git-got-subcommand]=0
     FAST_HIGHLIGHT[chroma-git-subcommand]=""
     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
     __style=${FAST_THEME_NAME}command
 } || {
+    # Following call, i.e. not the first one
+
     if [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-git-got-subcommand]} -eq 0 ]]; then
         __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
     else
