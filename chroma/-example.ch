@@ -20,8 +20,8 @@
 # Overall functioning is: when command "example" is occured, this function
 # is called with $1 == 1, it ("example") is the first token ($2), then for any
 # following token, this function is called with $1 == 0, until end of command
-# is occured (i.e. til enter is pressed or ";" is put into source, or the command
-# line simply ends).
+# is occured (i.e. till enter is pressed or ";" is put into source, or the
+# command line simply ends).
 #
 # Other tips are:
 # - $CURSOR holds cursor position
@@ -44,7 +44,6 @@
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 local __style
 integer __idx1 __idx2
-local -a __lines_list
 
 (( __first_call )) && {
     # Called for the first time - new command.
