@@ -16,6 +16,11 @@
 #
 # $4 - a private copy of $_end_pos from the above scope
 #
+#
+# Overall functioning is: when command "example" is occured, this function
+# is called with $1 == 1, it is the first token, then for any following token,
+# this function is called with $1 == 0, until end of command is occured (enter
+# or ;, etc.).
 
 (( next_word = 2 | 8192 ))
 
