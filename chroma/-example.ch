@@ -70,6 +70,10 @@ local -a __lines_list
 }
 
 # Add region_highlight entry (via `reply' array).
+# If 1 will be added to __start_pos, this will highlight "oken".
+# If 1 will be subtracted from __end_pos, this will highlight "toke".
+# $PREBUFFER is for specific situations when users does command \<ENTER>
+# i.e. when multi-line command using backslash is entered.
 [[ -n "$__style" ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
 # We aren't passing-through, do obligatory things ourselves.
