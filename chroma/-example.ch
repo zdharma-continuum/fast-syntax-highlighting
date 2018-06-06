@@ -91,6 +91,10 @@ local -a __lines_list
 # If 1 will be subtracted from __end_pos, this will highlight "toke".
 # $PREBUFFER is for specific situations when users does command \<ENTER>
 # i.e. when multi-line command using backslash is entered.
+#
+# This is a common place of adding such entry, but any above code can do
+# it itself (and it does in other chromas) and skip setting __style to
+# this way disable this code.
 [[ -n "$__style" ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
 # We aren't passing-through, do obligatory things ourselves.
