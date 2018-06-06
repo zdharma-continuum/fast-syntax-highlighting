@@ -38,11 +38,28 @@ functions with `zed`/`vared` (optimizations done in
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/eval_cmp.png)
 
+10. New architecture – **chroma functions** – highlighting that is **specific** for given command. There
+    are two chromas currently, for `git` (verifies correct remote & branch, also see below)  and `grep`
+    (highlights regular expression):
+
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/git_chroma.png)
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-06-06**
+
+FSH gained a new architecture – "chroma functions". They are similar to "completion functions", i.e. they
+are defined **per-command**, but instead of completing that command, they colorize it. Two chroma exist,
+for `Git` ([video](https://asciinema.org/a/185707), [video](https://asciinema.org/a/185811)) and for `grep`
+([video](https://asciinema.org/a/185942)). Checkout
+[example chroma](https://github.com/zdharma/fast-syntax-highlighting/blob/master/chroma/-example.ch) if you
+would like to highlight a command.
+
+![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/git_chroma.png)
+
 **2018-06-01**
 
 Highlighting of command substitution (i.e. `$(...)`) with alternate theme – two themes at once! It was just white before:
