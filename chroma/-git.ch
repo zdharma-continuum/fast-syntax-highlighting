@@ -81,6 +81,14 @@ local -a __lines_list
                 elif [[ "$__wrd" = "-m" ]]; then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=1
                 fi
+            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
+                [[ "$__wrd" != -* ]] && {
+                    if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
+                        __style=${FAST_THEME_NAME}builtin
+                    else
+                        __style=${FAST_THEME_NAME}unknown-token
+                    fi
+                }
             fi
         fi
     fi
