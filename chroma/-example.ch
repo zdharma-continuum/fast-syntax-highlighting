@@ -1,8 +1,9 @@
 # -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
 # Copyright (c) 2018 Sebastian Gniazdowski
 #
-# Chroma function for command `git'. It colorizes the part of command
-# line that holds `git' invocation.
+# Example chroma function. It colorizes first two arguments as `builtin' style,
+# third and following arguments as `globbing' style. First two arguments may
+# be "strings", they will be passed through to normal higlighter (by returning 1).
 #
 # $1 - 0 or 1, denoting if it's first call to the chroma, or following one
 #
