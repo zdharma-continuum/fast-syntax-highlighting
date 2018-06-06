@@ -900,7 +900,7 @@ typeset -ga ZLAST_COMMANDS
 -fast-highlight-check-path()
 {
   : ${expanded_path:=${(Q)~__arg}}
-  [[ -n "${FAST_BLIST_PATTERNS[(k)$expanded_path]}" ]] && return 1
+  [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && return 1
 
   [[ -z $expanded_path ]] && return 1
   [[ -e $expanded_path ]] && return 0
