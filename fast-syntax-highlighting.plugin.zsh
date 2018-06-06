@@ -33,6 +33,10 @@
 typeset -g ZERO=${(%):-%N}
 typeset -g FAST_BASE_DIR="${ZERO:h}"
 
+if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$FAST_BASE_DIR]}" != $FAST_BASE_DIR]]; then
+    fpath+=( "$FAST_BASE_DIR" )
+fi
+
 # Invokes each highlighter that needs updating.
 # This function is supposed to be called whenever the ZLE state changes.
 _zsh_highlight()
