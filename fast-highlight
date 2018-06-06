@@ -139,8 +139,11 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
 typeset -gA FAST_HIGHLIGHT
 
 FAST_HIGHLIGHT+=(
-  chroma-git    chroma/-git.ch
+  chroma-git     chroma/-git.ch
   chroma-example chroma/-example.ch
+  chroma-grep    chroma/-grep.ch
+  chroma-egrep    chroma/-grep.ch
+  chroma-fgrep    chroma/-grep.ch
 )
 
 # Assignments seen, to know if math parameter exists
