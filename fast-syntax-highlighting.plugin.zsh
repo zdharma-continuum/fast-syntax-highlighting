@@ -268,7 +268,8 @@ ZSH_HIGHLIGHT_MAXLENGTH=10000
 # Load zsh/parameter module if available
 zmodload zsh/parameter 2>/dev/null
 
-autoload -Uz -- is-at-least fast-theme fast-read-ini-file -fast-run-git-command chroma/-git.ch
+autoload -Uz -- is-at-least fast-theme fast-read-ini-file -fast-run-git-command
+autoload -Uz -- chroma/-git.ch chroma/-example.ch
 source "${ZERO:h}/fast-highlight"
 
 local __fsyh_theme
