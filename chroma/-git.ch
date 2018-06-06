@@ -83,10 +83,13 @@ local -a __lines_list
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
                 [[ "$__wrd" != -* ]] && {
-                    if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
-                        __style=${FAST_THEME_NAME}builtin
-                    else
-                        __style=${FAST_THEME_NAME}unknown-token
+                    (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
+                    if (( __idx1 == 2 )); then
+                        if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
+                            __style=${FAST_THEME_NAME}builtin
+                        else
+                            __style=${FAST_THEME_NAME}unknown-token
+                        fi
                     fi
                 }
             fi
