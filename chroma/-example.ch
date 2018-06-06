@@ -26,6 +26,9 @@
 # Other tips are:
 # - $CURSOR holds cursor position
 # - $BUFFER holds whole command line buffer
+# - $LBUFFER holds command line buffer that is left from the cursor, i.e. it's a
+#   BUFFER substring 1 .. $CURSOR
+# - $RBUFFER is the same as LBUFFER but holds part of BUFFER right to the cursor
 #
 # The function receives $BUFFER but via sequence of tokens, which are shell words,
 # e.g. "a b c" is a shell word, while a b c are 3 shell words.
