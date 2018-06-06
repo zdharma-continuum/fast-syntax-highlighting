@@ -18,9 +18,23 @@
 #
 #
 # Overall functioning is: when command "example" is occured, this function
-# is called with $1 == 1, it is the first token, then for any following token,
-# this function is called with $1 == 0, until end of command is occured (enter
-# or ;, etc.).
+# is called with $1 == 1, it ("example") is the first token ($2), then for any
+# following token, this function is called with $1 == 0, until end of command
+# is occured (i.e. til enter is pressed or ";" is put into source, or the command
+# line simply ends).
+#
+# Other tips are:
+# - $CURSOR holds cursor position
+# - $BUFFER holds whole command line buffer
+#
+# The function receives $BUFFER but via sequence of tokens, which are shell words,
+# e.g. "a b c" is a shell word, while a b c are 3 shell words.
+#
+# FAST_HIGHLIGHT is a friendly hash array which allows to store strings without
+# creating global parameters (variables). If you need hash, just use it first
+# declaring, under some distinct name like: typeset -gA CHROMA_EXPLE_DICT.
+# Remember to reset the hash and others at __first_call == 1, so that you have
+# a fresh state for new command.
 
 (( next_word = 2 | 8192 ))
 
