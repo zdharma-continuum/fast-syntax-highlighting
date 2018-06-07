@@ -39,6 +39,8 @@
 # Remember to reset the hash and others at __first_call == 1, so that you have
 # a fresh state for new command.
 
+# Keep chroma-takever state meaning: until ;, handle highlighting via chroma.
+# So the below 8192 assignment takes care that next token will be routed to chroma.
 (( next_word = 2 | 8192 ))
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
