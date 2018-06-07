@@ -25,23 +25,23 @@ integer __idx1 __idx2
     # FAST_HIGHLIGHT is used because it survives between calls, and
     # allows to use a single global hash only, instead of multiple
     # global variables.
-    FAST_HIGHLIGHT[chrome-git-got-eswitch]=0
+    FAST_HIGHLIGHT[chrome-perl-got-eswitch]=0
     __style=${FAST_THEME_NAME}command
 } || {
     # Following call, i.e. not the first one.
 
-    if [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-git-got-subcommand]} -eq 0 ]]; then
+    if [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-perl-got-subcommand]} -eq 0 ]]; then
         __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
 
         if [[ "$__wrd" = "-e" || ("$__wrd" = -*e* && "$__wrd" != --*) ]]; then
-            FAST_HIGHLIGHT[chrome-git-got-eswitch]=1
+            FAST_HIGHLIGHT[chrome-perl-got-eswitch]=1
         fi
     else
         __wrd="${__wrd//\`/x}"
         __arg="${__arg//\`/x}"
         __wrd="${(Q)__wrd}"
-        if (( FAST_HIGHLIGHT[chrome-git-got-eswitch] == 1 )); then
-            FAST_HIGHLIGHT[chrome-git-got-eswitch]=0
+        if (( FAST_HIGHLIGHT[chrome-perl-got-eswitch] == 1 )); then
+            FAST_HIGHLIGHT[chrome-perl-got-eswitch]=0
             if perl -ce "$__wrd" >/dev/null 2>&1; then
                 # Add correct-subtle style
                 (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
