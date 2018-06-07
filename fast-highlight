@@ -145,6 +145,7 @@ FAST_HIGHLIGHT+=(
   chroma-egrep   chroma/-grep.ch
   chroma-fgrep   chroma/-grep.ch
   chroma-perl    chroma/-perl.ch
+  chroma-make    chroma/-make.ch
 )
 
 # Assignments seen, to know if math parameter exists
