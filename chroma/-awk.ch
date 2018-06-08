@@ -55,7 +55,7 @@ integer __idx1 __idx2
             
             # Highlight keywords
             FSH_LIST=()
-            : "${__wrd//(#m)(BEGIN|END|FIELDWIDTHS|RS|ARGC|ARGV|ENVIRON|NF|NR|IGNORECASE|FILENAME|if|then|else|while|toupper|tolower|function|print)/$(( fsh_sy_h_append($MBEGIN, $MEND) ))}";
+            : "${__wrd//(#m)(BEGIN|END|FIELDWIDTHS|RS|ARGC|ARGV|ENVIRON|NF|NR|IGNORECASE|FILENAME|if|then|else|while|toupper|tolower|function|print|sub)/$(( fsh_sy_h_append($MBEGIN, $MEND) ))}";
             for __val in "${FSH_LIST[@]}" ; do
                 [[ ${__wrd[${__val%%;;*}]} = [a-zA-Z0-9_] || ${__wrd[${__val##*;;}+1]} = [a-zA-Z0-9_] ]] && continue
                 __idx1=$(( __start_pos + ${__val%%;;*} ))
@@ -65,10 +65,10 @@ integer __idx1 __idx2
             done
 
             # Highlight regex characters
-            __chars="*+\\)([]^"
+            __chars="*+\\)(\{\}[]^"
             __idx1=__start_pos
             __idx2=__start_pos
-            while [[ "$__wrd" = (#b)[^$__chars]#([\\][\\])#((+|\*|\[|\]|\)|\(|\^)|[\\](+|\*|\[|\]|\)|\(|\^))(*) ]]; do
+            while [[ "$__wrd" = (#b)[^$__chars]#([\\][\\])#((+|\*|\[|\]|\)|\(|\^|\}|\{)|[\\](+|\*|\[|\]|\)|\(|\^|\{|\}))(*) ]]; do
                 if [[ -n "${match[3]}" ]]; then
                     __idx1+=${mbegin[3]}-1
                     __idx2=__idx1+${mend[3]}-${mbegin[3]}+1
