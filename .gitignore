@@ -1,4 +1,6 @@
 current_theme.zsh
+*.txt
+test/out.parse
 
 ### Vim
 # Swap
