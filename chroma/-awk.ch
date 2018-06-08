@@ -16,7 +16,7 @@
 (( next_word = 2 | 8192 ))
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-local __style __chars __val
+local __style __chars __val __style2
 integer __idx1 __idx2
 
 # First call, i.e. command starts, i.e. "grep" token etc.
@@ -44,9 +44,15 @@ integer __idx1 __idx2
         # First non-option token is the pattern (regex), we will
         # highlight it.
         if (( FAST_HIGHLIGHT[chroma-awk-counter] == 1 && FAST_HIGHLIGHT[chroma-awk-f-seen] == 0 )); then
-            (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
-                reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}subtle-bg]}")
+            if print -r -- "${(Q)__wrd}" | gawk --source 'BEGIN { exit } END { exit 0 }' -f - >/dev/null 2>&1; then
+                __style2="${FAST_THEME_NAME}subtle-bg"
+            else
+                __style2="${FAST_THEME_NAME}incorrect-subtle"
+            fi
 
+            (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
+                reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style2]}")
+            
             # Highlight keywords
             FSH_LIST=()
             : "${__wrd//(#m)(BEGIN|END|FIELDWIDTHS|RS|ARGC|ARGV|ENVIRON|NF|NR|IGNORECASE|FILENAME|if|then|else|while|toupper|tolower|function|print)/$(( fsh_sy_h_append($MBEGIN, $MEND) ))}";
@@ -54,7 +60,8 @@ integer __idx1 __idx2
                 [[ ${__wrd[${__val%%;;*}]} = [a-zA-Z0-9_] || ${__wrd[${__val##*;;}+1]} = [a-zA-Z0-9_] ]] && continue
                 __idx1=$(( __start_pos + ${__val%%;;*} ))
                 __idx2=__idx1+${__val##*;;}-${__val%%;;*}+1
-                (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}-1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]},${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}subtle-bg]}")
+                (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}-1, __start >= 0 )) && \
+                    reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]},${FAST_HIGHLIGHT_STYLES[$__style2]}")
             done
 
             # Highlight regex characters
@@ -65,7 +72,8 @@ integer __idx1 __idx2
                 if [[ -n "${match[3]}" ]]; then
                     __idx1+=${mbegin[3]}-1
                     __idx2=__idx1+${mend[3]}-${mbegin[3]}+1
-                    (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]},${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}subtle-bg]}")
+                    (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}, __start >= 0 )) && \
+                        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]},${FAST_HIGHLIGHT_STYLES[$__style2]}")
                     __idx1=__idx2
                 else
                     __idx1+=${mbegin[5]}-1
