@@ -16,7 +16,7 @@
 (( next_word = 2 | 8192 ))
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-local __style __chars
+local __style __chars __val
 integer __idx1 __idx2
 
 # First call, i.e. command starts, i.e. "grep" token etc.
@@ -40,9 +40,13 @@ integer __idx1 __idx2
         # First non-option token is the pattern (regex), we will
         # highlight it.
         if (( FAST_HIGHLIGHT[chroma-awk-counter] == 1 && FAST_HIGHLIGHT[chroma-awk-f-seen] == 0 )); then
-
             # Highlight keywords
-            [[ "$__wrd" = (#b)*[^a-zA-Z0-9](print)([^a-zA-Z0-9]|(#e))* ]] && (( __start=__start_pos-${#PREBUFFER}+${mbegin[1]}-1, __end=__start_pos-${#PREBUFFER}+${mend[1]}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}builtin]}")
+            : "${__wrd//(#m)(BEGIN|END|print)/$(( fsh_sy_h_append($MBEGIN, $MEND) ))}";
+            for __val in "${FSH_LIST[@]}" ; do
+                __idx1=$(( __start_pos + ${__val%%;;*} ))
+                __idx2=__idx1+${__val##*;;}-${__val%%;;*}+1
+                (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+            done
 
             # Highlight regex characters
             __chars="*+\\)([]^"
