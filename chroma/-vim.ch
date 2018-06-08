@@ -24,12 +24,15 @@ local -a __viminfo
 
 # First call, i.e. command starts, i.e. "grep" token etc.
 (( __first_call )) && {
-    __style=${FAST_THEME_NAME}command
+    (( ${+commands[vim]} )) && __style=${FAST_THEME_NAME}command || __style=${FAST_THEME_NAME}unknown-token
 
     { __viminfo=( ${(f)"$(<$HOME/.viminfo)"} ); } >> /dev/null
     __viminfo=( "${${(M)__viminfo[@]:#>*}[@]:t}" )
     __viminfo=( "${__viminfo[@]:#COMMIT_EDITMSG}" )
     zle -M "Last opened:"$'\n'"${(F)__viminfo[1,5]}"
+} || {
+    # Pass almost everything to big loop
+    return 1
 }
 
 # Add region_highlight entry (via `reply' array).
