@@ -1043,4 +1043,16 @@ typeset -ga ZLAST_COMMANDS
   __fast_highlight_main__command_type_cache=()
 }
 
+# -------------------------------------------------------------------------------------------------
+# Other
+# -------------------------------------------------------------------------------------------------
+
+
+typeset -ga FSH_LIST
+-fsh_sy_h_shappend() {
+    FSH_LIST+=( "$(( $1 - 1 ));;$(( $2 ))" )
+}
+
+functions -M fsh_sy_h_append 2 2 -fsh_sy_h_shappend
+
 # vim:ft=zsh:sw=2:sts=2
