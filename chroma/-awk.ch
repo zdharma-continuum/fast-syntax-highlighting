@@ -41,6 +41,7 @@ integer __idx1 __idx2
         # highlight it.
         if (( FAST_HIGHLIGHT[chroma-awk-counter] == 1 && FAST_HIGHLIGHT[chroma-awk-f-seen] == 0 )); then
             # Highlight keywords
+            FSH_LIST=()
             : "${__wrd//(#m)(BEGIN|END|print)/$(( fsh_sy_h_append($MBEGIN, $MEND) ))}";
             for __val in "${FSH_LIST[@]}" ; do
                 __idx1=$(( __start_pos + ${__val%%;;*} ))
