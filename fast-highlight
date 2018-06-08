@@ -879,8 +879,8 @@ typeset -ga ZLAST_COMMANDS
   # Do we have whole buffer? I.e. start at zero
   [[ "$3" != 0 ]] && return 0
 
-  __inputs=( ${(0)${(S)__buf[1,110]//(#b)*\$\(([^\(]?#)([^\\\"]\)|(#e))/${mbegin[1]};${match[1]}${match[2]%\)}${__nul}}%$__nul*} )
-  if [[ "${__inputs[1]}" != "${__buf[1,110]}" ]]; then
+  __inputs=( ${(0)${(S)__buf[1,250]//(#b)*\$\(([^\(]?#)([^\\\"]\)|(#e))/${mbegin[1]};${match[1]}${match[2]%\)}${__nul}}%$__nul*} )
+  if [[ "${__inputs[1]}" != "${__buf[1,250]}" ]]; then
     if [[ -n "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}" ]]; then
       __idx=1
       __buf="$FAST_THEME_NAME"
