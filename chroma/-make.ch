@@ -29,6 +29,10 @@ local -a __lines_list
 } || {
     # Following call, i.e. not the first one.
 
+    # Check if chroma should end – test if token is of type
+    # "starts new command", if so pass-through – chroma ends
+    [[ "$__arg_type" = 3 ]] && return 2
+
     if [[ "$__wrd" = -* ]]; then
         __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
     else

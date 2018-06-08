@@ -28,6 +28,10 @@ integer __idx1 __idx2
 } || {
     # Following call, i.e. not the first one.
 
+    # Check if chroma should end – test if token is of type
+    # "starts new command", if so pass-through – chroma ends
+    [[ "$__arg_type" = 3 ]] && return 2
+
     if [[ "$__wrd" = -* ]]; then
         # Detected option, add style for it.
         [[ "$__wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \

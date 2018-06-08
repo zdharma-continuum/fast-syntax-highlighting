@@ -30,6 +30,10 @@ integer __idx1 __idx2
 } || {
     # Following call, i.e. not the first one.
 
+    # Check if chroma should end – test if token is of type
+    # "starts new command", if so pass-through – chroma ends
+    [[ "$__arg_type" = 3 ]] && return 2
+
     if [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-perl-got-subcommand]} -eq 0 ]]; then
         __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
 
