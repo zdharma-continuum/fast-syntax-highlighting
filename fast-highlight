@@ -253,12 +253,12 @@ typeset -ga ZLAST_COMMANDS
   # in_array_assignment true between 'a=(' and the matching ')'
   # braces_stack: "R" for round, "Q" for square, "Y" for curly
   # _mybuf, cdpath_dir are used in sub-functions
-  local _start_pos="$3" _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$1$2" _mybuf cdpath_dir active_command alias_target _was_double_hyphen=0 __nul=$'\0'
+  local _start_pos="$3" _end_pos __start __end highlight_glob=1 __arg __style in_array_assignment=0 MATCH expanded_path braces_stack __buf="$1$2" _mybuf __workbuf cdpath_dir active_command alias_target _was_double_hyphen=0 __nul=$'\0' __tmp
   # __arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
   integer __arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize
-  local -a match mbegin mend __inputs
+  local -a match mbegin mend __inputs __list
 
   # This comment explains the numbers:
   # BIT_for - word after reserved-word-recognized `for'
@@ -879,22 +879,39 @@ typeset -ga ZLAST_COMMANDS
   # Do we have whole buffer? I.e. start at zero
   [[ "$3" != 0 ]] && return 0
 
-  __inputs=( ${(0)${(S)__buf[1,250]//(#b)*\$\(([^\(]?#)([^\\\"]\)|(#e))/${mbegin[1]};${match[1]}${match[2]%\)}${__nul}}%$__nul*} )
-  if [[ "${__inputs[1]}" != "${__buf[1,250]}" ]]; then
+  _mybuf="${__buf[1,250]}" __workbuf="$_mybuf" __idx=0 __pos=0
+
+  while [[ "$__workbuf" = (#b)[^\(\)]#([\(\)])(*) ]]; do
+    if [[ "${match[1]}" == \( ]]; then
+      [[ ${_mybuf[__idx+${mbegin[1]}-1]} = '$' ]] && __list+=( $__pos )
+      # Increase parenthesis level
+      __pos+=1
+    else
+      # Decrease parenthesis level
+      __pos=__pos-1
+      [[ -z "${__list[(r)$__pos]}" ]] && [[ "$__pos" -gt 0 ]] && _mybuf[__idx+${mbegin[1]}]=x
+    fi
+    __idx+=${mbegin[2]}-1
+    __workbuf="${match[2]}"
+  done
+
+  # Run on fake buffer with replaced parentheses: ")" into "x"
+  __inputs=( ${(0)${(S)_mybuf//(#b)*\$\((?#)(\)|(#e))/${mbegin[1]};${mend[1]}${__nul}}%$__nul*} )
+  if [[ "${__inputs[1]}" != "$_mybuf" ]]; then
     if [[ -n "${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}" ]]; then
       __idx=1
-      __buf="$FAST_THEME_NAME"
+      __tmp="$FAST_THEME_NAME"
       FAST_THEME_NAME="${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}"
       (( ${+FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}default]} )) || source "$FAST_BASE_DIR/secondary_theme.zsh"
     else
       __idx=0
     fi
     for _mybuf in $__inputs; do
-      # Also replace last not-\) with not-\, because above solution
-      # (${match[2]%\)}) frankly doesn't always work
-      -fast-highlight-process "$PREBUFFER" "${${_mybuf#*;}/(#b)([^\\\"])\)(#e)/${match[1]}}" "$(( ${_mybuf%%;*} - 1 ))"
+      # Pass authentic buffer for recursive analysis
+      -fast-highlight-process "$PREBUFFER" "${__buf[${_mybuf%%;*},${_mybuf##*;}]}" "$(( ${_mybuf%%;*} - 1 ))"
     done
-    (( __idx )) && FAST_THEME_NAME="$__buf"
+    # Restore theme
+    (( __idx )) && FAST_THEME_NAME="$__tmp"
   fi
 
   return 0
