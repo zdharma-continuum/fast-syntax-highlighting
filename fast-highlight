@@ -139,20 +139,22 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
 typeset -gA FAST_HIGHLIGHT
 
 FAST_HIGHLIGHT+=(
-  chroma-git     chroma/-git.ch
-  chroma-example chroma/-example.ch
-  chroma-grep    chroma/-grep.ch
+  chroma-grep    chroma/-grep.ch   # Triple
   chroma-egrep   chroma/-grep.ch
   chroma-fgrep   chroma/-grep.ch
-  chroma-perl    chroma/-perl.ch
-  chroma-make    chroma/-make.ch
-  chroma-awk     chroma/-awk.ch
+  chroma-awk     chroma/-awk.ch    # Triple
   chroma-gawk    chroma/-awk.ch
   chroma-mawk    chroma/-awk.ch
-  chroma-vim     chroma/-vim.ch
-  chroma-source  chroma/-source.ch
+  chroma-source  chroma/-source.ch # Double
   chroma-.       chroma/-source.ch
-  chroma-sh      chroma/-sh.ch
+  chroma-sh      chroma/-sh.ch     # Triple
+  chroma-zsh     chroma/-sh.ch
+  chroma-bash    chroma/-sh.ch
+  chroma-vim     chroma/-vim.ch
+  chroma-make    chroma/-make.ch
+  chroma-perl    chroma/-perl.ch
+  chroma-git     chroma/-git.ch
+  chroma-example chroma/-example.ch
 )
 
 # Assignments seen, to know if math parameter exists
