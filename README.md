@@ -1,5 +1,14 @@
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D6XDCHDSBDSDG)
 
+```
+ _____         _       ____              _                  _   _ _       _     _ _       _     _   _
+|  ___|_ _ ___| |_    / ___| _   _ _ __ | |_ __ ___  __    | | | (_) __ _| |__ | (_) __ _| |__ | |_(_)_ __   __ _
+| |_ / _` / __| __|___\___ \| | | | '_ \| __/ _` \ \/ /____| |_| | |/ _` | '_ \| | |/ _` | '_ \| __| | '_ \ / _` |
+|  _| (_| \__ \ ||_____|__) | |_| | | | | || (_| |>  <_____|  _  | | (_| | | | | | | (_| | | | | |_| | | | | (_| |
+|_|  \__,_|___/\__|   |____/ \__, |_| |_|\__\__,_/_/\_\    |_| |_|_|\__, |_| |_|_|_|\__, |_| |_|\__|_|_| |_|\__, |
+                             |___/                                  |___/           |___/                   |___/
+```
+
 # Zshell Fast Syntax Highlighting
 
 60 commits that optimized standard `zsh-syntax-highlighting` to the point that it can edit `10 kB`
