@@ -150,6 +150,8 @@ FAST_HIGHLIGHT+=(
   chroma-gawk    chroma/-awk.ch
   chroma-mawk    chroma/-awk.ch
   chroma-vim     chroma/-vim.ch
+  chroma-source  chroma/-source.ch
+  chroma-.       chroma/-source.ch
 )
 
 # Assignments seen, to know if math parameter exists
