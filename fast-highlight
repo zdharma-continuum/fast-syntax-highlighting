@@ -152,6 +152,7 @@ FAST_HIGHLIGHT+=(
   chroma-vim     chroma/-vim.ch
   chroma-source  chroma/-source.ch
   chroma-.       chroma/-source.ch
+  chroma-sh      chroma/-sh.ch
 )
 
 # Assignments seen, to know if math parameter exists
