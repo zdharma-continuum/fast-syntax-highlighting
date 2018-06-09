@@ -16,13 +16,13 @@
 
 2. Big loop occurs a command that has a chroma, e.g. `git`.
 
-3. Big loop enters "chroma" state, calls associated chroma.
+3. Big loop enters "chroma" state, calls associated chroma function.
 
-4. Chroma takes care of "chroma" state, ensures will be set also for next token.
+4. Chroma takes care of "chroma" state, ensures it will be set also for next token.
 
 5. "chroma" state is active, so all following tokens are routed to the chroma.
 
-6. When finished processing any single token by the associated chroma, it returs 0
+6. When processing of single token is complete, the associated chroma returs 0
    (shell-truth) to request no further processing by the big loop.
 
 7. It can also return 1 so that single, current token will be passed into big-loop
@@ -46,7 +46,6 @@
 
 ## Example Chroma-Function
 
-.-example.ch
 [source,zsh]
 ----
 # -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
