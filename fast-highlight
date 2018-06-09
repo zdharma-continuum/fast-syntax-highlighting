@@ -879,7 +879,13 @@ typeset -ga ZLAST_COMMANDS
   # Do we have whole buffer? I.e. start at zero
   [[ "$3" != 0 ]] && return 0
 
-  _mybuf="${__buf[1,250]}" __workbuf="$_mybuf" __idx=0 __pos=0
+  # The loop overwrites ")" with "x", except those from $( ) substitution
+  #
+  # __pos: current nest level, starts from 0
+  # __workbuf: copy of __buf, with limit on 250 characters
+  # __idx: index in whole command line buffer
+  # __list: list of coordinates of ) which shouldn't be ovewritten
+  _mybuf="${__buf[1,250]}" __workbuf="$_mybuf" __idx=0 __pos=0 __list=()
 
   while [[ "$__workbuf" = (#b)[^\(\)]#([\(\)])(*) ]]; do
     if [[ "${match[1]}" == \( ]]; then
