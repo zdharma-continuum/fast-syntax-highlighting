@@ -147,9 +147,10 @@ FAST_HIGHLIGHT+=(
   chroma-mawk    chroma/-awk.ch
   chroma-source  chroma/-source.ch # Double
   chroma-.       chroma/-source.ch
-  chroma-sh      chroma/-sh.ch     # Triple
+  chroma-sh      chroma/-sh.ch     # Four targets
   chroma-zsh     chroma/-sh.ch
   chroma-bash    chroma/-sh.ch
+  chroma-fish    chroma/-sh.ch
   chroma-vim     chroma/-vim.ch
   chroma-make    chroma/-make.ch
   chroma-perl    chroma/-perl.ch
