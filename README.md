@@ -58,6 +58,11 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-06-09**
+
+New chroma functions: `awk`, `make`, `perl`, `vim`. Checkout the [video](https://asciinema.org/a/186234),
+it shows functionality of `awk` – compiling of code and NOT running it. The perl.in [in action](https://asciinema.org/a/186098).
+
 **2018-06-06**
 
 FSH gained a new architecture – "chroma functions". They are similar to "completion functions", i.e. they
