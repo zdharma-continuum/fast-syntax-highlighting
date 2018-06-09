@@ -87,7 +87,12 @@ _make-parseMakefile () {
     done
 }
 
-_make-parseMakefile
-reply=( "${TARGETS[@]}" )
+if [[ -z "${FAST_HIGHLIGHT[chroma-make-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[chroma-make-cache-born-at] )) -gt 7 ]]; then
+    _make-parseMakefile
+    FAST_HIGHLIGHT[chroma-make-cache-born-at]="$EPOCHSECONDS"
+    FAST_HIGHLIGHT[chroma-make-cache]="${(j:;:)TARGETS}"
+fi
+
+reply=( "${(s:;:)FAST_HIGHLIGHT[chroma-make-cache]}" )
 
 # vim:ft=zsh:et

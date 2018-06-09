@@ -43,12 +43,12 @@ local -a __lines_list
             __wrd="${__wrd//\`/x}"
             __wrd="${(Q)__wrd}"
 
-            -fast-make-targets < Makefile # returns in reply
-
-            if [[ "${reply[(r)$__wrd]}" ]]; then
-                (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
-            else
-                (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+            if [[ -f Makefile ]] && -fast-make-targets < Makefile; then
+                if [[ "${reply[(r)$__wrd]}" ]]; then
+                    (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
+                else
+                    (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+                fi
             fi
         else
             # Pass-through to the big-loop outside
