@@ -43,6 +43,15 @@
 - $4 - a private copy of $_end_pos from the upper scope; denotes where token
        ends (at which index in the string, the command line).
 
+So example invocation could look like this:
+
+----
+chroma/-example.ch 1 "grep" "$_start_pos" "$_end_pos"
+----
+
+Such call is in fact very simple, and additionally, in general user doesn't
+need to do such calls, big-loop will be doing them. User should be however
+aware what's going on.
 
 ## Example Chroma-Function
 
