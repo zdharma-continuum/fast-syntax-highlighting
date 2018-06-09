@@ -85,7 +85,7 @@ local -a __lines_list
                 elif [[ "$__wrd" = "-m" ]]; then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=1
                 fi
-            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
+            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]]; then
                 [[ "$__wrd" != -* ]] && {
                     (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                     if (( __idx1 == 2 )); then
