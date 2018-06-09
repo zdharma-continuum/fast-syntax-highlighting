@@ -28,7 +28,7 @@
 7. It can also return 1 so that single, current token will be passed into big-loop
    for processing.
 
-## Chroma Function Arguments
+## Chroma-Function Arguments
 
 - $1 - 0 or 1, denoting if it's the first call to the chroma, or a following one,
 
@@ -44,7 +44,7 @@
        ends (at which index in the string, the command line).
 
 
-## Example Chroma Function
+## Example Chroma-Function
 
 .-example.ch
 [source,zsh]
@@ -58,21 +58,11 @@
 #
 # $1 - 0 or 1, denoting if it's first call to the chroma, or following one
 #
-# $2 - the current token, also accessible by $__arg from the above scope -
-#      basically a private copy of $__arg; the token can be eg.: "grep"
+# $2 - like above document says
 #
-# $3 - a private copy of $_start_pos, i.e. the position of the token in the
-#      command line buffer, used to add region_highlight entry (see man),
-#      because Zsh colorizes by *ranges* in command line buffer
+# $3 - ...
 #
-# $4 - a private copy of $_end_pos from the above scope
-#
-#
-# Overall functioning is: when command "example" is occured, this function
-# is called with $1 == 1, it ("example") is the first token ($2), then for any
-# following token, this function is called with $1 == 0, until end of command
-# is occured (i.e. till enter is pressed or ";" is put into source, or the
-# command line simply ends).
+# $4 - ...
 #
 # Other tips are:
 # - $CURSOR holds cursor position
@@ -85,8 +75,8 @@
 # e.g. "a b c" is a shell word, while a b c are 3 shell words.
 #
 # FAST_HIGHLIGHT is a friendly hash array which allows to store strings without
-# creating global parameters (variables). If you need hash, just use it first
-# declaring, under some distinct name like: typeset -gA CHROMA_EXPLE_DICT.
+# creating global parameters (variables). If you need hash, go ahead and use it,
+# declaring first, under some distinct name like: typeset -gA CHROMA_EXPLE_DICT.
 # Remember to reset the hash and others at __first_call == 1, so that you have
 # a fresh state for new command.
 
@@ -155,15 +145,9 @@ integer __idx1 __idx2
 
 # We aren't passing-through, do obligatory things ourselves.
 # _start_pos=$_end_pos advainces pointers in command line buffer.
-#
-# To pass through means to `return 1'. The highlighting of
-# this single token is then done by fast-syntax-highlighting's
-# main code and chroma doesn't have to do anything.
 (( this_word = next_word ))
 _start_pos=$_end_pos
 
 return 0
-
-# vim:ft=zsh:et:sw=4
 ----
 
