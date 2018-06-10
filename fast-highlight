@@ -811,10 +811,18 @@ typeset -ga ZLAST_COMMANDS
                  elif (( in_redirection == 2 )); then
                    __style=${FAST_THEME_NAME}redirection
                  else
-                   if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]] && exec {PCFD}< <(-fast-highlight-check-path ); then
-                     FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
-                     zle -F -w "$PCFD" fast-highlight-check-path-handler
-                     already_added=1
+                   if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]]; then
+                     if [[ -z "${FAST_HIGHLIGHT[cache-path-${__arg}-${_start_pos}]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[cache-path-${__arg}-${_start_pos}-born-at] )) -gt 8 ]]; then
+                       exec {PCFD}< <(-fast-highlight-check-path)
+                       FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
+                       zle -F -w "$PCFD" fast-highlight-check-path-handler
+                       already_added=1
+                     elif [[ "${FAST_HIGHLIGHT[cache-path-${__arg}-${_start_pos}]}" -eq 1 ]]; then
+                       (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+                       already_added=1
+                     else
+                       __style=${FAST_THEME_NAME}default
+                     fi
                    else
                      __style=${FAST_THEME_NAME}default
                    fi
@@ -935,6 +943,9 @@ typeset -ga ZLAST_COMMANDS
 # Else, return non-zero (and the contents of $REPLY is undefined).
 -fast-highlight-check-path()
 {
+  # This is to fill cache
+  print -r -- "$__arg"
+
   : ${expanded_path:=${(Q)~__arg}}
   [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && { print -r -- "- $_start_pos $_end_pos"; return 1; }
 
@@ -952,21 +963,27 @@ typeset -ga ZLAST_COMMANDS
 }
 
 -fast-highlight-check-path-handler() {
-  local IFS=$'\n' PCFD="$1" line val
+  local IFS=$'\n' PCFD="$1" line stripped val
   integer idx
 
-  if read -r -u "$PCFD" line; then
-    idx="${${FAST_HIGHLIGHT[path-queue]}[(I)${line#- }]}"
-    (( idx > 0 )) && {
-      if [[ "$line" != -* ]]; then
-        region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
-        zle .redisplay
-      fi
-      line="${line#- }"
-      val="${FAST_HIGHLIGHT[path-queue]}"
-      val[idx-1,idx+${#line}]=""
-      FAST_HIGHLIGHT[path-queue]="$val"
-    }
+  if read -r -u "$PCFD" val; then
+    if read -r -u "$PCFD" line; then
+      stripped="${line#- }"
+      FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}-born-at]="$EPOCHSECONDS"
+      idx="${${FAST_HIGHLIGHT[path-queue]}[(I)$stripped]}"
+      (( idx > 0 )) && {
+        if [[ "$line" != -* ]]; then
+          FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=1
+          region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+          zle .redisplay
+        else
+          FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=0
+        fi
+        val="${FAST_HIGHLIGHT[path-queue]}"
+        val[idx-1,idx+${#stripped}]=""
+        FAST_HIGHLIGHT[path-queue]="$val"
+      }
+    fi
   fi
 
   zle -F ${PCFD}
