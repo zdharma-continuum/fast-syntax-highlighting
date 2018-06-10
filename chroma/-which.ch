@@ -56,7 +56,7 @@ local -a __results
             if [[ "$__idx1" -eq 1 ]]; then
                 __chars="{"
                 __output="$(command which "$__wrd")"
-                FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"*/bin/which: $__output"
+                FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"command which: $__output"
                 __output="$(builtin which "$__wrd")"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"builtin which: ${${${${__output[1,100]}//$'\n'/;}//$'\t'/  }//$__chars;/$__chars}${__output[101,101]:+...}"
                 __output="$(builtin type -w "$__wrd")"
@@ -65,6 +65,9 @@ local -a __results
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whence -v: $__output"
                 __output="$(command whereis "$__wrd")"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whereis: $__output"
+                __output="$(command whatis "$__wrd")"
+                __output="${${__output%%$'\n'*}//[[:blank:]]##/ }"
+                FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whatis: $__output"
             fi
         fi
     fi
