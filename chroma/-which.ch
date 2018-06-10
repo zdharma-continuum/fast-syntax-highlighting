@@ -19,7 +19,7 @@
 (( next_word = 2 | 8192 ))
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-local __style __output
+local __style __output __chars
 integer __idx1 __idx2
 local -a __results
 
@@ -54,13 +54,16 @@ local -a __results
         else
             (( FAST_HIGHLIGHT[chroma-which-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-which-counter] ))
             if [[ "$__idx1" -eq 1 ]]; then
-                __output="$(which "$__wrd")"
-                FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"which -w: $__output"
-                __output="$(type -w "$__wrd")"
+                __chars="{"
+                __output="$(command which "$__wrd")"
+                FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"*/bin/which: $__output"
+                __output="$(builtin which "$__wrd")"
+                FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"builtin which: ${${${${__output[1,100]}//$'\n'/;}//$'\t'/  }//$__chars;/$__chars}${__output[101,101]:+...}"
+                __output="$(builtin type -w "$__wrd")"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"type -w: $__output"
-                __output="$(whence -v "$__wrd")"
+                __output="$(builtin whence -v "$__wrd")"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whence -v: $__output"
-                __output="$(whereis "$__wrd")"
+                __output="$(command whereis "$__wrd")"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whereis: $__output"
             fi
         fi
