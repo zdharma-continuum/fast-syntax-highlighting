@@ -159,6 +159,7 @@ FAST_HIGHLIGHT+=(
   chroma-docker  chroma/-docker.ch
   chroma-autoload chroma/-autoload.ch
   chroma-ssh     chroma/-ssh.ch
+  chroma-scp     chroma/-scp.ch
 )
 
 # Assignments seen, to know if math parameter exists
