@@ -1,8 +1,8 @@
 # -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
 # Copyright (c) 2018 Sebastian Gniazdowski
 #
-# Outputs (under prompt) result of query done with `which', `whatis', `whence -v',
-# `where', `type -w'.
+# Outputs (under prompt) result of query done with `which', `type -w',
+# `whence -v', `whereis', `whatis'.
 #
 # $1 - 0 or 1, denoting if it's first call to the chroma, or following one
 #
