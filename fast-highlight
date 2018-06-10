@@ -336,6 +336,15 @@ typeset -ga ZLAST_COMMANDS
   local proc_buf="$__buf" needle
   for __arg in ${interactive_comments-${(z)__buf}} \
              ${interactive_comments+${(zZ+c+)__buf}}; do
+
+    # Async path checkers, that didn't manage to return result
+    # on time, will be forgoten by this assignment (unless,
+    # what is very probable, indices will not change, then
+    # the more new async patch checker will be forgoten by
+    # a regular operation - removal of highlighted paths from
+    # this hash key
+    FAST_HIGHLIGHT[path_queue]=""
+
     # Initialize $next_word to its default value?
     (( in_redirection = in_redirection > 0 ? in_redirection - 1 : in_redirection ));
     (( next_word = (in_redirection == 0) ? 2 : next_word )) # else Stall $next_word.
@@ -810,17 +819,10 @@ typeset -ga ZLAST_COMMANDS
                  elif (( in_redirection == 2 )); then
                    __style=${FAST_THEME_NAME}redirection
                  else
-                   if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]] && -fast-highlight-check-path; then
-                     # ADD
-                     (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+                   if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]] && exec {PCFD}< <(-fast-highlight-check-path ); then
+                     FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
+                     zle -F -w "$PCFD" fast-highlight-check-path-handler
                      already_added=1
-
-                     [[ -n "$FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path_pathseparator]" && "$FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]" != "$FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path_pathseparator]" ]] && {
-                       for (( __pos = _start_pos; __pos <= _end_pos; __pos++ )) ; do
-                         # ADD
-                         [[ ${__buf[__pos]} == "/" ]] && (( __start=__pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __start - 1 )) $__start ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path_pathseparator]}")
-                       done
-                     }
                    else
                      __style=${FAST_THEME_NAME}default
                    fi
@@ -942,19 +944,44 @@ typeset -ga ZLAST_COMMANDS
 -fast-highlight-check-path()
 {
   : ${expanded_path:=${(Q)~__arg}}
-  [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && return 1
+  [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && { print -r -- "- $_start_pos $_end_pos"; return 1; }
 
-  [[ -z $expanded_path ]] && return 1
-  [[ -e $expanded_path ]] && return 0
+  [[ -z $expanded_path ]] && { print -r -- "- $_start_pos $_end_pos"; return 1; }
+  [[ -e $expanded_path ]] && { print -r -- "$_start_pos $_end_pos"; return 0; }
 
   # Search the path in CDPATH, only for CD command
   [[ "$active_command" = "cd" ]] && for cdpath_dir in $cdpath ; do
-    [[ -e "$cdpath_dir/$expanded_path" ]] && return 0
+    [[ -e "$cdpath_dir/$expanded_path" ]] && { print -r -- "$_start_pos $_end_pos"; return 0; }
   done
 
   # It's not a path.
+  print -r -- "- $_start_pos $_end_pos"
   return 1
 }
+
+-fast-highlight-check-path-handler() {
+  local IFS=$'\n' PCFD="$1" line val
+  integer idx
+
+  if read -r -u "$PCFD" line; then
+    idx="${${FAST_HIGHLIGHT[path-queue]}[(I)${line#- }]}"
+    (( idx > 0 )) && {
+      if [[ "$line" != -* ]]; then
+        region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+        zle .redisplay
+      fi
+      line="${line#- }"
+      val="${FAST_HIGHLIGHT[path-queue]}"
+      val[idx-1,idx+${#line}]=""
+      FAST_HIGHLIGHT[path-queue]="$val"
+    }
+  fi
+
+  zle -F ${PCFD}
+  exec {PCFD}<&-
+}
+
+zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
 
 # Highlight special blocks inside double-quoted strings
 #
