@@ -162,6 +162,7 @@ FAST_HIGHLIGHT+=(
   chroma-ssh     chroma/-ssh.ch
   chroma-scp     chroma/-scp.ch
   chroma-which   chroma/-which.ch
+  chroma-printf  chroma/-printf.ch
 )
 
 # Assignments seen, to know if math parameter exists
