@@ -337,14 +337,6 @@ typeset -ga ZLAST_COMMANDS
   for __arg in ${interactive_comments-${(z)__buf}} \
              ${interactive_comments+${(zZ+c+)__buf}}; do
 
-    # Async path checkers, that didn't manage to return result
-    # on time, will be forgoten by this assignment (unless,
-    # what is very probable, indices will not change, then
-    # the more new async patch checker will be forgoten by
-    # a regular operation - removal of highlighted paths from
-    # this hash key
-    FAST_HIGHLIGHT[path_queue]=""
-
     # Initialize $next_word to its default value?
     (( in_redirection = in_redirection > 0 ? in_redirection - 1 : in_redirection ));
     (( next_word = (in_redirection == 0) ? 2 : next_word )) # else Stall $next_word.
