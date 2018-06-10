@@ -53,7 +53,7 @@ local -a __results
         else
             (( FAST_HIGHLIGHT[chroma-ssh-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-ssh-counter] ))
             if [[ "${FAST_HIGHLIGHT[chroma-ssh-counter]}" -eq 1 ]]; then
-                if [[ "$__arg" = *:* ]]; then
+                if [[ "$__arg" = [^:]##:[0-9]## ]]; then
                     FAST_HIGHLIGHT[chroma-ssh-message]+="Format of hostname incorrect, use -p to pass port number"
                 fi
             fi
