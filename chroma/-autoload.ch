@@ -50,7 +50,7 @@ local -a __results
         [[ "${#__results}" -gt 0 ]] && __style=${FAST_THEME_NAME}builtin || __style=${FAST_THEME_NAME}unknown-token
 
         if (( ${+functions[${(Q)__wrd}]} )); then
-            FAST_HIGHLIGHT[chroma-autoload-message]+="Warning: Function ${(Q)__wrd} already exists"$'\n'
+            FAST_HIGHLIGHT[chroma-autoload-message]+="Warning: Function ${(Q)__wrd} already defined (e.g. loaded)"$'\n'
         fi
     fi
 
