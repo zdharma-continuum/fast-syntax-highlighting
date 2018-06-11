@@ -163,6 +163,7 @@ FAST_HIGHLIGHT+=(
   chroma-scp     chroma/-scp.ch
   chroma-which   chroma/-which.ch
   chroma-printf  chroma/-printf.ch
+  chroma-ruby    chroma/-ruby.ch
 )
 
 # Assignments seen, to know if math parameter exists

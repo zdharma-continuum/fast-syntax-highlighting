@@ -276,7 +276,8 @@ autoload -Uz -- is-at-least fast-theme fast-read-ini-file -fast-run-git-command 
                 -fast-run-command
 autoload -Uz -- chroma/-git.ch chroma/-example.ch chroma/-grep.ch chroma/-perl.ch chroma/-make.ch \
                 chroma/-awk.ch chroma/-vim.ch chroma/-source.ch chroma/-sh.ch chroma/-docker.ch \
-                chroma/-autoload.ch chroma/-ssh.ch chroma/-scp.ch chroma/-which.ch chroma/-printf.ch
+                chroma/-autoload.ch chroma/-ssh.ch chroma/-scp.ch chroma/-which.ch chroma/-printf.ch \
+                chroma/-ruby.ch
 source "${ZERO:h}/fast-highlight"
 
 local __fsyh_theme
