@@ -55,17 +55,17 @@ local -a __results
             (( FAST_HIGHLIGHT[chroma-which-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-which-counter] ))
             if [[ "$__idx1" -eq 1 ]]; then
                 __chars="{"
-                __output="$(command which "$__wrd")"
+                __output="$(command which "$__wrd" 2>/dev/null)"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"command which: $__output"
-                __output="$(builtin which "$__wrd")"
+                __output="$(builtin which "$__wrd" 2>/dev/null)"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"builtin which: ${${${${__output[1,100]}//$'\n'/;}//$'\t'/  }//$__chars;/$__chars}${__output[101,101]:+...}"
-                __output="$(builtin type -w "$__wrd")"
+                __output="$(builtin type -w "$__wrd" 2>/dev/null)"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"type -w: $__output"
-                __output="$(builtin whence -v "$__wrd")"
+                __output="$(builtin whence -v "$__wrd" 2>/dev/null)"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whence -v: $__output"
-                __output="$(command whereis "$__wrd")"
+                __output="$(command whereis "$__wrd" 2>/dev/null)"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whereis: $__output"
-                __output="$(command whatis "$__wrd")"
+                __output="$(command whatis "$__wrd" 2>/dev/null)"
                 __output="${${__output%%$'\n'*}//[[:blank:]]##/ }"
                 FAST_HIGHLIGHT[chroma-which-message]+=$'\n'"whatis: $__output"
             fi
