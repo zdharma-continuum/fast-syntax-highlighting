@@ -152,7 +152,7 @@ FAST_HIGHLIGHT+=(
   chroma-bash    chroma/-sh.ch
   chroma-fish    chroma/-sh.ch
   chroma-tmux    chroma/-sh.ch
-  chroma-vim     chroma/-vim.ch
+  #chroma-vim     chroma/-vim.ch
   chroma-make    chroma/-make.ch
   chroma-perl    chroma/-perl.ch
   chroma-git     chroma/-git.ch
