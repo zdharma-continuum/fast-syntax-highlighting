@@ -946,18 +946,19 @@ typeset -ga ZLAST_COMMANDS
   print -r -- "$__arg"
 
   : ${expanded_path:=${(Q)~__arg}}
-  [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && { print -r -- "- $_start_pos $_end_pos"; return 1; }
+  [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && { print -r -- "- $_start_pos $_end_pos"; sleep 1; return 1; }
 
-  [[ -z $expanded_path ]] && { print -r -- "- $_start_pos $_end_pos"; return 1; }
-  [[ -e $expanded_path ]] && { print -r -- "$_start_pos $_end_pos"; return 0; }
+  [[ -z $expanded_path ]] && { print -r -- "- $_start_pos $_end_pos"; sleep 1; return 1; }
+  [[ -e $expanded_path ]] && { print -r -- "$_start_pos $_end_pos"; sleep 1; return 0; }
 
   # Search the path in CDPATH, only for CD command
   [[ "$active_command" = "cd" ]] && for cdpath_dir in $cdpath ; do
-    [[ -e "$cdpath_dir/$expanded_path" ]] && { print -r -- "$_start_pos $_end_pos"; return 0; }
+    [[ -e "$cdpath_dir/$expanded_path" ]] && { print -r -- "$_start_pos $_end_pos"; sleep 1; return 0; }
   done
 
   # It's not a path.
   print -r -- "- $_start_pos $_end_pos"
+  sleep 1
   return 1
 }
 
