@@ -939,11 +939,9 @@ typeset -ga ZLAST_COMMANDS
   return 0
 }
 
-# Check if $__arg is a path.
-# If yes, return 0 and in $REPLY the __style to use.
-# Else, return non-zero (and the contents of $REPLY is undefined).
 -fast-highlight-check-path()
 {
+  print -r -- "${sysparams[pid]}"
   # This is to fill cache
   print -r -- "$__arg"
 
@@ -964,27 +962,30 @@ typeset -ga ZLAST_COMMANDS
 }
 
 -fast-highlight-check-path-handler() {
-  local IFS=$'\n' PCFD="$1" line stripped val
+  local IFS=$'\n' pid PCFD="$1" line stripped val
   integer idx
 
-  if read -r -u "$PCFD" val; then
-    if read -r -u "$PCFD" line; then
-      stripped="${line#- }"
-      FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}-born-at]="$EPOCHSECONDS"
-      idx="${${FAST_HIGHLIGHT[path-queue]}[(I)$stripped]}"
-      (( idx > 0 )) && {
-        if [[ "$line" != -* ]]; then
-          FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=1
-          region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
-          zle .redisplay
-        else
-          FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=0
-        fi
-        val="${FAST_HIGHLIGHT[path-queue]}"
-        val[idx-1,idx+${#stripped}]=""
-        FAST_HIGHLIGHT[path-queue]="$val"
-      }
+  if read -r -u "$PCFD" pid; then
+    if read -r -u "$PCFD" val; then
+      if read -r -u "$PCFD" line; then
+        stripped="${line#- }"
+        FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}-born-at]="$EPOCHSECONDS"
+        idx="${${FAST_HIGHLIGHT[path-queue]}[(I)$stripped]}"
+        (( idx > 0 )) && {
+          if [[ "$line" != -* ]]; then
+            FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=1
+            region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+            zle .redisplay
+          else
+            FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=0
+          fi
+          val="${FAST_HIGHLIGHT[path-queue]}"
+          val[idx-1,idx+${#stripped}]=""
+          FAST_HIGHLIGHT[path-queue]="$val"
+        }
+      fi
     fi
+    kill -9 "$pid" 2>/dev/null
   fi
 
   zle -F ${PCFD}

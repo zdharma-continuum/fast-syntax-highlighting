@@ -271,6 +271,7 @@ ZSH_HIGHLIGHT_MAXLENGTH=10000
 
 # Load zsh/parameter module if available
 zmodload zsh/parameter 2>/dev/null
+zmodload zsh/system 2>/dev/null
 
 autoload -Uz -- is-at-least fast-theme fast-read-ini-file -fast-run-git-command -fast-make-targets \
                 -fast-run-command
