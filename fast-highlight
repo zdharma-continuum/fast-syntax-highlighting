@@ -814,9 +814,11 @@ typeset -ga ZLAST_COMMANDS
                  else
                    if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]]; then
                      if [[ -z "${FAST_HIGHLIGHT[cache-path-${__arg}-${_start_pos}]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[cache-path-${__arg}-${_start_pos}-born-at] )) -gt 8 ]]; then
-                       exec {PCFD}< <(-fast-highlight-check-path)
-                       FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
-                       zle -F -w "$PCFD" fast-highlight-check-path-handler
+                       if [[ "$LASTWIDGET" != *-or-beginning-search ]]; then
+                         exec {PCFD}< <(-fast-highlight-check-path)
+                         FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
+                         zle -F -w "$PCFD" fast-highlight-check-path-handler
+                       fi
                        already_added=1
                      elif [[ "${FAST_HIGHLIGHT[cache-path-${__arg}-${_start_pos}]}" -eq 1 ]]; then
                        (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
