@@ -161,7 +161,7 @@ FAST_HIGHLIGHT+=(
   chroma-autoload chroma/-autoload.ch
   chroma-ssh     chroma/-ssh.ch
   chroma-scp     chroma/-scp.ch
-  chroma-which   chroma/-which.ch
+  #chroma-which   chroma/-which.ch
   chroma-printf  chroma/-printf.ch
   chroma-ruby    chroma/-ruby.ch
 )
