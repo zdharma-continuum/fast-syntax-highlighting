@@ -971,15 +971,15 @@ typeset -ga ZLAST_COMMANDS
     if read -r -u "$PCFD" val; then
       if read -r -u "$PCFD" line; then
         stripped="${line#- }"
-        FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}-born-at]="$EPOCHSECONDS"
+        FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}-born-at]="$EPOCHSECONDS"
         idx="${${FAST_HIGHLIGHT[path-queue]}[(I)$stripped]}"
         (( idx > 0 )) && {
           if [[ "$line" != -* ]]; then
-            FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=1
+            FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]=1
             region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
             zle .redisplay
           else
-            FAST_HIGHLIGHT[cache-path-${val}-${stripped%% *}]=0
+            FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]=0
           fi
           val="${FAST_HIGHLIGHT[path-queue]}"
           val[idx-1,idx+${#stripped}]=""
