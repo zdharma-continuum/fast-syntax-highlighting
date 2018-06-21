@@ -1130,6 +1130,6 @@ typeset -ga FSH_LIST
     FSH_LIST+=( "$(( $1 - 1 ));;$(( $2 ))" )
 }
 
-functions -M fsh_sy_h_append 2 2 -fsh_sy_h_shappend
+functions -M fsh_sy_h_append 2 2 -fsh_sy_h_shappend 2>/dev/null
 
 # vim:ft=zsh:sw=2:sts=2
