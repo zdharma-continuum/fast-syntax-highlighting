@@ -393,8 +393,6 @@ typeset -ga ZLAST_COMMANDS
         _start_pos=$_end_pos
         continue
       fi
-
-      __arg_type=3
     else
       offset=0
       if [[ "$proc_buf" = (#b)(#s)(([[:space:]]|\\[[:space:]])##)* ]]; then
@@ -566,7 +564,7 @@ typeset -ga ZLAST_COMMANDS
         hashed)         __style=${FAST_THEME_NAME}hashed-command;;
         dirpath)        __style=${FAST_THEME_NAME}path;;
         none)           # Assign?
-                        if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || "${braces_stack[1]}" = 'T' ]]; then
+                        if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( "${braces_stack[1]}" = 'T' && "${__arg_type}" != 3 ) ]]; then
                           __style=${FAST_THEME_NAME}assign
                           [[ "$__arg" = *[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
@@ -870,7 +868,11 @@ typeset -ga ZLAST_COMMANDS
         # literal newline inside an array assignment
         (( next_word = 2 | (next_word & BIT_case_code) ))
       elif [[ -n "${braces_stack[(r)A]}" ]]; then
+        # 'A' in stack -> inside [[ ... ]]
         (( next_word = 2 | (next_word & BIT_case_code) ))
+      elif [[ "${braces_stack[1]}" = 'T' ]]; then
+        braces_stack[1]=""
+        (( next_word = 1 | (next_word & BIT_case_code) ))
       else
         (( next_word = 1 | (next_word & BIT_case_code) ))
         highlight_glob=1
