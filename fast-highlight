@@ -1050,7 +1050,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
   __idx=_start_pos
 
   #                                                                                                                                                                                                                       7
-  while [[ "$_mybuf" = (#b)[^\$_a-zA-Z0-9]#((\$(#B)(+|)(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](#B)(+|)(#b)(\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(*) ]]; do
+  while [[ "$_mybuf" = (#b)[^\$_a-zA-Z0-9]#((\$(#B)(+|)(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]##\])(#c0,1))|(\$[{](#B)(+|)(#b)(\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]##\])(#c0,1)[}])|\$|[a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(*) ]]; do
     __idx+=${mbegin[1]}-1
     _end_idx=__idx+${mend[1]}-${mbegin[1]}+1
     _mybuf="${match[7]}"
@@ -1067,7 +1067,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
     }
 
     # ADD
-    [[ "$__style" != "none" ]] && (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end $__style")
+    [[ "$__style" != "none" && -n "$__style" ]] && (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end $__style")
 
     __idx=_end_idx
   done
