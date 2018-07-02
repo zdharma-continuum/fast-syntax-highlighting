@@ -1061,17 +1061,13 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
       } || {
         [[ "${match[1][1]}" = "$" ]] && {
           match[1]="${match[1]//[\{\}\+]/}"
-          ( [[ "${match[1]}" = "$" || -n "${(P)${match[1]:1}}" || ${FAST_ASSIGNS_SEEN[${match[1]:1}]} = 1 ]] && \
-              return 11 || return 12; ) 2>/dev/null; __pos=$?
-
-          (( __pos == 11 )) && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}
-          (( __pos == 12 || __pos == 1 )) && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}
+          [[ "${match[1]}" = "$" || -n "${(P)${match[1]:1}}" || ${FAST_ASSIGNS_SEEN[${match[1]:1}]} = 1 ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]} || __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}
         }
       }
     }
 
     # ADD
-    [[ "$__style" != "none" && -n "$__style" ]] && (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end $__style")
+    [[ "$__style" != "none" ]] && (( __start=__idx-${#PREBUFFER}, __end=_end_idx-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end $__style")
 
     __idx=_end_idx
   done
