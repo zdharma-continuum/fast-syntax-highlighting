@@ -815,7 +815,7 @@ typeset -ga ZLAST_COMMANDS
                        if [[ "$LASTWIDGET" != *-or-beginning-search ]]; then
                          exec {PCFD}< <(-fast-highlight-check-path)
                          FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
-                         zle -F -w "$PCFD" fast-highlight-check-path-handler
+                         zle -F ${${(M)ZSH_VERSION:#5.*}:+-w} "$PCFD" fast-highlight-check-path-handler
                        fi
                        already_added=1
                      elif [[ "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]}" -eq 1 ]]; then
