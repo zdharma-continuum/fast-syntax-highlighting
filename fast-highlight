@@ -472,10 +472,10 @@ typeset -ga ZLAST_COMMANDS
      active_command="$__arg"
      [[ -n ${FAST_HIGHLIGHT[chroma-$active_command]} ]] && {
        (( next_word = next_word | 8192 ))  # lasting state
-       ${FAST_HIGHLIGHT[chroma-$active_command]} 1 "$__arg" "$_start_pos" "$_end_pos" && continue
+       ${FAST_HIGHLIGHT[chroma-$active_command]} 1 "$__arg" "$_start_pos" "$_end_pos" 2>/dev/null && continue
      } || (( 1 ))
    } || {
-     (( this_word & 8192 )) && ${FAST_HIGHLIGHT[chroma-$active_command]} 0 "$__arg" "$_start_pos" "$_end_pos" && continue
+     (( this_word & 8192 )) && ${FAST_HIGHLIGHT[chroma-$active_command]} 0 "$__arg" "$_start_pos" "$_end_pos" 2>/dev/null && continue
    }
 
    expanded_path=""
