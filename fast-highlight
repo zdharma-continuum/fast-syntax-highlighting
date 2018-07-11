@@ -813,7 +813,8 @@ typeset -ga ZLAST_COMMANDS
                    if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]]; then
                      if [[ -z "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}-born-at] )) -gt 8 ]]; then
                        if [[ "$LASTWIDGET" != *-or-beginning-search ]]; then
-                         exec {PCFD}< <(-fast-highlight-check-path)
+                         exec {PCFD}< <(-fast-highlight-check-path; sleep 5)
+                         command sleep 0
                          FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
                          is-at-least 5.0.6 && __pos=1 || __pos=0
                          zle -F ${${__pos:#0}:+-w} "$PCFD" fast-highlight-check-path-handler
@@ -993,7 +994,7 @@ typeset -ga ZLAST_COMMANDS
     kill -9 "$pid" 2>/dev/null
   fi
 
-  zle -F ${PCFD}
+  zle -F -w ${PCFD}
   exec {PCFD}<&-
 }
 

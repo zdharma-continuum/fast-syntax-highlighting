@@ -58,6 +58,11 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-07-11**
+
+There were problems with Ctrl-C not working when using FSH. After many days I've found a fix
+for this, it's pushed to master.
+
 **2018-06-09**
 
 New chroma functions: `awk`, `make`, `perl`, `vim`. Checkout the [video](https://asciinema.org/a/186234),
