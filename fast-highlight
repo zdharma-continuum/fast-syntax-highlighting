@@ -810,21 +810,41 @@ typeset -ga ZLAST_COMMANDS
                  elif (( in_redirection == 2 )); then
                    __style=${FAST_THEME_NAME}redirection
                  else
-                   if [[ -z "${FAST_HIGHLIGHT[no_check_paths]}" ]]; then
-                     if [[ -z "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}-born-at] )) -gt 8 ]]; then
-                       if [[ "$LASTWIDGET" != *-or-beginning-search ]]; then
-                         exec {PCFD}< <(-fast-highlight-check-path; sleep 5)
-                         command sleep 0
-                         FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
-                         is-at-least 5.0.6 && __pos=1 || __pos=0
-                         zle -F ${${__pos:#0}:+-w} "$PCFD" fast-highlight-check-path-handler
-                       fi
-                       already_added=1
-                     elif [[ "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]}" -eq 1 ]]; then
-                       (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
-                       already_added=1
-                     else
-                       __style=${FAST_THEME_NAME}default
+                   if [[ "${FAST_HIGHLIGHT[no_check_paths]}" != 1 ]]; then
+                     if [[ "${FAST_HIGHLIGHT[use_async]}" != 1 ]]; then
+		       if -fast-highlight-check-path noasync; then
+			 # ADD
+			 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+                         already_added=1
+
+                         # TODO: path separators, optimize and add to async code-path
+                         [[ -n "$FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path_pathseparator]" && "$FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]" != "$FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path_pathseparator]" ]] && {
+                           for (( __pos = _start_pos; __pos <= _end_pos; __pos++ )) ; do
+                             # ADD
+                             [[ ${__buf[__pos]} == "/" ]] && (( __start=__pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$(( __start - 1 )) $__start ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path_pathseparator]}")
+                           done
+                         }
+                       else
+                         __style=${FAST_THEME_NAME}default
+		       fi
+		     else
+		       if [[ -z "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}-born-at] )) -gt 8 ]]; then
+			 if [[ "$LASTWIDGET" != *-or-beginning-search ]]; then
+			   exec {PCFD}< <(-fast-highlight-check-path; sleep 5)
+			   command sleep 0
+			   FAST_HIGHLIGHT[path-queue]+=";$_start_pos $_end_pos;"
+			   is-at-least 5.0.6 && __pos=1 || __pos=0
+			   zle -F ${${__pos:#0}:+-w} "$PCFD" fast-highlight-check-path-handler
+                           already_added=1
+                         else
+                           __style=${FAST_THEME_NAME}default
+			 fi
+		       elif [[ "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]}" -eq 1 ]]; then
+			 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+			 already_added=1
+		       else
+			 __style=${FAST_THEME_NAME}default
+		       fi
                      fi
                    else
                      __style=${FAST_THEME_NAME}default
@@ -947,23 +967,25 @@ typeset -ga ZLAST_COMMANDS
 
 -fast-highlight-check-path()
 {
-  print -r -- "${sysparams[pid]}"
-  # This is to fill cache
-  print -r -- "$__arg"
+  [[ "$1" != "noasync" ]] && {
+    print -r -- "${sysparams[pid]}"
+    # This is to fill cache
+    print -r -- "$__arg"
+  }
 
   : ${expanded_path:=${(Q)~__arg}}
-  [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && { print -r -- "- $_start_pos $_end_pos"; return 1; }
+  [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && { [[ "$1" != "noasync" ]] && print -r -- "- $_start_pos $_end_pos"; return 1; }
 
-  [[ -z $expanded_path ]] && { print -r -- "- $_start_pos $_end_pos"; return 1; }
-  [[ -e $expanded_path ]] && { print -r -- "$_start_pos $_end_pos"; ; return 0; }
+  [[ -z $expanded_path ]] && { [[ "$1" != "noasync" ]] && print -r -- "- $_start_pos $_end_pos"; return 1; }
+  [[ -e $expanded_path ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos $_end_pos"; return 0; }
 
   # Search the path in CDPATH, only for CD command
   [[ "$active_command" = "cd" ]] && for cdpath_dir in $cdpath ; do
-    [[ -e "$cdpath_dir/$expanded_path" ]] && { print -r -- "$_start_pos $_end_pos"; return 0; }
+    [[ -e "$cdpath_dir/$expanded_path" ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos $_end_pos"; return 0; }
   done
 
   # It's not a path.
-  print -r -- "- $_start_pos $_end_pos"
+  [[ "$1" != "noasync" ]] && print -r -- "- $_start_pos $_end_pos"
   return 1
 }
 
