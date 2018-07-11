@@ -63,6 +63,10 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 There were problems with Ctrl-C not working when using FSH. After many days I've found a fix
 for this, it's pushed to master.
 
+Second, asynchronous path checking (useful on e.g. slow network drives, or when there are many files in directory)
+is now optional. Set `FAST_HIGHLIGHT[use_async]=1` to enable it. This saves some users from Zshell crashes
+– there's an unknown bug in Zsh.
+
 **2018-06-09**
 
 New chroma functions: `awk`, `make`, `perl`, `vim`. Checkout the [video](https://asciinema.org/a/186234),
