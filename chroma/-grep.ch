@@ -42,6 +42,12 @@ integer __idx1 __idx2
         # First non-option token is the pattern (regex), we will
         # highlight it.
         if (( FAST_HIGHLIGHT[chroma-grep-counter] == 1 )); then
+            [[ "$__wrd" = \"* ]] && __style=${FAST_THEME_NAME}double-quoted-argument
+            [[ "$__wrd" = \'* ]] && __style=${FAST_THEME_NAME}single-quoted-argument
+            [[ "$__wrd" = \$\'* ]] && __style=${FAST_THEME_NAME}dollar-quoted-argument
+            [[ -n "$__style" ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
+            __style=""
+
             __chars="*+\\)([]^\$"
             __idx1=__start_pos
             __idx2=__start_pos
