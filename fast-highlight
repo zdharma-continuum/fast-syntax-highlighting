@@ -529,6 +529,8 @@ typeset -ga ZLAST_COMMANDS
                           (( next_word = next_word | 32 )) # BIT_for
                         elif [[ $__arg == "case" ]]; then
                           (( next_word = BIT_case_preamble ))
+                        elif [[ "$__arg" = (typeset|declare|local|float|integer|export|readonly) ]]; then
+                          braces_stack='T'"$braces_stack"
                         fi
                         ;;
         'suffix alias') __style=${FAST_THEME_NAME}suffix-alias;;
