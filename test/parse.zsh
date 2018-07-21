@@ -37,8 +37,9 @@ autoload is-at-least chroma/-git.ch
 setopt interactive_comments
 
 # Own input?
-if [[ "$1" = "-o" || "$1" = "-oo" || "$1" = "-ooo" || "$1" = "-git" ]]; then
+if [[ "$1" = "-o" || "$1" = "-oo" || "$1" = "-ooo" || "$1" = "-git" || "$1" = "-hue" ]]; then
     typeset -a input
+    input=()
     if [[ "$1" = "-o" ]]; then
         input+=( "./parse.zsh ../fast-highlight parse2.out" )
         input+=( "rm -f parse*.out" )
@@ -47,6 +48,7 @@ if [[ "$1" = "-o" || "$1" = "-oo" || "$1" = "-ooo" || "$1" = "-git" ]]; then
         input+=( "[[ \"a\" = *[[:alpha:]_-][[:alpha:]]# ]] && echo yes" )
         input+=( 'git tag -a v0.98 -m "Syntax highlighting of the history entries"' )
         input+=( 'func() { echo "a" >! phist2.db; echo "b" >>! phist2.db; fc -Rap "phist2.db"; list=( ${history[@]} ); echo "${history[1]}"; }' )
+        (( ${+ZSH_EXECUTION_STRING} == 0 )) && { print -zr "${(F)input}"; return 0; }
     elif [[ "$1" = "-oo" ]]; then
         input+=( 'typeset -a list\n() {\necho "a" >! phist2.db\necho "b" >>! phist2.db\nfc -Rap "phist2.db"\nlist=( ${history[@]} )\necho "${history[2]}"\necho "${history[1]}"\necho "${#history}";\ninteger size="${#history}"\nsize+=1\necho "$size" / "${history[$size]}"\nlist=( "${history[$size]}" ${history[@]} )\n}' )
         input+=( 'typeset -a list\n() {\necho "a" >! phist2.db\necho "b" >>! phist2.db\nfc -Rap "phist2.db"\nlist=( ${history[@]} )\necho "${history[2]}"\necho "${history[1]}"\necho "${#history}";\ninteger size="${#history}"\nsize+=1\necho "$size" / "${history[$size]}"\nlist=( "${history[$size]}" ${history[@]} )\n}' )
@@ -55,6 +57,7 @@ if [[ "$1" = "-o" || "$1" = "-oo" || "$1" = "-ooo" || "$1" = "-git" ]]; then
         input+=( 'typeset -a list\n() {\necho "a" >! phist2.db\necho "b" >>! phist2.db\nfc -Rap "phist2.db"\nlist=( ${history[@]} )\necho "${history[2]}"\necho "${history[1]}"\necho "${#history}";\ninteger size="${#history}"\nsize+=1\necho "$size" / "${history[$size]}"\nlist=( "${history[$size]}" ${history[@]} )\n}' )
         input+=( 'typeset -a list\n() {\necho "a" >! phist2.db\necho "b" >>! phist2.db\nfc -Rap "phist2.db"\nlist=( ${history[@]} )\necho "${history[2]}"\necho "${history[1]}"\necho "${#history}";\ninteger size="${#history}"\nsize+=1\necho "$size" / "${history[$size]}"\nlist=( "${history[$size]}" ${history[@]} )\n}' )
         input+=( 'typeset -a list\n() {\necho "a" >! phist2.db\necho "b" >>! phist2.db\nfc -Rap "phist2.db"\nlist=( ${history[@]} )\necho "${history[2]}"\necho "${history[1]}"\necho "${#history}";\ninteger size="${#history}"\nsize+=1\necho "$size" / "${history[$size]}"\nlist=( "${history[$size]}" ${history[@]} )\n}' )
+        (( ${+ZSH_EXECUTION_STRING} == 0 )) && { print -zr "${(F)input}"; return 0; }
     elif [[ "$1" = "-ooo" ]]; then
         local in='
 # This is an example code that is diverse and allows to test a theme
@@ -71,6 +74,7 @@ for (( ii = 1; ii <= size; ++ ii )); do
         }
     fi
 done'
+        (( ${+ZSH_EXECUTION_STRING} == 0 )) && { print -zr "$in"; return 0; }
         input+=( "$in" )
         input+=( "$in" )
     elif [[ "$1" = "-git" ]]; then
@@ -87,8 +91,23 @@ git tag -a 'v1.18' -m 'Here-string is highlighted, descriptor-variables passed t
 git tag -l -n9
 git checkout cb66b11
 "
+        (( ${+ZSH_EXECUTION_STRING} == 0 )) && { print -zr "$in"; return 0; }
         input+=( "$in" )
         input+=( "$in" )
+    elif [[ "$1" = "-hue" ]]; then
+        local in="var=\$other; local var=\$other
+        () { eval \"\$var\"; }
+        case \$other in
+            \$var)
+                ( echo OK; )
+                ;;
+        esac
+        sudo -i -s ls -1 /var/log
+        () { ( eval \"command ls -1\" ); } argument"
+
+        (( ${+ZSH_EXECUTION_STRING} == 0 )) && { print -zr "$in"; return 0; }
+
+        input+=( "$in" "$in" )
     fi
 
     typeset -a long_input
