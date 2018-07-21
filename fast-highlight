@@ -393,7 +393,7 @@ typeset -ga ZLAST_COMMANDS
     # Handle the INTERACTIVE_COMMENTS option.
     #
     # We use the (Z+c+) flag so the entire comment is presented as one token in $__arg.
-    if [[ -n ${interactive_comments+'set'} && $__arg[1] == $histchars[3] ]]; then
+    if [[ -n ${interactive_comments+'set'} && $__arg == ${histchars[3]}* ]]; then
       if (( this_word & 3 )); then
         __style=${FAST_THEME_NAME}comment
       else
@@ -570,9 +570,9 @@ typeset -ga ZLAST_COMMANDS
                                 } || -fast-highlight-string;
                                 (( _start_pos = _start_pos - itmp + 1, 1 > 0 ))
                             }
-                        elif [[ $__arg[1] = $histchars[1] && -n "${__arg[2]}" ]]; then
+                        elif [[ $__arg = ${histchars[1]}* && -n "${__arg[2]}" ]]; then
                           __style=${FAST_THEME_NAME}history-expansion
-                        elif [[ $__arg[1] == $histchars[2] ]]; then
+                        elif [[ $__arg == ${histchars[2]}* ]]; then
                           __style=${FAST_THEME_NAME}history-expansion
                         elif (( __arg_type == 3 )); then
                           # This highlights empty commands (semicolon follows nothing) as an error.
@@ -776,7 +776,7 @@ typeset -ga ZLAST_COMMANDS
                  elif [[ "$__arg" = ';;' ]] && (( this_word & BIT_case_code )); then
                    (( next_word = (next_word | BIT_case_item) & ~(BIT_case_code+3) ))
                    __style=${FAST_THEME_NAME}default
-                 elif [[ $__arg[1] = $histchars[1] && -n "${__arg[2]}" ]]; then
+                 elif [[ $__arg = ${histchars[1]}* && -n "${__arg[2]}" ]]; then
                    __style=${FAST_THEME_NAME}history-expansion
                  elif (( __arg_type == 3 )); then
                    __style=${FAST_THEME_NAME}commandseparator
