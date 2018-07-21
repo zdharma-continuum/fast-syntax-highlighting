@@ -58,6 +58,11 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-07-21**
+
+Chroma architecture now supports aliases. You can have `alias mygit="git commit"` and when `mygit`
+will be invoked everything will work as expected (Git chroma will be ran).
+
 **2018-07-11**
 
 There were problems with Ctrl-C not working when using FSH. After many days I've found a fix
