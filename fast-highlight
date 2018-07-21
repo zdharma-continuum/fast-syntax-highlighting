@@ -976,13 +976,13 @@ typeset -ga ZLAST_COMMANDS
           if [[ "$line" != -* ]]; then
             FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]=1
             region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
-            zle .redisplay
           else
             FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]=0
           fi
           val="${FAST_HIGHLIGHT[path-queue]}"
           val[idx-1,idx+${#stripped}]=""
           FAST_HIGHLIGHT[path-queue]="$val"
+          [[ ${FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]} = 1 && ${#val} -le 27 ]] && zle .redisplay
         }
       fi
     fi
