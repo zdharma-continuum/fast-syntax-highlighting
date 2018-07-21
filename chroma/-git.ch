@@ -84,6 +84,7 @@ local -a __lines_list
                     fi
                 elif [[ "$__wrd" = "-m" ]]; then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=1
+                    __style=${FAST_THEME_NAME}single-hyphen-option
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]]; then
                 [[ "$__wrd" != -* ]] && {
