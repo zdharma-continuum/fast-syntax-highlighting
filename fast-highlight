@@ -571,10 +571,9 @@ typeset -ga ZLAST_COMMANDS
                           [[ "$__arg" = *[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
                           # Handle array assignment
-                          integer itmp=${__arg[(i)=\(]}-1+1 iitmp=${__arg[(i)\)]}-1
-                          (( itmp <= __asize - 1 )) && {
-                              (( __start=_start_pos-${#PREBUFFER}+itmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}")
-                              (( iitmp <= __asize - 1 )) && (( __start=_start_pos-${#PREBUFFER}+iitmp, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}") || in_array_assignment=1
+                          [[ "$__arg" = (#b)*=(\()[^\)]#(\))(#c0,1)* ]] && {
+                              (( __start=_start_pos-${#PREBUFFER}+${mbegin[1]}-1, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}")
+                              (( mbegin[2] >= 1 )) && (( __start=_start_pos-${#PREBUFFER}+${mbegin[2]}-1, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}") || in_array_assignment=1
                           } || { [[ "${braces_stack[1]}" != 'T' ]] && (( next_word = (next_word | 1) & ~2 )); }
 
                           # Handle no-string highlight, string "/' highlight, math mode highlight
