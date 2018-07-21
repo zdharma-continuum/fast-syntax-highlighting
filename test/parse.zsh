@@ -10,7 +10,7 @@
 # option in $1), no region_highlight file then.
 #
 
-[[ -z "$ZSH_VERSION" ]] && exec /usr/bin/env /usr/local/bin/zsh-5.4.2-dev-0 -f -c "source \"$0\" \"$1\" \"$2\" \"$3\""
+[[ -z "$ZSH_VERSION" ]] && exec /usr/bin/env /usr/local/bin/zsh-5.5.1 -f -c "source \"$0\" \"$1\" \"$2\" \"$3\""
 
 ZERO="${(%):-%N}"
 
