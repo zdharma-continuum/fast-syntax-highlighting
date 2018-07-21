@@ -352,7 +352,7 @@ typeset -ga ZLAST_COMMANDS
 
     # Compute the new $_start_pos and $_end_pos, skipping over whitespace in $__buf.
     if [[ $__arg == ';' ]] ; then
-      [[ "${braces_stack[1]}" = 'T' ]] && braces_stack[1]=""
+      braces_stack="${braces_stack#T}"
 
       # Both ; and \n are rendered as a ";" (SEPER) by the ${(z)..} flag.
       needle=$';\n'
@@ -630,7 +630,7 @@ typeset -ga ZLAST_COMMANDS
       case $__arg in
         ']]')
                  __style=${FAST_THEME_NAME}builtin
-                 [[ $braces_stack[1] == "A" ]] && braces_stack[1]=""
+                 braces_stack="${braces_stack#A}"
                  ;;
         ']')
                  __style=${FAST_THEME_NAME}builtin
