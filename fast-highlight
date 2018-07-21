@@ -475,7 +475,7 @@ typeset -ga ZLAST_COMMANDS
      else
        _mybuf="${${(Q)__arg}#\"}"
        if [[ ${_mybuf[1]} == \$ ]] && (( ${+parameters} )) && \
-         [[ ${_mybuf:1} = (#b)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(/*|) || ${_mybuf:1} = (#b)\{([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)\}(/*|) ]] && \
+         [[ $_mybuf = (#b)\$([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(/*|) || $_mybuf = (#b)\$\{([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)\}(/*|) ]] && \
          (( ${+parameters[${match[1]}]} )); then
          -fast-highlight-main-type ${(P)match[1]}${match[2]}
        elif [[ "${braces_stack[1]}" = 'T' ]]; then
