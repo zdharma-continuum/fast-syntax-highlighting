@@ -405,11 +405,9 @@ typeset -ga ZLAST_COMMANDS
       continue
     fi
 
-    # Analyse the current word.
-    if [[ $__arg == (<0-9>|)(\<|\>)* ]] && [[ $__arg != (\<|\>)$'\x28'* ]] && [[ "$__arg" != "<<<" ]]; then
-      # A '<' or '>', possibly followed by a digit
+    # Redirection?
+    [[ $__arg == (<0-9>|)(\<|\>)* && $__arg != (\<|\>)$'\x28'* && "$__arg" != "<<<" ]] && \
       in_redirection=2
-    fi
 
     # Special-case the first word after 'sudo'.
     if (( ! in_redirection )); then
