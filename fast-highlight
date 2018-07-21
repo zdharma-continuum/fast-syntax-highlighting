@@ -473,16 +473,11 @@ typeset -ga ZLAST_COMMANDS
       (( next_word = next_word | 4 ))
       (( next_word = next_word | 1 ))
      else
-       # Special-case: command word is '$foo', like that, without braces or anything.
-       #
-       # That's not entirely correct --- if the parameter's value happens to be a reserved
-       # word, the parameter expansion will be highlighted as a reserved word --- but that
-       # incorrectness is outweighed by the usability improvement of permitting the use of
-       # parameters that refer to commands, functions, and builtins.
-       if [[ ${__arg[1]} == \$ ]] && (( ${+parameters} )) && \
-         [[ ${__arg:1} = (#b)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##) || ${__arg:1} = (#b)\{([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)\} ]] && \
+       _mybuf="${${(Q)__arg}#\"}"
+       if [[ ${_mybuf[1]} == \$ ]] && (( ${+parameters} )) && \
+         [[ ${_mybuf:1} = (#b)([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(/*|) || ${_mybuf:1} = (#b)\{([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)\}(/*|) ]] && \
          (( ${+parameters[${match[1]}]} )); then
-         -fast-highlight-main-type ${(P)match[1]}
+         -fast-highlight-main-type ${(P)match[1]}${match[2]}
        elif [[ "${braces_stack[1]}" = 'T' ]]; then
          REPLY=none
        else
