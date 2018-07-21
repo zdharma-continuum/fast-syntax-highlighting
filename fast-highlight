@@ -481,7 +481,7 @@ typeset -ga ZLAST_COMMANDS
        elif [[ "${braces_stack[1]}" = 'T' ]]; then
          REPLY=none
        else
-         : ${expanded_path::=${(Q)~__arg}}
+         : ${expanded_path::=${~_mybuf}}
          -fast-highlight-main-type $expanded_path
        fi
 
