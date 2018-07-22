@@ -451,7 +451,7 @@ typeset -ga ZLAST_COMMANDS
      _mybuf="${aliases[$active_command]:-$active_command}"
      [[ -n ${FAST_HIGHLIGHT[chroma-${_mybuf%% *}]} ]] && {
        __list=( "${(z@)_mybuf}" )
-       if (( ${#__list} > 1 )) || [[ "$active_command" != "${aliases[$active_command]:-$active_command}" ]]; then
+       if (( ${#__list} > 1 )) || [[ "$active_command" != "$_mybuf" ]]; then
          __style=${FAST_THEME_NAME}alias
          (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
 
