@@ -453,7 +453,7 @@ typeset -ga ZLAST_COMMANDS
        __list=( "${(z@)_mybuf}" )
        if (( ${#__list} > 1 )) || [[ "$active_command" != "$_mybuf" ]]; then
          __style=${FAST_THEME_NAME}alias
-         (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+         (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
          ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 1 "${__list[1]}" "-100000" "$_end_pos" 2>/dev/null || \
            (( this_word = next_word, next_word = 2 ))
