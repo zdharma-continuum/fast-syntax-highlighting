@@ -457,13 +457,16 @@ typeset -ga ZLAST_COMMANDS
 
          ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 1 "${__list[1]}" "-100000" "$_end_pos" 2>/dev/null || \
            (( this_word = next_word, next_word = 2 ))
-         (( next_word = next_word | (this_word & (BIT_case_code|8192)) ))
 
          for _mybuf in "${(@)__list[2,-1]}"; do
+           (( next_word = next_word | (this_word & (BIT_case_code|8192)) ))
            ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 0 "$_mybuf" "-100000" "$_end_pos" 2>/dev/null || \
              (( this_word = next_word, next_word = 2 ))
-           (( next_word = next_word | (this_word & (BIT_case_code|8192)) ))
          done
+
+         # This might have been done multiple times in chroma, but
+         # as _end_pos doesn't change, it can be done one more time
+         _start_pos=$_end_pos
 
          continue
        else
