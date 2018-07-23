@@ -886,10 +886,8 @@ typeset -ga ZLAST_COMMANDS
       elif [[ -n "${braces_stack[(r)A]}" ]]; then
         # 'A' in stack -> inside [[ ... ]]
         (( next_word = 2 | (next_word & BIT_case_code) ))
-      elif [[ "${braces_stack[1]}" = 'T' ]]; then
-        braces_stack[1]=""
-        (( next_word = 1 | (next_word & BIT_case_code) ))
       else
+        braces_stack="${braces_stack#T}"
         (( next_word = 1 | (next_word & BIT_case_code) ))
         highlight_glob=1
       fi
