@@ -879,7 +879,7 @@ typeset -ga ZLAST_COMMANDS
     # ADD
     (( already_added == 0 )) && [[ "${FAST_HIGHLIGHT_STYLES[$__style]}" != "none" ]] && (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
-    if (( __arg_type == 3 && this_word & (BIT_case_preamble|BIT_case_item) == 0 )); then
+    if (( (__arg_type == 3) && ((this_word & (BIT_case_preamble|BIT_case_item)) == 0) )); then
       if [[ $__arg == ';' ]] && (( in_array_assignment )); then
         # literal newline inside an array assignment
         (( next_word = 2 | (next_word & BIT_case_code) ))
@@ -891,7 +891,7 @@ typeset -ga ZLAST_COMMANDS
         (( next_word = 1 | (next_word & BIT_case_code) ))
         highlight_glob=1
       fi
-    elif (( (__arg_type & 3) * (this_word & 1) )); then # (( __arg_type == 1 || __arg_type == 2 )) && (( this_word & 1 ))
+    elif (( ( (__arg_type == 1) || (__arg_type == 2) ) && (this_word & 1) )); then # (( __arg_type == 1 || __arg_type == 2 )) && (( this_word & 1 ))
         (( next_word = 1 | (next_word & (64 | BIT_case_code)) ))
     elif [[ $__arg == "repeat" ]] && (( this_word & 1 )); then
       # skip the repeat-count word
