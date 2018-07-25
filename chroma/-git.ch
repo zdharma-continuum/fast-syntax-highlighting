@@ -92,6 +92,8 @@ local -a __lines_list
                     if (( __idx1 == 2 )); then
                         if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
                             __style=${FAST_THEME_NAME}builtin
+                        elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" && -e "$__wrd" ]]; then
+                            __style=${FAST_THEME_NAME}path
                         else
                             __style=${FAST_THEME_NAME}unknown-token
                         fi
