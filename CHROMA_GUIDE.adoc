@@ -1,15 +1,22 @@
 # Chroma Guide
 
+## Motivation
+
+Someone might want to create a detailed highlighting for a specific program
+and this document helps achieving this. It explains how chroma functions – the
+code behind such detailed highlighting – are constructed and used.
+
 ## Keywords
 
 - `chroma` - a shorthand for `chroma function`,
 - `big loop` - main highlighting code, a loop over tokens and at least 2 large structular constructs (big `if` and `case`);
-  it is advanced, e.g. parses `case` statement, here-string,
-- `chroma function` - a plugin function that is called when specified command occurs (e.g. when user enters `git`)
-  without requiring any action from the `big loop`,
-- `token` - result of splitting whole command line (i.e. BUFFER) into bits separated by spaces, called tokens.
+  it is advanced, e.g. parses `case` statements, here-string,
+- `chroma function` - a plugin-function that is called when a specific command occurs (e.g. when user enters `git` at
+  command line) suppressing activity of `big loop` (i.e. no standard highlighting),
+- `token` - result of splitting whole command line (i.e. `$BUFFER`, the Zle variable) into bits called tokens, which are
+  words in general separated by spaces on the command line.
 
-## Overall Functioning 
+## Overview Of Functioning
 
 1. Big loop is working – token by token processes command line, changes states (e.g. enters state "inside case
    statement") and in the end decides on color of the token currently processed.
@@ -26,7 +33,7 @@
    (shell-truth) to request no further processing by the big loop.
 
 7. It can also return 1 so that single, current token will be passed into big-loop
-   for processing.
+   for processing (to do a standard highlighting).
 
 ## Chroma-Function Arguments
 
@@ -41,7 +48,7 @@
        `from-10 to-13 fg=red`),
 
 - $4 - a private copy of $_end_pos from the upper scope; denotes where token
-       ends (at which index in the string, the command line).
+       ends (at which index in the string being the command line).
 
 So example invocation could look like this:
 
@@ -49,9 +56,7 @@ So example invocation could look like this:
 chroma/-example.ch 1 "grep" "$_start_pos" "$_end_pos"
 ----
 
-Such call is in fact very simple, and additionally, in general user doesn't
-need to do such calls, big-loop will be doing them. User should be however
-aware what's going on.
+Such call is in fact very simple, big-loop will be doing them for the user.
 
 ## Example Chroma-Function
 
