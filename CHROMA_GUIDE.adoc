@@ -37,17 +37,17 @@ code behind such detailed highlighting – are constructed and used.
 
 ## Chroma-Function Arguments
 
-- $1 - 0 or 1, denoting if it's the first call to the chroma, or a following one,
+- `$1` - 0 or 1, denoting if it's the first call to the chroma, or a following one,
 
-- $2 - the current token, also accessible by $\__arg from the upper scope -
-       basically a private copy of $\__arg; the token can be eg.: "grep",
+- `$2` - the current token, also accessible by `$\__arg` from the upper scope -
+       basically a private copy of `$__arg`; the token can be eg.: "grep",
 
-- $3 - a private copy of $_start_pos, i.e. the position of the token in the
+- `$3` - a private copy of `$_start_pos`, i.e. the position of the token in the
        command line buffer, used to add region_highlight entry (see man),
        because Zsh colorizes by *ranges* applied onto command line buffer (e.g.
        `from-10 to-13 fg=red`),
 
-- $4 - a private copy of $_end_pos from the upper scope; denotes where token
+- `$4` - a private copy of `$_end_pos` from the upper scope; denotes where token
        ends (at which index in the string being the command line).
 
 So example invocation could look like this:
