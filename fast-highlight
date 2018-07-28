@@ -50,6 +50,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[commandseparator]:=none}
 : ${FAST_HIGHLIGHT_STYLES[hashed-command]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[path]:=fg=magenta}
+: ${FAST_HIGHLIGHT_STYLES[path-to-dir]:=fg=magenta,underline}
 : ${FAST_HIGHLIGHT_STYLES[path_pathseparator]:=}
 : ${FAST_HIGHLIGHT_STYLES[globbing]:=fg=blue,bold}
 : ${FAST_HIGHLIGHT_STYLES[history-expansion]:=fg=blue,bold}
@@ -560,7 +561,7 @@ typeset -ga ZLAST_COMMANDS
         function)       __style=${FAST_THEME_NAME}function;;
         command)        __style=${FAST_THEME_NAME}command;;
         hashed)         __style=${FAST_THEME_NAME}hashed-command;;
-        dirpath)        __style=${FAST_THEME_NAME}path;;
+        dirpath)        __style=${FAST_THEME_NAME}path-to-dir;;
         none)           # Assign?
                         if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( "${braces_stack[1]}" = 'T' && "${__arg_type}" != 3 ) ]]; then
                           __style=${FAST_THEME_NAME}assign
@@ -811,7 +812,7 @@ typeset -ga ZLAST_COMMANDS
                      if [[ "${FAST_HIGHLIGHT[use_async]}" != 1 ]]; then
 		       if -fast-highlight-check-path noasync; then
 			 # ADD
-			 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+			 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
                          already_added=1
 
                          # TODO: path separators, optimize and add to async code-path
@@ -836,8 +837,8 @@ typeset -ga ZLAST_COMMANDS
                          else
                            __style=${FAST_THEME_NAME}default
 			 fi
-		       elif [[ "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]}" -eq 1 ]]; then
-			 (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+		       elif [[ "${FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]%D}" -eq 1 ]]; then
+                         (( __start=_start_pos-${#PREBUFFER}, __end=_end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path${${(M)FAST_HIGHLIGHT[cache-path-${(q)__arg}-${_start_pos}]%D}:+-to-dir}]}")
 			 already_added=1
 		       else
 			 __style=${FAST_THEME_NAME}default
@@ -972,11 +973,13 @@ typeset -ga ZLAST_COMMANDS
   [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)expanded_path:#/*}:-$PWD/$expanded_path}]}" ]] && { [[ "$1" != "noasync" ]] && print -r -- "- $_start_pos $_end_pos"; return 1; }
 
   [[ -z $expanded_path ]] && { [[ "$1" != "noasync" ]] && print -r -- "- $_start_pos $_end_pos"; return 1; }
-  [[ -e $expanded_path ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos $_end_pos"; return 0; }
+  [[ -d $expanded_path ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos ${_end_pos}D" || __style=${FAST_THEME_NAME}path-to-dir; return 0; }
+  [[ -e $expanded_path ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos $_end_pos" || __style=${FAST_THEME_NAME}path; return 0; }
 
   # Search the path in CDPATH, only for CD command
-  [[ "$active_command" = "cd" ]] && for cdpath_dir in $cdpath ; do
-    [[ -e "$cdpath_dir/$expanded_path" ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos $_end_pos"; return 0; }
+  [[ "$active_command" = "cd" ]] && for cdpath_dir in $cdpath; do
+    [[ -d "$cdpath_dir/$expanded_path" ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos ${_end_pos}D" || __style=${FAST_THEME_NAME}path-to-dir; return 0; }
+    [[ -e "$cdpath_dir/$expanded_path" ]] && { [[ "$1" != "noasync" ]] && print -r -- "$_start_pos $_end_pos" || __style=${FAST_THEME_NAME}path; return 0; }
   done
 
   # It's not a path.
@@ -991,20 +994,20 @@ typeset -ga ZLAST_COMMANDS
   if read -r -u "$PCFD" pid; then
     if read -r -u "$PCFD" val; then
       if read -r -u "$PCFD" line; then
-        stripped="${line#- }"
+        stripped="${${line#- }%D}"
         FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}-born-at]="$EPOCHSECONDS"
         idx="${${FAST_HIGHLIGHT[path-queue]}[(I)$stripped]}"
         (( idx > 0 )) && {
           if [[ "$line" != -* ]]; then
-            FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]=1
-            region_highlight+=("${line%% *} ${line##* } ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+            FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]="1${(M)line%D}"
+            region_highlight+=("${line%% *} ${${line##* }%D} ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path${${(M)line%D}:+-to-dir}]}")
           else
             FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]=0
           fi
           val="${FAST_HIGHLIGHT[path-queue]}"
           val[idx-1,idx+${#stripped}]=""
           FAST_HIGHLIGHT[path-queue]="$val"
-          [[ ${FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]} = 1 && ${#val} -le 27 ]] && zle .redisplay
+          [[ ${FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]%D} = 1 && ${#val} -le 27 ]] && zle .redisplay
         }
       fi
     fi
