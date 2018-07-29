@@ -23,7 +23,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 [[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set)"; return 0; }
 
 [[ -n "$OPT_LIST" ]] && {
-    print -r -- "Available themes:"
+    [[ -z "$OPT_QUIET" ]] && print -r -- "Available themes:"
     print -rl -- "$FAST_BASE_DIR"/themes/*.ini(:t:r)
     return 0
 }
