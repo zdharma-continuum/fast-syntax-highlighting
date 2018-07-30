@@ -79,6 +79,10 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[case-input]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[case-parentheses]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[case-condition]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[paired-bracket]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[bracket-level-1]:=fg=green,bold}
+: ${FAST_HIGHLIGHT_STYLES[bracket-level-2]:=fg=yellow,bold}
+: ${FAST_HIGHLIGHT_STYLES[bracket-level-3]:=fg=cyan,bold}
 fi
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
