@@ -52,7 +52,7 @@ function -fast-highlight-string-process {
         __idx=$(( CURSOR + 1 ))
         if (( ${+pos_to_level[$__idx]} )) && (( ${+final_pairs[$__idx]} )); then
             (( __start=final_pairs[$__idx]-${#PREBUFFER}-1, __end=final_pairs[$__idx]-${#PREBUFFER}, __start >= 0 )) && \
-                reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[paired-bracket]}")
+                reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}paired-bracket]}")
         fi
     fi
     return 0
