@@ -32,6 +32,7 @@
 # Set $ZERO to the expected value, regardless of functionargzero.
 typeset -g ZERO=${(%):-%N}
 typeset -g FAST_BASE_DIR="${ZERO:h}"
+typeset -ga _ZSH_HIGHLIGHT_MAIN_CACHE
 
 if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$FAST_BASE_DIR]}" != $FAST_BASE_DIR ]]; then
     fpath+=( "$FAST_BASE_DIR" )
