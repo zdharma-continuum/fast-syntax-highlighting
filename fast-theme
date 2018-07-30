@@ -94,6 +94,10 @@ map=(
     incorrect-subtle            -
     subtle-bg                   -
     path-to-dir                 -
+    paired-bracket              -
+    bracket-level-1             -
+    bracket-level-2             -
+    bracket-level-3             -
 )
 
 # In which order to generate entries
@@ -107,7 +111,7 @@ order=(
     mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
     for-loop-separator exec-descriptor here-string-tri here-string-word secondary
     case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-bg
-    path-to-dir
+    path-to-dir paired-bracket bracket-level-1 bracket-level-2 bracket-level-3
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
