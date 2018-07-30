@@ -53,11 +53,26 @@ functions with `zed`/`vared` (optimizations done in
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/git_chroma.png)
 
+11. Ideal highlighting of brackets (pairing, etc.) – no quoting can disturb the result:
+
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/brackets.gif)
+
+    Add `FAST_HIGHLIGHT[use_brackets]=1` to `.zshrc` to enable.
+
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-07-30**
+
+Ideal highlighting of brackets (pairing, etc.) – no quoting can disturb the result:
+
+![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/brackets.gif)
+
+`FAST_HIGHLIGHT[use_brackets]=1` to enable.
+
 **2018-07-21**
 
 Chroma architecture now supports aliases. You can have `alias mygit="git commit"` and when `mygit`
