@@ -1,0 +1,51 @@
+# vim:ft=zsh:sw=4:sts=4
+
+#
+# $1 - PREBUFFER
+# $2 - BUFFER
+#
+function -fast-highlight-string-process {
+    local -A pos_to_level level_to_pos pair_map final_pairs
+    local input="$1$2" _mybuf="$1$2" __style __quoting
+    integer __idx=0 __pair_idx __level=0 __start __end
+    local -a match mbegin mend
+
+    pair_map=( "(" ")" "{" "}" "[" "]" )
+
+    while [[ $_mybuf = (#b)[^"{}()[]\\\"'"]#((["({[]})\"'"])|[\\](*))(*) ]]; do
+        [[ -n "${match[3]}" ]] && {
+            __idx+=${mbegin[1]}+1
+            _mybuf="${match[3]:1}"
+        } || {
+            __idx+=${mbegin[1]}
+            [[ -z "$__quoting" ]] && {
+                if [[ "${match[1]}" = ["({["] ]]; then
+                    pos_to_level[$__idx]=$(( ++__level ))
+                    level_to_pos[$__level]="$__idx"
+                elif [[ "${match[1]}" = ["]})"] ]]; then
+                    if (( __level > 0 )); then
+                        __pair_idx="${level_to_pos[$__level]}"
+                        pos_to_level[$__idx]=$(( __level -- ))
+                        [[ "${pair_map[${input[__pair_idx]}]}" = "${input[__idx]}" ]] && {
+                            final_pairs[$__idx]=$__pair_idx
+                            final_pairs[$__pair_idx]=$__idx
+                        }
+                    else
+                        pos_to_level[$__idx]=-1
+                    fi
+                fi
+            }
+            [[ "${match[1]}" = \" && "$__quoting" != \' ]] && { [[ "$__quoting" = '"' ]] && __quoting="" || __quoting='"'; }
+            [[ "${match[1]}" = \' && "$__quoting" != \" ]] && { [[ "$__quoting" = "'" ]] && __quoting="" || __quoting="'"; }
+            _mybuf="${match[4]}"
+        }
+    done
+
+    for __idx in ${(k)pos_to_level}; do
+        (( ${+final_pairs[$__idx]} )) && __style=${FAST_THEME_NAME}here-string-word || __style=${FAST_THEME_NAME}unknown-token
+        (( __start=__idx-${#PREBUFFER}-1, __end=__idx-${#PREBUFFER}, __start >= 0 )) && \
+            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
+    done
+
+    return 0
+}
