@@ -57,7 +57,7 @@ functions with `zed`/`vared` (optimizations done in
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/brackets.gif)
 
-    Add `FAST_HIGHLIGHT[use_brackets]=1` to `.zshrc` to enable.
+    Add `FAST_HIGHLIGHT[use_brackets]=1` to `.zshrc` to enable (**2018-07-31**: not needed anymore, this highlighting is active by default and can be disabled).
 
 
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
@@ -71,7 +71,7 @@ Ideal highlighting of brackets (pairing, etc.) – no quoting can disturb the re
 
 ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/brackets.gif)
 
-`FAST_HIGHLIGHT[use_brackets]=1` to enable.
+`FAST_HIGHLIGHT[use_brackets]=1` to enable this feature (**2018-07-31**: not needed anymore, this highlighting is active by default).
 
 **2018-07-21**
 

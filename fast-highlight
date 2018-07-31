@@ -143,6 +143,9 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
 # A hash instead of multiple globals
 typeset -gA FAST_HIGHLIGHT
 
+# Brackets highlighter active by default
+: ${FAST_HIGHLIGHT[use_brackets]:=1}
+
 FAST_HIGHLIGHT+=(
   chroma-grep    chroma/-grep.ch   # Triple
   chroma-egrep   chroma/-grep.ch
