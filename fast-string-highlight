@@ -18,7 +18,7 @@ function -fast-highlight-string-process {
             _mybuf="${match[3]:1}"
         } || {
             __idx+=${mbegin[1]}
-            [[ -z "$__quoting" ]] && {
+            [[ -z "$__quoting" && -z "${_FAST_COMPLEX_BRACKETS[(r)$((__idx-1))]}" ]] && {
                 if [[ "${match[1]}" = ["({["] ]]; then
                     pos_to_level[$__idx]=$(( ++__level ))
                     level_to_pos[$__level]="$__idx"
