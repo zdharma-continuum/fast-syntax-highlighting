@@ -270,7 +270,6 @@ typeset -ga ZLAST_COMMANDS
 
   (( FAST_HIGHLIGHT[path_dirs_was_set] )) && setopt PATH_DIRS
   (( FAST_HIGHLIGHT[ointeractive_comments] )) && local interactive_comments= # _set_ to empty
-  _FAST_COMPLEX_BRACKETS=()
 
   # Variable declarations and initializations
   # in_array_assignment true between 'a=(' and the matching ')'
@@ -1190,6 +1189,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
 }
 
 -fast-highlight-init() {
+  _FAST_COMPLEX_BRACKETS=()
   __fast_highlight_main__command_type_cache=()
 }
 
