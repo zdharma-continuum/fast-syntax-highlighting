@@ -220,10 +220,12 @@ typeset -ga ZLAST_COMMANDS
   [[ -z "$REPLY" ]] && REPLY="${$(LC_ALL=C builtin type -w -- $1 2>/dev/null)##*: }"
 
   [[ "$REPLY" = "none" ]] && {
-    [[ -d "$1" ]] && REPLY="dirpath" || {
-      for cdpath_dir in $cdpath; do
-        [[ -d "$cdpath_dir/$1" ]] && { REPLY="dirpath"; break; }
-      done
+    [[ -n "${FAST_BLIST_PATTERNS[(k)${${(M)1:#/*}:-$PWD/$1}]}" ]] || {
+      [[ -d "$1" ]] && REPLY="dirpath" || {
+        for cdpath_dir in $cdpath; do
+          [[ -d "$cdpath_dir/$1" ]] && { REPLY="dirpath"; break; }
+        done
+      }
     }
   }
 
