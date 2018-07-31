@@ -979,7 +979,9 @@ typeset -ga ZLAST_COMMANDS
 
   while [[ "$__workbuf" = (#b)[^\(\)]#([\(\)])(*) ]]; do
     if [[ "${match[1]}" == \( ]]; then
-      [[ ${_mybuf[__idx+${mbegin[1]}-1]} = '$' ]] && __list+=( $__pos )
+      __arg=${_mybuf[__idx+${mbegin[1]}-1,__idx+${mbegin[1]}-1+2]}
+      [[ "$__arg" = '$('[^\(] ]] && __list+=( $__pos )
+      [[ "$__arg" = '$((' ]] && _mybuf[__idx+${mbegin[1]}-1]=x
       # Increase parenthesis level
       __pos+=1
     else
