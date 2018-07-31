@@ -32,7 +32,7 @@
 # Set $ZERO to the expected value, regardless of functionargzero.
 typeset -g ZERO=${(%):-%N}
 typeset -g FAST_BASE_DIR="${ZERO:h}"
-typeset -ga _ZSH_HIGHLIGHT_MAIN_CACHE
+typeset -ga _FAST_MAIN_CACHE
 
 if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$FAST_BASE_DIR]}" != $FAST_BASE_DIR ]]; then
     fpath+=( "$FAST_BASE_DIR" )
@@ -69,7 +69,7 @@ _zsh_highlight()
       -fast-highlight-init
       -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
       (( FAST_HIGHLIGHT[use_brackets] )) && {
-          _ZSH_HIGHLIGHT_MAIN_CACHE=( $reply )
+          _FAST_MAIN_CACHE=( $reply )
           -fast-highlight-string-process "$PREBUFFER" "$BUFFER"
       }
       region_highlight=( $reply )
@@ -78,7 +78,7 @@ _zsh_highlight()
       if [[ "$char" = ["{([])}"] || "${FAST_HIGHLIGHT[prev_char]}" = ["{([])}"] ]]; then
           FAST_HIGHLIGHT[prev_char]="$char"
           (( FAST_HIGHLIGHT[use_brackets] )) && {
-              reply=( $_ZSH_HIGHLIGHT_MAIN_CACHE )
+              reply=( $_FAST_MAIN_CACHE )
               -fast-highlight-string-process "$PREBUFFER" "$BUFFER"
               region_highlight=( $reply )
           }
@@ -276,7 +276,7 @@ _zsh_highlight_preexec_hook()
 {
   typeset -g _ZSH_HIGHLIGHT_PRIOR_BUFFER=
   typeset -gi _ZSH_HIGHLIGHT_PRIOR_CURSOR=0
-  typeset -ga _ZSH_HIGHLIGHT_MAIN_CACHE=()
+  typeset -ga _FAST_MAIN_CACHE=()
 }
 
 autoload -Uz add-zsh-hook
