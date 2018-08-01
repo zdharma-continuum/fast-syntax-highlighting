@@ -42,7 +42,7 @@ function -fast-highlight-string-process {
     done
 
     for __idx in ${(k)pos_to_level}; do
-        (( ${+final_pairs[$__idx]} )) && __style=${FAST_THEME_NAME}bracket-level-$(( ( pos_to_level[$__idx] % 3) + 1 )) || __style=${FAST_THEME_NAME}unknown-token
+        (( ${+final_pairs[$__idx]} )) && __style=${FAST_THEME_NAME}bracket-level-$(( ( pos_to_level[$__idx] % 3) )) || __style=${FAST_THEME_NAME}unknown-token
         (( __start=__idx-${#PREBUFFER}-1, __end=__idx-${#PREBUFFER}, __start >= 0 )) && \
             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
     done
