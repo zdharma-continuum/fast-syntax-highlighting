@@ -65,6 +65,25 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-08-01**
+
+Hint – how to customize styles when using Zplugin and turbo mode:
+
+```zsh
+zplugin ice wait"1" atload"set_fast_theme"
+zplugin light zdharma/fast-syntax-highlighting
+
+set_fast_theme() {
+    FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}paired-bracket]='bg=blue'
+    FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}bracket-level-1]='fg=red,bold'
+    FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}bracket-level-2]='fg=magenta,bold'
+    FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}bracket-level-3]='fg=cyan,bold'
+}
+```
+
+If you have set theme before an update of styles (e.g. recent addition of bracket highlighting)
+then please repeat `fast-theme {theme}` call to regenerate theme files.
+
 **2018-07-30**
 
 Ideal highlighting of brackets (pairing, etc.) – no quoting can disturb the result:
