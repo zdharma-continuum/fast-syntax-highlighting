@@ -279,7 +279,8 @@ _zsh_highlight_preexec_hook()
 {
   typeset -g _ZSH_HIGHLIGHT_PRIOR_BUFFER=
   typeset -gi _ZSH_HIGHLIGHT_PRIOR_CURSOR=0
-  typeset -ga _FAST_MAIN_CACHE=()
+  typeset -ga _FAST_MAIN_CACHE
+  _FAST_MAIN_CACHE=()
 }
 
 autoload -Uz add-zsh-hook
