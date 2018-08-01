@@ -176,9 +176,9 @@ math=$(( 10 + HISTSIZ + HISTSIZE + $SAVEHIST )) size=$(( 0 ))
 for (( ii = 1; ii <= size; ++ ii )); do
     if [[ "${cmds[ii]} string" = "| string" ]]
     then
-        sidx=${buffer[(in:ii:)\$\(?#[^\\\\]\)]} # find opening $(
+        sidx=${buffer[(in:ii:)\$\(?#[^\\\\]\)]} # find opening cmd-subst
         (( sidx <= len )) && {
-            eidx=${buffer[(b:sidx:ii)[^\\\\]\)]} # find closing )
+            eidx=${buffer[(b:sidx:ii)[^\\\\]\)]} # find closing cmd-subst
         }
     fi
 done
