@@ -65,6 +65,12 @@ Performance differencies can be observed at Asciinema recording, where `10 kB` f
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-08-02**
+
+Global aliases are now supported:
+
+![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/global-alias.png)
+
 **2018-08-01**
 
 Hint – how to customize styles when using Zplugin and turbo mode:
