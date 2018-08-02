@@ -93,6 +93,6 @@ if [[ -z "${FAST_HIGHLIGHT[chroma-make-cache]}" || $(( EPOCHSECONDS - FAST_HIGHL
     FAST_HIGHLIGHT[chroma-make-cache]="${(j:;:)TARGETS}"
 fi
 
-reply=( "${(s:;:)FAST_HIGHLIGHT[chroma-make-cache]}" )
+reply2=( "${(s:;:)FAST_HIGHLIGHT[chroma-make-cache]}" )
 
 # vim:ft=zsh:et

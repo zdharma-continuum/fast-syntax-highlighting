@@ -17,7 +17,7 @@
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 local __style
 integer __idx1 __idx2
-local -a __lines_list
+local -a __lines_list reply2
 
 (( __first_call )) && {
     # Called for the first time - new command.
@@ -44,7 +44,7 @@ local -a __lines_list
             __wrd="${(Q)__wrd}"
 
             if [[ -f Makefile ]] && -fast-make-targets < Makefile; then
-                if [[ "${reply[(r)$__wrd]}" ]]; then
+                if [[ "${reply2[(r)$__wrd]}" ]]; then
                     (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
                 else
                     (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
