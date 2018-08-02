@@ -129,16 +129,6 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
   '&|'  3
   # ### 'case' syntax, but followed by a pattern, not by a command
   # ';;' ';&' ';|'
-
-  # Assign-capability starters
-
-  typeset  4
-  declare  4
-  local    4
-  float    4
-  integer  4
-  export   4
-  readonly 4
 )
 
 # A hash instead of multiple globals
