@@ -660,7 +660,7 @@ typeset -ga ZLAST_COMMANDS
                           [[ $braces_stack[1] == "R" ]] && { braces_stack[1]=""; __style=${FAST_THEME_NAME}reserved-word; }
                         elif (( this_word & 14 )); then
                           __style=${FAST_THEME_NAME}default
-                        elif [[ "$__arg" = ';;' ]] && (( this_word & BIT_case_code )); then
+                        elif [[ "$__arg" = (';;'|';&'|';|') ]] && (( this_word & BIT_case_code )); then
                           (( next_word = (next_word | BIT_case_item) & ~(BIT_case_code+3) ))
                           __style=${FAST_THEME_NAME}default
                         fi
@@ -846,7 +846,7 @@ typeset -ga ZLAST_COMMANDS
                    braces_stack[1]=""
                    __style=${FAST_THEME_NAME}reserved-word
                    (( next_word = next_word | 16 ))
-                 elif [[ "$__arg" = ';;' ]] && (( this_word & BIT_case_code )); then
+                 elif [[ "$__arg" = (';;'|';&'|';|') ]] && (( this_word & BIT_case_code )); then
                    (( next_word = (next_word | BIT_case_item) & ~(BIT_case_code+3) ))
                    __style=${FAST_THEME_NAME}default
                  elif [[ $__arg = ${histchars[1]}* && -n "${__arg[2]}" ]]; then
