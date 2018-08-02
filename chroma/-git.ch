@@ -29,6 +29,7 @@ local -a __lines_list
     FAST_HIGHLIGHT[chroma-git-got-subcommand]=0
     FAST_HIGHLIGHT[chroma-git-subcommand]=""
     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
+    FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=0
     __style=${FAST_THEME_NAME}command
 } || {
     # Following call, i.e. not the first one
@@ -50,7 +51,7 @@ local -a __lines_list
             __arg="${__arg//\`/x}"
             __wrd="${(Q)__wrd}"
             if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
-                [[ "$__wrd" != -* ]] && {
+                [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]] && {
                     (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                     if (( __idx1 == 2 )); then
                         -fast-run-git-command "git remote" "chroma-git-remotes" ""
@@ -61,7 +62,10 @@ local -a __lines_list
                                 "refs/heads"
                         [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}unknown-token || __style=${FAST_THEME_NAME}reserved-word
                     fi
-                } || __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
+                } || {
+                    [[ "$__wrd" = "--" ]] && FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
+                    __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
+                }
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
                 if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 )); then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
@@ -82,15 +86,22 @@ local -a __lines_list
                                 reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}unknown-token]}")
                         fi
                     fi
-                elif [[ "$__wrd" = "-m" ]]; then
-                    FAST_HIGHLIGHT[chrome-git-got-msg1]=1
-                    __style=${FAST_THEME_NAME}single-hyphen-option
+                elif [[ "$__wrd" = "--" && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
+                    FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
+                    __style=${FAST_THEME_NAME}double-hyphen-option
+                elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
+                    if [[ "$__wrd" = "-m" ]]; then
+                        FAST_HIGHLIGHT[chrome-git-got-msg1]=1
+                        __style=${FAST_THEME_NAME}single-hyphen-option
+                    elif [[ "$__wrd" = -* ]]; then
+                        __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
+                    fi
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]]; then
-                [[ "$__wrd" != -* ]] && {
+                [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 1 ]] && {
                     (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                     if (( __idx1 == 2 )); then
-                        if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
+                        if git rev-parse --verify --quiet -- "$__wrd" >/dev/null 2>&1; then
                             __style=${FAST_THEME_NAME}builtin
                         elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" && -e "$__wrd" ]]; then
                             __style=${FAST_THEME_NAME}path
@@ -98,6 +109,9 @@ local -a __lines_list
                             __style=${FAST_THEME_NAME}unknown-token
                         fi
                     fi
+                } || {
+                    [[ "$__wrd" = "--" ]] && FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
+                    __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
                 }
             fi
         fi
