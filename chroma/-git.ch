@@ -67,8 +67,12 @@ local -a __lines_list
                     __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
                 }
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
-                if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 )); then
+                match[1]=""
+                if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 )) || \
+                        [[ "$__wrd" = (#b)--message=(*) && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]
+                then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
+                    [[ -n "${match[1]}" ]] && { __wrd="${(Q)${match[1]//\`/x}}"; }
                     if (( ${#__wrd} <= 72 )); then
                         __style=${FAST_THEME_NAME}${${${__arg:#\"*}:+single-quoted-argument}:-double-quoted-argument}
                     else
