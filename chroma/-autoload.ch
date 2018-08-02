@@ -46,8 +46,11 @@ local -a __results
     else
         # Count non-option tokens.
         (( FAST_HIGHLIGHT[chroma-autoload-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-autoload-counter] ))
-        __results=( ${^fpath}/$__wrd(N) )
-        [[ "${#__results}" -gt 0 ]] && __style=${FAST_THEME_NAME}builtin || __style=${FAST_THEME_NAME}unknown-token
+
+        if [[ "$__wrd" != \$* && "$__wrd" != \"\$* ]]; then
+            __results=( ${^fpath}/$__wrd(N) )
+            [[ "${#__results}" -gt 0 ]] && __style=${FAST_THEME_NAME}correct-subtle || __style=${FAST_THEME_NAME}incorrect-subtle
+        fi
 
         if (( ${+functions[${(Q)__wrd}]} )); then
             FAST_HIGHLIGHT[chroma-autoload-message]+="Warning: Function ${(Q)__wrd} already defined (e.g. loaded)"$'\n'
