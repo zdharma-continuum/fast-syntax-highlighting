@@ -43,6 +43,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[reserved-word]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[alias]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[suffix-alias]:=fg=green}
+: ${FAST_HIGHLIGHT_STYLES[global-alias]:=bg=blue}
 : ${FAST_HIGHLIGHT_STYLES[builtin]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[function]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[command]:=fg=green}
@@ -196,6 +197,8 @@ typeset -ga ZLAST_COMMANDS
   if zmodload -e zsh/parameter; then
     if (( $+aliases[(e)$1] )); then
       REPLY=alias
+    elif (( ${+galiases[(e)$1]} )); then
+      REPLY="global alias"
     elif (( $+functions[(e)$1] )); then
       REPLY=function
     elif (( $+builtins[(e)$1] )); then
@@ -543,6 +546,7 @@ typeset -ga ZLAST_COMMANDS
                         fi
                         ;;
         'suffix alias') __style=${FAST_THEME_NAME}suffix-alias;;
+        'global alias') __style=${FAST_THEME_NAME}global-alias;;
         alias)
                           insane_alias=0
                           case $__arg in
@@ -861,6 +865,8 @@ typeset -ga ZLAST_COMMANDS
                    __style=${FAST_THEME_NAME}commandseparator
                  elif (( in_redirection == 2 )); then
                    __style=${FAST_THEME_NAME}redirection
+                 elif (( ${+galiases[(e)$__arg]} )); then
+                   __style=${FAST_THEME_NAME}global-alias
                  else
                    if [[ "${FAST_HIGHLIGHT[no_check_paths]}" != 1 ]]; then
                      if [[ "${FAST_HIGHLIGHT[use_async]}" != 1 ]]; then
