@@ -923,6 +923,7 @@ typeset -ga ZLAST_COMMANDS
         elif [[ "$__arg" = [\)\(] ]]; then
           __style=${FAST_THEME_NAME}case-parentheses
           [[ "$__arg" = \) ]] && (( next_word = BIT_case_code | 1 )) || (( next_word = BIT_case_item | BIT_case_nempty_item ))
+          _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-${#PREBUFFER} )) )
         else
           (( next_word = BIT_case_item | BIT_case_nempty_item ))
           __style=${FAST_THEME_NAME}case-condition
