@@ -26,6 +26,8 @@ local -a __lines_list reply2
     # global variables.
     FAST_HIGHLIGHT[chroma-make-counter]=0
     FAST_HIGHLIGHT[chroma-make-skip-two]=0
+    FAST_HIGHLIGHT[chroma-make-custom-dir]="./"
+    FAST_HIGHLIGHT[chroma-make-got-custom-dir-opt]=0
     __style=${FAST_THEME_NAME}command
 } || {
     # Following call, i.e. not the first one.
@@ -39,10 +41,15 @@ local -a __lines_list reply2
 
         if [[ "$__wrd" = (-I|-o|-W) ]]; then
             FAST_HIGHLIGHT[chroma-make-skip-two]=1
+        elif [[ "$__wrd" = "-C" ]]; then
+            FAST_HIGHLIGHT[chroma-make-got-custom-dir-opt]=1
         fi
     else
         if (( FAST_HIGHLIGHT[chroma-make-skip-two] )); then
             FAST_HIGHLIGHT[chroma-make-skip-two]=0
+        elif (( FAST_HIGHLIGHT[chroma-make-got-custom-dir-opt] )); then
+            FAST_HIGHLIGHT[chroma-make-got-custom-dir-opt]=0
+            FAST_HIGHLIGHT[chroma-make-custom-dir]="$__wrd"
         else
             # Count non-option tokens.
             (( FAST_HIGHLIGHT[chroma-make-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-make-counter] ))
@@ -50,7 +57,9 @@ local -a __lines_list reply2
                 __wrd="${__wrd//\`/x}"
                 __wrd="${(Q)__wrd}"
 
-                if [[ -f Makefile ]] && -fast-make-targets < Makefile; then
+                if [[ -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/Makefile" ]] && \
+                        -fast-make-targets < "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/Makefile"
+                then
                     if [[ "${reply2[(r)$__wrd]}" ]]; then
                         (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
                     else
