@@ -1093,7 +1093,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
   __idx=_start_pos
 
   #                                                                                                                                                                                                    7   8
-  while [[ "$_mybuf" = (#b)[^\$\\]#((\$(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[\\][\'\"\$]|[\\](*))(*) ]]; do
+  while [[ "$_mybuf" = (#b)[^\$\\]#((\$(#B)([#+^=~](#c1,2))(#c0,1)(#B)([a-zA-Z_:][a-zA-Z0-9_:]#|[0-9]##)(#b)(\[[^\]]#\])(#c0,1))|(\$[{](#B)([#+^=~](#c1,2))(#c0,1)(#b)(\([a-zA-Z0-9_:@%#]##\))(#c0,1)[a-zA-Z0-9_:#]##(\[[^\]]#\])(#c0,1)[}])|\$|[\\][\'\"\$]|[\\](*))(*) ]]; do
     [[ -n "${match[7]}" ]] && {
       # Skip following char – it is quoted. Choice is
       # made to not highlight such quoting
