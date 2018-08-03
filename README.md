@@ -59,6 +59,9 @@ functions with `zed`/`vared` (optimizations done in
 
     Add `FAST_HIGHLIGHT[use_brackets]=1` to `.zshrc` to enable (**2018-07-31**: not needed anymore, this highlighting is active by default and can be disabled).
 
+12. Highlighting of herestring:
+
+    ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/herestring.png)
 
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
