@@ -13,7 +13,20 @@
 
 60 commits that optimized standard `zsh-syntax-highlighting` to the point that it can edit `10 kB`
 functions with `zed`/`vared` (optimizations done in
-[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)). Also added:
+[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)).
+
+Fast-Syntax-Highlighting has great granularity and a few crucial extensions, compare:
+
+![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/highlight-much.png)
+
+to regular:
+
+![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/highlight-less.png)
+
+It can be seen, FSH highlights `-c` contents (thanks to chroma-architecture), `(( ))` contents (thanks to
+math-mode highlighting – yes it works in `zcalc`), `eval` contents (thanks to recursive highlighting), etc.
+
+Other extensions:
 
 1. Variable highlighting
 
