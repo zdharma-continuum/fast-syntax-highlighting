@@ -6,7 +6,8 @@
 
 zmodload zsh/zutil 2>/dev/null
 
-setopt localoptions extendedglob
+emulate -LR zsh
+setopt extendedglob typesetsilent warncreateglobal
 
 local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY
 local -A opthash
@@ -18,9 +19,9 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 (( ${+opthash[-r]} + ${+opthash[--reset]} ))   && OPT_RESET="-r"
 (( ${+opthash[-l]} + ${+opthash[--list]} ))    && OPT_LIST="-l"
 (( ${+opthash[-t]} + ${+opthash[--test]} ))    && OPT_TEST="-t"
-(( ${+opthash[--secondary]} )) && OPT_SECONDARY="--secondary"
+(( ${+opthash[--secondary]} ))                 && OPT_SECONDARY="--secondary"
 
-[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set)"; return 0; }
+[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set, restart is required)"; return 0; }
 
 [[ -n "$OPT_LIST" ]] && {
     [[ -z "$OPT_QUIET" ]] && print -r -- "Available themes:"
@@ -29,21 +30,30 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 }
 
 [[ -n "$OPT_HELP" ]] && {
-    print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] [-t/--test] <theme-name>"
+    print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] [-t/--test] <theme-name|theme-path>"
     print -r -- "       fast-theme [-r/--reset] [-l/--list]"
     print -r -- ""
-    print -r -- "Default action (after providing <theme-name>) is to switch current session"
-    print -r -- "and any future sessions to the new theme."
+    print -r -- "Default action (after providing <theme-name> or <theme-path>) is to switch current session"
+    print -r -- "and any future sessions to the new theme. Using <theme-path>, i.e. a path to an ini file"
+    print -r -- "means using custom, own theme. The path can use an \"XDG:\" shorthand (e.g. \"XDG:mytheme\")"
+    print -r -- "that will point to ~/.config/fsh/<theme>.ini (or \$XDG_CONFIG_HOME/fsh/<theme>.ini in general"
+    print -r -- "if the variable is set in the environment). If the INI file pointed in the path is \"overlay\","
+    print -r -- "then it is not a full theme, but an additional theme-snippet that overwrites only selected"
+    print -r -- "styles of the main theme."
+    print -r -- ""
+    print -r -- "Other path-shorthands:"
+    print -r -- "LOCAL: = /usr/local/share/fsh/"
+    print -r -- "HOME: = $HOME/.fsh/"
+    print -r -- "OPT: = /opt/local/share/fsh/"
     print -r -- ""
     print -r -- "-r/--reset     - unset any theme, use default highlighting (requires restart)"
+    print -r -- "-R/--ov-reset  - unset overlay, use styles only from main-theme (requires restart)"
     print -r -- "-l/--list      - list names of available themes"
     print -r -- "-t/--test      - show test block of code after switching theme"
     return 0
 }
 
-[[ -z "$1" ]] && { print -u2 "Provide a theme (its name) to switch to, aborting (see -h/--help)"; return 1; }
-[[ ! -f "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
-[[ ! -r "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
+[[ -z "$1" ]] && { print -u2 "Provide a theme (its name or path to its file) to switch to, aborting (see -h/--help)"; return 1; }
 
 # FAST_HIGHLIGHT_STYLES key onto ini-file key
 local -A map
@@ -127,19 +137,38 @@ color=( red green blue yellow cyan magenta black white )
 #
 
 local -A out
-fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
+local THEME_NAME
+if [[ "$1" = */* || "$1" = (XDG|LOCAL|HOME|OPT):* ]]; then
+    1="${${1/(#s)XDG:/${${XDG_CONFIG_HOME:-$HOME/.config}%/}/fsh/}%.ini}.ini"
+    1="${${1/(#s)LOCAL://usr/local/share/fsh/}%.ini}.ini"
+    1="${${1/(#s)HOME:/$HOME/.fsh/}%.ini}.ini"
+    1="${${1/(#s)OPT://opt/local/share/fsh/}%.ini}.ini"
+    1=${~1} # allow user to quote ~
+
+    [[ ! -f "$1" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
+    [[ ! -r "$1" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
+
+    THEME_NAME="${1:t:r}"
+    fast-read-ini-file "$1" out ""
+else
+    [[ ! -f "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
+    [[ ! -r "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
+
+    THEME_NAME="$1"
+    fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
+fi
 
 [[ -z "$OPT_SECONDARY" ]] && local outfile="current_theme.zsh" || local outfile="secondary_theme.zsh"
 command rm -f "$FAST_BASE_DIR"/"$outfile"
 
 # Set a zstyle and a parameter to carry theme name
 if [[ -z "$OPT_SECONDARY" ]]; then
-    print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$1"'"' >>! "$FAST_BASE_DIR"/"$outfile"
-    print -r -- 'typeset -g FAST_THEME_NAME="'"$1"'"' >>! "$FAST_BASE_DIR"/"$outfile"
-    zstyle :plugin:fast-syntax-highlighting theme "$1"
-    FAST_THEME_NAME="$1"
+    print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$THEME_NAME"'"' >>! "$FAST_BASE_DIR"/"$outfile"
+    print -r -- 'typeset -g FAST_THEME_NAME="'"$THEME_NAME"'"' >>! "$FAST_BASE_DIR"/"$outfile"
+    zstyle :plugin:fast-syntax-highlighting theme "$THEME_NAME"
+    FAST_THEME_NAME="$THEME_NAME"
 else
-    local FAST_THEME_NAME="$1"
+    local FAST_THEME_NAME="$THEME_NAME"
 fi
 
 # Generate current_theme.zsh or secondary_theme.zsh, traversing ini-file associative array
@@ -166,7 +195,7 @@ for k in "${order[@]}"; do
     FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
 done
 
-[[ -z "$OPT_QUIET" ]] && print "Switched to theme \`$1' (current session, and future sessions)"
+[[ -z "$OPT_QUIET" ]] && print "Switched to theme \`$THEME_NAME' (current session, and future sessions)"
 
 [[ -n "$OPT_TEST" ]] && {
     print -zr '
