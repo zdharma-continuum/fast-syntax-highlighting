@@ -48,7 +48,8 @@ Other extensions:
 
 6. Paths from `$CDPATH` aren't colorized unless the command is `cd`
 
-7. Five 256-color themes, switched with `fast-theme {theme-name}` (also try `-t` option to obtain the below snippet):
+7. Five 256-color themes, switched with `fast-theme {theme-name}` (also try `-t` option to obtain the below snippet).
+   also note the ideal brackets highlighting in the `sidx=...`, `eidx=...` lines:
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/theme.png)
 
