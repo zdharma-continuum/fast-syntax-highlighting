@@ -86,6 +86,9 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[bracket-level-3]:=fg=cyan,bold}
 fi
 
+# This can overwrite some of *_STYLES fields
+[[ -r "$FAST_BASE_DIR"/theme_overlay.zsh ]] && source "$FAST_BASE_DIR"/theme_overlay.zsh
+
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
 
 __FAST_HIGHLIGHT_TOKEN_TYPES=(
