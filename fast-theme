@@ -9,9 +9,10 @@ zmodload zsh/zutil 2>/dev/null
 emulate -LR zsh
 setopt extendedglob typesetsilent warncreateglobal
 
-local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY
+local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY OPT_COPY
 local -A opthash
-zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test -secondary || { echo "Improper options given, see help (-h/--help)"; return 1; }
+zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test -secondary \
+            -copy-shipped-theme: || { echo "Improper options given, see help (-h/--help)"; return 1; }
 
 (( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
 (( ${+opthash[-v]} + ${+opthash[--verbose]} )) && OPT_VERBOSE="-v"
@@ -20,6 +21,17 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 (( ${+opthash[-l]} + ${+opthash[--list]} ))    && OPT_LIST="-l"
 (( ${+opthash[-t]} + ${+opthash[--test]} ))    && OPT_TEST="-t"
 (( ${+opthash[--secondary]} ))                 && OPT_SECONDARY="--secondary"
+(( ${+opthash[--copy-shipped-theme]} ))        && OPT_COPY="${opthash[--copy-shipped-theme]}"
+
+[[ -n "$OPT_COPY" ]] && {
+    [[ ! -f "$FAST_BASE_DIR"/themes/"${OPT_COPY%.ini}.ini" ]] && { print "Theme \`$OPT_COPY' doesn't exist in FSH plugin dir ($FAST_BASE_DIR/themes)"; return 1; }
+    [[ ! -r "$FAST_BASE_DIR"/themes/"${OPT_COPY%.ini}.ini" ]] && { print "Theme \`$OPT_COPY' isn't readable in FSH plugin dir ($FAST_BASE_DIR/themes)"; return 1; }
+    [[ -n "$1" ]] && {
+        [[ ! -e "$1" && ! -e ${1:h} ]] && { print "Destination path doesn't exist, aborting"; return 1; }
+    }
+    command cp -vf "$FAST_BASE_DIR"/themes/"${OPT_COPY%.ini}.ini" "${${1:-.}%.ini}.ini" || return 1
+    return 0
+}
 
 [[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set, restart is required)"; return 0; }
 
@@ -32,6 +44,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 [[ -n "$OPT_HELP" ]] && {
     print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] [-t/--test] <theme-name|theme-path>"
     print -r -- "       fast-theme [-r/--reset] [-l/--list]"
+    print -r -- "       fast-theme --copy-shipped-theme {theme-name} [destination-path]"
     print -r -- ""
     print -r -- "Default action (after providing <theme-name> or <theme-path>) is to switch current session"
     print -r -- "and any future sessions to the new theme. Using <theme-path>, i.e. a path to an ini file"
@@ -50,6 +63,10 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
     print -r -- "-R/--ov-reset  - unset overlay, use styles only from main-theme (requires restart)"
     print -r -- "-l/--list      - list names of available themes"
     print -r -- "-t/--test      - show test block of code after switching theme"
+    print -r -- ""
+    print -r -- "The option --copy-shipped-theme allows easy copying of one of the 6 shipped themes into given"
+    print -r -- "destination path. Normal use means changing directory to e.g. ~/.config/fsh, and then issuing"
+    print -r -- "e.g. \`fast-theme --copy-shipped-theme clean mytheme', to obtain a template for own new theme."
     return 0
 }
 
