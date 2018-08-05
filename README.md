@@ -219,7 +219,7 @@ them (like the animation below shows) to change colors.
 
 ![animation](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/math.gif)
 
-## Installation
+# Installation
 
 **The plugin is "standalone"**, which means that only sourcing it is needed. So to
 install, unpack `fast-syntax-highlighting` somewhere and add
@@ -262,3 +262,37 @@ cloning the plugin for you automatically the next time you start zsh.
 
 Add `zgen load zdharma/fast-syntax-highlighting` to your `.zshrc` file in the same place you're doing
 your other `zgen load` calls in.
+
+# Customization
+
+`fast-theme` tool is used to select a theme. There are 6 shipped themes, they can be listed with `fast-theme -l`.
+Besides shipped themes, user can point this tool to any other theme, by simple `fast-theme ~/mytheme.ini`. To
+obtain template to work on when creating own theme, issue `fast-theme --copy-shipped-theme {theme-name}`.
+
+To alter just a few styles and not create a whole new theme, use **overlay**. What is overlay? It is in the same
+format as full theme, but can have only a few styles defined, and these styles will overwrite styles in main-theme.
+Example overlay file:
+
+```ini
+; overlay.ini
+[base]
+commandseparator = yellow,bold
+comment          = 17
+
+[command-point]
+function       = green
+command        = 180
+```
+
+File name `overlay.ini` is treated specially.
+
+When specifing path, following short-hands can be used:
+
+```
+XDG:    = ~/.config/fsh (respects $XDG_CONFIG_HOME env var)
+LOCAL:  = /usr/local/share/fsh/
+HOME:   = ~/.fsh/
+OPT:    = /opt/local/share/fsh/
+```
+
+So for example, issue `fast-theme XDG:overlay` to load `~/.config/fsh/overlay.ini` as overlay.
