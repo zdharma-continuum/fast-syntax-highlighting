@@ -266,6 +266,8 @@ your other `zgen load` calls in.
 # Customization
 
 `fast-theme` tool is used to select a theme. There are 6 shipped themes, they can be listed with `fast-theme -l`.
+Themes are basic [INI files](https://github.com/zdharma/fast-syntax-highlighting/tree/master/themes) where each
+key is a *style*.
 Besides shipped themes, user can point this tool to any other theme, by simple `fast-theme ~/mytheme.ini`. To
 obtain template to work on when creating own theme, issue `fast-theme --copy-shipped-theme {theme-name}`.
 
@@ -318,8 +320,8 @@ highlighting uses alternate theme to make the highlighted code distinct:
 
 ![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/cmdsubst.png)
 
-In above screen-shot the interior of `$( ... )` uses different colors than rest of the code. Example
-for `eval`:
+In the above screen-shot the interior of `$( ... )` uses different colors than the rest of the
+code. Example for `eval`:
 
 ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/eval_cmp.png)
 
