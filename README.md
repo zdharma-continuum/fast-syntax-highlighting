@@ -9,6 +9,22 @@
                              |___/                                  |___/           |___/                   |___/
 ```
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Zshell Fast Syntax Highlighting](#zshell-fast-syntax-highlighting)
+- [Updates (2018)](#updates-2018)
+- [Installation](#installation)
+    - [Zplugin](#zplugin)
+    - [Antigen](#antigen)
+    - [Oh-My-Zsh](#oh-my-zsh)
+    - [Zgen](#zgen)
+- [Customization](#customization)
+  - [Secondary Theme](#secondary-theme)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Zshell Fast Syntax Highlighting
 
 60 commits that optimized standard `zsh-syntax-highlighting` to the point that it can edit `10 kB`
@@ -297,7 +313,8 @@ HOME:   = ~/.fsh/
 OPT:    = /opt/local/share/fsh/
 ```
 
-So for example, issue `fast-theme XDG:overlay` to load `~/.config/fsh/overlay.ini` as overlay.
+So for example, issue `fast-theme XDG:overlay` to load `~/.config/fsh/overlay.ini` as overlay. The `.ini`
+extension is optional.
 
 ## Secondary Theme
 
