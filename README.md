@@ -296,3 +296,32 @@ OPT:    = /opt/local/share/fsh/
 ```
 
 So for example, issue `fast-theme XDG:overlay` to load `~/.config/fsh/overlay.ini` as overlay.
+
+## Secondary Theme
+
+Each theme has key `secondary`, e.g. for theme `free`:
+
+```ini
+; free.ini
+[base]
+default          = none
+unknown-token    = red,bold
+; ...
+; ...
+; ...
+secondary        = zdharma
+```
+
+Secondary theme (`zdharma` in the example) will be used for highlighting of argument for `eval`
+and of `$( ... )` interior (i.e. of interior of command substitution). Basically, recursive
+highlighting uses alternate theme to make the highlighted code distinct:
+
+![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/cmdsubst.png)
+
+In above screen-shot the interior of `$( ... )` uses different colors than rest of the code. Example
+for `eval`:
+
+![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/eval_cmp.png)
+
+First line doesn't use recursive highlighting, highlights `eval` argument as regular string.
+Second line switches theme to `zdharma` and does full recursive highlighting of eval argument.
