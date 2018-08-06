@@ -85,57 +85,57 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 # FAST_HIGHLIGHT_STYLES key onto ini-file key
 local -A map
 map=(
-    default                     -
-    unknown-token               -
-    reserved-word               -
-    alias                       -
-    suffix-alias                -
-    builtin                     -
-    function                    -
-    command                     -
-    precommand                  -
-    commandseparator            -
-    hashed-command              -
-    path                        -
-    path_pathseparator          pathseparator
-    globbing                    -
-    history-expansion           -
-    single-hyphen-option        -
-    double-hyphen-option        -
-    back-quoted-argument        -
-    single-quoted-argument      -
-    double-quoted-argument      -
-    dollar-quoted-argument      -
-    back-or-dollar-double-quoted-argument   -
-    back-dollar-quoted-argument             -
-    assign                      -
-    redirection                 -
-    comment                     -
-    variable                    -
-    mathvar                     -
-    mathnum                     -
-    matherr                     -
-    assign-array-bracket        -
-    for-loop-variable           forvar
-    for-loop-number             fornum
-    for-loop-operator           foroper
-    for-loop-separator          forsep
-    exec-descriptor             -
-    here-string-tri             -
-    here-string-word            -
-    secondary                   -
-    case-input                  -
-    case-parentheses            -
-    case-condition              -
-    correct-subtle              -
-    incorrect-subtle            -
-    subtle-bg                   -
-    path-to-dir                 -
-    paired-bracket              -
-    bracket-level-1             -
-    bracket-level-2             -
-    bracket-level-3             -
-    global-alias                -
+    default                     "-"
+    unknown-token               "-"
+    reserved-word               "-"
+    alias                       "- command builtin"
+    suffix-alias                "- alias command builtin"
+    builtin                     "-"
+    function                    "- builtin command"
+    command                     "-"
+    precommand                  "- command"
+    commandseparator            "-"
+    hashed-command              "- command"
+    path                        "-"
+    path_pathseparator          "pathseparator"
+    globbing                    "-"
+    history-expansion           "-"
+    single-hyphen-option        "- single-quoted-argument"
+    double-hyphen-option        "- double-quoted-argument"
+    back-quoted-argument        "-"
+    single-quoted-argument      "-"
+    double-quoted-argument      "-"
+    dollar-quoted-argument      "-"
+    back-or-dollar-double-quoted-argument   "- back-dollar-quoted-argument"
+    back-dollar-quoted-argument             "- back-or-dollar-double-quoted-argument"
+    assign                      "- reserved-word"
+    redirection                 "- reserved-word"
+    comment                     "-"
+    variable                    "-"
+    mathvar                     "- forvar variable"
+    mathnum                     "- fornum"
+    matherr                     "- incorrect-subtle"
+    assign-array-bracket        "-"
+    for-loop-variable           "forvar mathvar variable"
+    for-loop-number             "fornum mathnum"
+    for-loop-operator           "foroper reserved-word"
+    for-loop-separator          "forsep commandseparator"
+    exec-descriptor             "- reserved-word"
+    here-string-tri             "-"
+    here-string-word            "- correct-subtle"
+    secondary                   "-"
+    case-input                  "- variable"
+    case-parentheses            "- reserved-word"
+    case-condition              "- correct-subtle"
+    correct-subtle              "-"
+    incorrect-subtle            "-"
+    subtle-bg                   "- correct-subtle"
+    path-to-dir                 "- path"
+    paired-bracket              "- subtle-bg correct-subtle"
+    bracket-level-1             "-"
+    bracket-level-2             "-"
+    bracket-level-3             "-"
+    global-alias                "- alias suffix-alias"
 )
 
 # In which order to generate entries
@@ -202,11 +202,22 @@ fi
 
 # Generate current_theme.zsh or secondary_theme.zsh, traversing ini-file associative array
 local k kk
-local inikey inival result
-integer ov_counter=0
+local inikey inival result first_val
+integer ov_counter=0 first
 for k in "${order[@]}"; do
-    [[ "${map[$k]}" = "-" ]] && kk="$k" || kk="${map[$k]}"
-    inikey="${out[(i)<*>_${kk}]}"
+    first=1
+    for kk in ${(s. .)map[$k]} default; do
+        [[ "$kk" = "-" ]] && kk="$k"
+        (( first )) && first_val="$kk"
+        inikey="${out[(i)<*>_${kk}]}"
+        [[ -n "$inikey" ]] && {
+            (( !first )) && [[ -z "$OPT_QUIET" ]] && print "For style $first_val, went for fallback style $kk"
+            break
+        }
+        first=0
+    done
+    [[ -z "$inikey" ]] && continue
+
     inival="${out[$inikey]}"
     if [[ "$k" = "secondary" && -z "$OPT_SECONDARY" && -n "$inival" ]]; then
         fast-theme -q --secondary "$inival"
