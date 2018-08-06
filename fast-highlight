@@ -653,7 +653,7 @@ typeset -ga ZLAST_COMMANDS
                           # ADD
                           [[ $__arg[-2,-1] == '))' ]] && {
                             (( __start=_end_pos-__PBUFLEN-2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
-                            (( __delimited )) && __delimited=2
+                            (( __delimited = __delimited ? 2 : __delimited ))
 
                             # Counting complex brackets (for brackets-highlighter): 7. )) for as-command ((
                             _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
@@ -690,7 +690,7 @@ typeset -ga ZLAST_COMMANDS
                  # A - [[
                  [[ "$braces_stack" = A* ]] && {
                    __style=${FAST_THEME_NAME}builtin
-                   (( __delimited )) && __delimited=2
+                   (( __delimited = __delimited ? 2 : __delimited ))
                    # Counting complex brackets (for brackets-highlighter): 8a. ]] for as-command [[
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
                  } || {
@@ -812,7 +812,7 @@ typeset -ga ZLAST_COMMANDS
                    __style=${FAST_THEME_NAME}builtin
                    # Counting complex brackets (for brackets-highlighter): 12. )) as for-syntax
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
-                   (( __delimited )) && __delimited=2
+                   (( __delimited = __delimited ? 2 : __delimited ))
                  }
                  ;;
         '<<<')
