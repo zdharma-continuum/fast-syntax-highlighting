@@ -277,7 +277,7 @@ typeset -ga ZLAST_COMMANDS
   # __arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
-  integer __arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} __PBUFLEN=${#1} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize
+  integer __arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} __PBUFLEN=${#1} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize __delimited=0
   local -a match mbegin mend __inputs __list
 
   # This comment explains the numbers:
@@ -349,6 +349,11 @@ typeset -ga ZLAST_COMMANDS
     (( next_word = (in_redirection == 0) ? 2 : next_word )) # else Stall $next_word.
     (( next_word = next_word | (this_word & (BIT_case_code|8192)) ))
 
+    # If we have a good delimiting construct just ending, and '{'
+    # occurs, then respect this and go for alternate syntax, i.e.
+    # treat '{' (\x7b) as if it's on command position
+    [[ "$__arg" = '{' && "$__delimited" = 2 ]] && { (( this_word = (this_word & ~2) | 1 )); __delimited=0; }
+
     __asize=${#__arg}
 
     # Reset state of working variables
@@ -359,6 +364,7 @@ typeset -ga ZLAST_COMMANDS
     # Compute the new $_start_pos and $_end_pos, skipping over whitespace in $__buf.
     if [[ $__arg == ';' ]] ; then
       braces_stack="${braces_stack#T}"
+      __delimited=0
 
       # Both ; and \n are rendered as a ";" (SEPER) by the ${(z)..} flag.
       needle=$';\n'
@@ -647,6 +653,7 @@ typeset -ga ZLAST_COMMANDS
                           # ADD
                           [[ $__arg[-2,-1] == '))' ]] && {
                             (( __start=_end_pos-__PBUFLEN-2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+                            (( __delimited )) && __delimited=2
 
                             # Counting complex brackets (for brackets-highlighter): 7. )) for as-command ((
                             _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
@@ -680,8 +687,10 @@ typeset -ga ZLAST_COMMANDS
    then # $__arg is a non-command word
       case $__arg in
         ']]')
+                 # A - [[
                  [[ "$braces_stack" = A* ]] && {
                    __style=${FAST_THEME_NAME}builtin
+                   (( __delimited )) && __delimited=2
                    # Counting complex brackets (for brackets-highlighter): 8a. ]] for as-command [[
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
                  } || {
@@ -787,14 +796,24 @@ typeset -ga ZLAST_COMMANDS
                  ;;
         '`'*)    __style=${FAST_THEME_NAME}back-quoted-argument;;
         '((')    # 'F' - (( after for
-                 (( this_word & 32 )) && braces_stack='F'"$braces_stack" && __style=${FAST_THEME_NAME}builtin && \
+                 (( this_word & 32 )) && {
+                   braces_stack='F'"$braces_stack"
+                   __style=${FAST_THEME_NAME}builtin && \
                    # Counting complex brackets (for brackets-highlighter): 11. (( as for-syntax
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
+                   # This is set after __arg_type == 2, and also here,
+                   # when another alternate-syntax capable command occurs
+                   __delimited=1
+                 }
                  ;;
         '))')    # 'F' - (( after for
-                 [[ "${braces_stack[1]}" = "F" ]] && braces_stack[1]="" && __style=${FAST_THEME_NAME}builtin && \
+                 [[ "${braces_stack[1]}" = "F" ]] && {
+                   braces_stack[1]=""
+                   __style=${FAST_THEME_NAME}builtin
                    # Counting complex brackets (for brackets-highlighter): 12. )) as for-syntax
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
+                   (( __delimited )) && __delimited=2
+                 }
                  ;;
         '<<<')
                  (( next_word = (next_word | 128) & ~3 ))
@@ -949,10 +968,16 @@ typeset -ga ZLAST_COMMANDS
         braces_stack="${braces_stack#T}"
         (( next_word = 1 | (next_word & BIT_case_code) ))
         highlight_glob=1
+        # A new command means that we should not expect
+        # that alternate syntax will occur. This is also
+        # in the ';' short-path
+        __delimited=0
       fi
     elif (( ( (__arg_type == 1) || (__arg_type == 2) ) && (this_word & 1) )); then # (( __arg_type == 1 || __arg_type == 2 )) && (( this_word & 1 ))
+        __delimited=1
         (( next_word = 1 | (next_word & (64 | BIT_case_code)) ))
     elif [[ $__arg == "repeat" ]] && (( this_word & 1 )); then
+      __delimited=1
       # skip the repeat-count word
       in_redirection=2
       # The redirection mechanism assumes $this_word describes the word
