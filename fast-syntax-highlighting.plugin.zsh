@@ -55,7 +55,7 @@ _zsh_highlight()
     return $ret
   fi
 
-  setopt localoptions warncreateglobal noksharrays
+  setopt localoptions warncreateglobal noksharrays noshwordsplit extendedglob typesetsilent nokshglob
   local REPLY # don't leak $REPLY into global scope
   local -a reply
 
