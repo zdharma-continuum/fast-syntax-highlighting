@@ -968,10 +968,10 @@ typeset -ga ZLAST_COMMANDS
         braces_stack="${braces_stack#T}"
         (( next_word = 1 | (next_word & BIT_case_code) ))
         highlight_glob=1
-        # A new command means that we should not expect
-        # that alternate syntax will occur. This is also
-        # in the ';' short-path
-        __delimited=0
+        # A new command means that we should not expect that alternate
+        # syntax will occur (this is also in the ';' short-path), but
+        # || and && mean going down just 1 step, not all the way to 0
+        [[ $__arg != ("||"|"&&") ]] && __delimited=0 || (( __delimited = __delimited == 2 ? 1 : __delimited ))
       fi
     elif (( ( (__arg_type == 1) || (__arg_type == 2) ) && (this_word & 1) )); then # (( __arg_type == 1 || __arg_type == 2 )) && (( this_word & 1 ))
         __delimited=1
