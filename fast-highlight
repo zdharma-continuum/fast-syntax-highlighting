@@ -746,7 +746,7 @@ typeset -ga ZLAST_COMMANDS
                    else
                      __idx=0
                    fi
-                   -fast-highlight-process $PREBUFFER ${__arg[2,__asize]%[\'\"]} $(( _start_pos + 1 ))
+                   -fast-highlight-process "$PREBUFFER" ${__arg[2,__asize]%[\'\"]} $(( _start_pos + 1 ))
                    (( __idx )) && FAST_THEME_NAME=$_mybuf
                    already_added=1
                  else
