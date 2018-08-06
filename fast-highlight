@@ -1022,7 +1022,7 @@ typeset -ga ZLAST_COMMANDS
   done
 
   # Run on fake buffer with replaced parentheses: ")" into "x"
-  __inputs=( ${(0)${(S)_mybuf//(#b)*\$\((?#)(\)|(#e))/${mbegin[1]};${mend[1]}${__nul}}%$__nul*} )
+  __inputs=( ${(0)${(S)_mybuf//(#b)*\$\(([^\)]#)(\)|(#e))/${mbegin[1]};${mend[1]}${__nul}}%$__nul*} )
   if [[ ${__inputs[1]} != $_mybuf ]]; then
     if [[ -n ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]} ]]; then
       __idx=1
