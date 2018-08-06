@@ -105,7 +105,7 @@ local -a __lines_list
                 [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 1 ]] && {
                     (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                     if (( __idx1 == 2 )); then
-                        if git rev-parse --verify --quiet -- "$__wrd" >/dev/null 2>&1; then
+                        if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
                             __style=${FAST_THEME_NAME}builtin
                         elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" && -e "$__wrd" ]]; then
                             __style=${FAST_THEME_NAME}path
