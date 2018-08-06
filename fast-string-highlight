@@ -6,32 +6,32 @@
 #
 function -fast-highlight-string-process {
     local -A pos_to_level level_to_pos pair_map final_pairs
-    local input="$1$2" _mybuf="$1$2" __style __quoting
+    local input=$1$2 _mybuf=$1$2 __style __quoting
     integer __idx=0 __pair_idx __level=0 __start __end
     local -a match mbegin mend
 
     pair_map=( "(" ")" "{" "}" "[" "]" )
 
     while [[ $_mybuf = (#b)[^"{}()[]\\\"'"]#((["({[]})\"'"])|[\\](*))(*) ]]; do
-        [[ -n "${match[3]}" ]] && {
+        [[ -n ${match[3]} ]] && {
             __idx+=${mbegin[1]}
-            [[ "$__quoting" = \' && "${match[3]}" = \'* ]] && {
-                _mybuf="${match[3]}"
+            [[ $__quoting = \' && ${match[3]} = \'* ]] && {
+                _mybuf=${match[3]}
             } || {
-                _mybuf="${match[3]:1}"
+                _mybuf=${match[3]:1}
                 (( ++ __idx ))
             }
         } || {
             __idx+=${mbegin[1]}
-            [[ -z "$__quoting" && -z "${_FAST_COMPLEX_BRACKETS[(r)$((__idx-${#PREBUFFER}-1))]}" ]] && {
-                if [[ "${match[1]}" = ["({["] ]]; then
+            [[ -z $__quoting && -z ${_FAST_COMPLEX_BRACKETS[(r)$((__idx-${#PREBUFFER}-1))]} ]] && {
+                if [[ ${match[1]} = ["({["] ]]; then
                     pos_to_level[$__idx]=$(( ++__level ))
-                    level_to_pos[$__level]="$__idx"
-                elif [[ "${match[1]}" = ["]})"] ]]; then
+                    level_to_pos[$__level]=$__idx
+                elif [[ ${match[1]} = ["]})"] ]]; then
                     if (( __level > 0 )); then
-                        __pair_idx="${level_to_pos[$__level]}"
+                        __pair_idx=${level_to_pos[$__level]}
                         pos_to_level[$__idx]=$(( __level -- ))
-                        [[ "${pair_map[${input[__pair_idx]}]}" = "${input[__idx]}" ]] && {
+                        [[ ${pair_map[${input[__pair_idx]}]} = ${input[__idx]} ]] && {
                             final_pairs[$__idx]=$__pair_idx
                             final_pairs[$__pair_idx]=$__idx
                         }
@@ -40,9 +40,9 @@ function -fast-highlight-string-process {
                     fi
                 fi
             }
-            [[ "${match[1]}" = \" && "$__quoting" != \' ]] && { [[ "$__quoting" = '"' ]] && __quoting="" || __quoting='"'; }
-            [[ "${match[1]}" = \' && "$__quoting" != \" ]] && { [[ "$__quoting" = "'" ]] && __quoting="" || __quoting="'"; }
-            _mybuf="${match[4]}"
+            [[ ${match[1]} = \" && $__quoting != \' ]] && { [[ $__quoting = '"' ]] && __quoting="" || __quoting='"'; }
+            [[ ${match[1]} = \' && $__quoting != \" ]] && { [[ $__quoting = "'" ]] && __quoting="" || __quoting="'"; }
+            _mybuf=${match[4]}
         }
     done
 
@@ -53,7 +53,7 @@ function -fast-highlight-string-process {
     done
 
     # If cursor is on a bracket, then highlight corresponding bracket, if any.
-    if [[ "$WIDGET" != zle-line-finish ]]; then
+    if [[ $WIDGET != zle-line-finish ]]; then
         __idx=$(( CURSOR + 1 ))
         if (( ${+pos_to_level[$__idx]} )) && (( ${+final_pairs[$__idx]} )); then
             (( __start=final_pairs[$__idx]-${#PREBUFFER}-1, __end=final_pairs[$__idx]-${#PREBUFFER}, __start >= 0 )) && \
