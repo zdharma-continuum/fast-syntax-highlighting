@@ -227,13 +227,15 @@ for k in "${order[@]}"; do
         inikey="${out[(i)<*>_${kk}]}"
         [[ -n "$inikey" ]] && {
             (( !first )) && [[ -z "$OPT_QUIET" ]] && {
-                [[ $kk = default ]] && print "Missing style: $first_val" || print "For style $first_val, went for fallback style $kk"
+                [[ $kk = default ]] && {
+                    [[ "$THEME_NAME" != "overlay" ]] && print "Missing style: $first_val"
+                } || print "For style $first_val, went for fallback style $kk"
             }
             break
         }
         first=0
     done
-    [[ -z "$inikey" ]] && { [[ -z "$OPT_QUIET" ]] && print "Missing style $first_val"; continue; }
+    [[ -z "$inikey" ]] && { [[ -z "$OPT_QUIET" && "$THEME_NAME" != "overlay" ]] && print "Missing style $first_val"; continue; }
 
     inival="${out[$inikey]}"
     if [[ "$k" = "secondary" && -z "$OPT_SECONDARY" && -n "$inival" ]]; then
