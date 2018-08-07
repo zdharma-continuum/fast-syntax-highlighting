@@ -22,6 +22,7 @@
     - [Zgen](#zgen)
 - [Customization](#customization)
   - [Secondary Theme](#secondary-theme)
+  - [Custom Working Directory](#custom-working-directory)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -344,3 +345,14 @@ code. Example for `eval`:
 
 First line doesn't use recursive highlighting, highlights `eval` argument as regular string.
 Second line switches theme to `zdharma` and does full recursive highlighting of eval argument.
+
+## Custom Working Directory
+
+Set `$FAST_WORK_DIR` before loading the plugin to have e.g. processed theme files (ready to
+load, in Zsh format, not INI) kept under specified location. This is handy if e.g. you install
+Fast-Syntax-Highlighting system-wide (e.g. from AUR on ArchLinux) and want to have per-user
+theme setup.
+
+You can use "~" in the path, e.g. `FAST_WORK_DIR=~/.fsh` and also the `XDG:`, `LOCAL:`, `OPT:`,
+etc. short-hands, so e.g. `FAST_WORK_DIR=XDG` or `FAST_WORK_DIR=XDG:` is allowed (in this case
+it will be changed to `$HOME/.config/fsh` by default by fast-syntax-highlighting loader).
