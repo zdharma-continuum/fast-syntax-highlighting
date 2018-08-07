@@ -23,10 +23,10 @@ map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
 FAST_WORK_DIR=${${FAST_WORK_DIR/(#m)(#s)(XDG|LOCAL|HOME|OPT):(#c0,1)/${map[${MATCH%:}:]}}%/}
 
 local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY OPT_SHOW OPT_COPY OPT_OV_RESET
-local OPT_PALETTE
+local OPT_PALETTE OPT_CDWD
 local -A opthash
 zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test -secondary \
-            s -show -copy-shipped-theme: R -ov-reset p -palette || \
+            s -show -copy-shipped-theme: R -ov-reset p -palette w -workdir || \
                 { echo "Improper options given, see help (-h/--help)"; return 1; }
 
 (( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
@@ -40,6 +40,12 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 (( ${+opthash[--copy-shipped-theme]} ))        && OPT_COPY="${opthash[--copy-shipped-theme]}"
 (( ${+opthash[-R]} + ${+opthash[--ov-reset]} )) && OPT_OV_RESET="-R"
 (( ${+opthash[-p]} + ${+opthash[--palette]} )) && OPT_PALETTE="-p"
+(( ${+opthash[-w]} + ${+opthash[--workdir]} )) && OPT_CDWD="-w"
+
+[[ -n "$OPT_CDWD" ]] && {
+    builtin cd $FAST_WORK_DIR
+    return 0
+}
 
 [[ -n "$OPT_PALETTE" ]] && {
     local n
@@ -79,7 +85,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 
 [[ -n "$OPT_HELP" ]] && {
     print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] [-t/--test] <theme-name|theme-path>"
-    print -r -- "       fast-theme [-r/--reset] [-l/--list] [-s/--show] [-p/--palette]"
+    print -r -- "       fast-theme [-r/--reset] [-l/--list] [-s/--show] [-p/--palette] [-w/--workdir]"
     print -r -- "       fast-theme --copy-shipped-theme {theme-name} [destination-path]"
     print -r -- ""
     print -r -- "Default action (after providing <theme-name> or <theme-path>) is to switch current session"
@@ -101,6 +107,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
     print -r -- "-t/--test      - show test block of code after switching theme"
     print -r -- "-s/--show      - get and display the theme currently being set"
     print -r -- "-p/--palette   - just print all 256 colors and exit (useful when creating a theme)"
+    print -r -- "-w/--workdir   - cd into \$FAST_WORK_DIR (if not set, then into the plugin directory)"
     print -r -- ""
     print -r -- "The option --copy-shipped-theme allows easy copying of one of the 6 shipped themes into given"
     print -r -- "destination path. Normal use means changing directory to e.g. ~/.config/fsh, and then issuing"
