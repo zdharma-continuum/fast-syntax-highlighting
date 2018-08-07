@@ -278,6 +278,8 @@ done
 # Re-apply overlay on top of the theme we switched to
 [[ "$THEME_NAME" != "overlay" ]] && [[ -r "$FAST_WORK_DIR"/theme_overlay.zsh ]] && source "$FAST_WORK_DIR"/theme_overlay.zsh
 
+zcompile $FAST_WORK_DIR/$outfile
+
 [[ -z "$OPT_QUIET" ]] && {
     if [[ "$THEME_NAME" != "overlay" ]]; then
         print "Switched to theme \`$THEME_NAME' (current session, and future sessions)" || \
