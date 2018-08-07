@@ -10,9 +10,11 @@ emulate -LR zsh
 setopt extendedglob typesetsilent warncreateglobal
 
 local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY OPT_SHOW OPT_COPY OPT_OV_RESET
+local OPT_PALETTE
 local -A opthash
 zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test -secondary \
-            s -show -copy-shipped-theme: R -ov-reset || { echo "Improper options given, see help (-h/--help)"; return 1; }
+            s -show -copy-shipped-theme: R -ov-reset p -palette || \
+                { echo "Improper options given, see help (-h/--help)"; return 1; }
 
 (( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
 (( ${+opthash[-v]} + ${+opthash[--verbose]} )) && OPT_VERBOSE="-v"
@@ -24,6 +26,18 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 (( ${+opthash[-s]} + ${+opthash[--show]} ))    && OPT_SHOW="-s"
 (( ${+opthash[--copy-shipped-theme]} ))        && OPT_COPY="${opthash[--copy-shipped-theme]}"
 (( ${+opthash[-R]} + ${+opthash[--ov-reset]} )) && OPT_OV_RESET="-R"
+(( ${+opthash[-p]} + ${+opthash[--palette]} )) && OPT_PALETTE="-p"
+
+[[ -n "$OPT_PALETTE" ]] && {
+    local n
+    local -a __colors
+    for n in {000..255}
+    do
+        __colors+=("%F{$n}$n%f")
+    done
+    print -cP $__colors
+    return
+}
 
 [[ -n "$OPT_SHOW" ]] && {
     ( source "$FAST_BASE_DIR"/current_theme.zsh 2>/dev/null && print "Current theme: $FAST_THEME_NAME" || print "No theme is set"; )
@@ -52,7 +66,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 
 [[ -n "$OPT_HELP" ]] && {
     print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] [-t/--test] <theme-name|theme-path>"
-    print -r -- "       fast-theme [-r/--reset] [-l/--list] [-s/--show]"
+    print -r -- "       fast-theme [-r/--reset] [-l/--list] [-s/--show] [-p/--palette]"
     print -r -- "       fast-theme --copy-shipped-theme {theme-name} [destination-path]"
     print -r -- ""
     print -r -- "Default action (after providing <theme-name> or <theme-path>) is to switch current session"
@@ -73,6 +87,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
     print -r -- "-l/--list      - list names of available themes"
     print -r -- "-t/--test      - show test block of code after switching theme"
     print -r -- "-s/--show      - get and display the theme currently being set"
+    print -r -- "-p/--palette   - just print all 256 colors and exit (useful when creating a theme)"
     print -r -- ""
     print -r -- "The option --copy-shipped-theme allows easy copying of one of the 6 shipped themes into given"
     print -r -- "destination path. Normal use means changing directory to e.g. ~/.config/fsh, and then issuing"
