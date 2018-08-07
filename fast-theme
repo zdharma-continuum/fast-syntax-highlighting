@@ -11,6 +11,16 @@ setopt extendedglob typesetsilent warncreateglobal
 
 typeset -g FAST_WORK_DIR
 : ${FAST_WORK_DIR:=$FAST_BASE_DIR}
+FAST_WORK_DIR=${~FAST_WORK_DIR}
+
+local -A map
+map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
+      "LOCAL:"  "/usr/local/share/fsh/"
+      "HOME:"   "$HOME/.fsh/"
+      "OPT:"    "/opt/local/share/fsh/"
+)
+
+FAST_WORK_DIR=${${FAST_WORK_DIR/(#m)(#s)(XDG|LOCAL|HOME|OPT):(#c0,1)/${map[${MATCH%:}:]}}%/}
 
 local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY OPT_SHOW OPT_COPY OPT_OV_RESET
 local OPT_PALETTE
@@ -101,7 +111,6 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 [[ -z "$1" ]] && { print -u2 "Provide a theme (its name or path to its file) to switch to, aborting (see -h/--help)"; return 1; }
 
 # FAST_HIGHLIGHT_STYLES key onto ini-file key
-local -A map
 map=(
     default                     "-"
     unknown-token               "-"

@@ -31,6 +31,17 @@
 typeset -gA __fast_highlight_main__command_type_cache FAST_BLIST_PATTERNS
 typeset -g FAST_WORK_DIR
 : ${FAST_WORK_DIR:=$FAST_BASE_DIR}
+FAST_WORK_DIR=${~FAST_WORK_DIR}
+() {
+  setopt localoptions extendedglob
+  local -A map
+  map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
+        "LOCAL:"  "/usr/local/share/fsh/"
+        "HOME:"   "$HOME/.fsh/"
+        "OPT:"    "/opt/local/share/fsh/"
+  )
+  FAST_WORK_DIR=${${FAST_WORK_DIR/(#m)(#s)(XDG|LOCAL|HOME|OPT):(#c0,1)/${map[${MATCH%:}:]}}%/}
+}
 
 # Define default styles. You can set this after loading the plugin in
 # Zshrc and use 256 colors via numbers, like: fg=150
