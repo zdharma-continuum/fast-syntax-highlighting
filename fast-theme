@@ -237,6 +237,7 @@ for k in "${order[@]}"; do
             break
         }
         first=0
+        [[ "$THEME_NAME" = "overlay" ]] && break
     done
     [[ -z "$inikey" ]] && { [[ -z "$OPT_QUIET" && "$THEME_NAME" != "overlay" ]] && print "Missing style $first_val"; continue; }
 
