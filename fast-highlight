@@ -29,12 +29,14 @@
 # -------------------------------------------------------------------------------------------------
 
 typeset -gA __fast_highlight_main__command_type_cache FAST_BLIST_PATTERNS
+typeset -g FAST_WORK_DIR
+: ${FAST_WORK_DIR:=$FAST_BASE_DIR}
 
 # Define default styles. You can set this after loading the plugin in
 # Zshrc and use 256 colors via numbers, like: fg=150
 typeset -gA FAST_HIGHLIGHT_STYLES
-if [[ -e "$FAST_BASE_DIR"/current_theme.zsh ]]; then
-  source "$FAST_BASE_DIR"/current_theme.zsh
+if [[ -e $FAST_WORK_DIR/current_theme.zsh ]]; then
+  source $FAST_WORK_DIR/current_theme.zsh
 else
 # built-in theme
 zstyle :plugin:fast-syntax-highlighting theme default
@@ -87,7 +89,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 fi
 
 # This can overwrite some of *_STYLES fields
-[[ -r "$FAST_BASE_DIR"/theme_overlay.zsh ]] && source "$FAST_BASE_DIR"/theme_overlay.zsh
+[[ -r $FAST_WORK_DIR/theme_overlay.zsh ]] && source $FAST_WORK_DIR/theme_overlay.zsh
 
 typeset -gA __FAST_HIGHLIGHT_TOKEN_TYPES
 
@@ -742,7 +744,7 @@ typeset -ga ZLAST_COMMANDS
                      __idx=1
                      _mybuf=$FAST_THEME_NAME
                      FAST_THEME_NAME=${${${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}:t:r}#(XDG|LOCAL|HOME|OPT):}
-                     (( ${+FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}default]} )) || source $FAST_BASE_DIR/secondary_theme.zsh
+                     (( ${+FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}default]} )) || source $FAST_WORK_DIR/secondary_theme.zsh
                    else
                      __idx=0
                    fi
@@ -1028,7 +1030,7 @@ typeset -ga ZLAST_COMMANDS
       __idx=1
       __tmp=$FAST_THEME_NAME
       FAST_THEME_NAME=${${${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]}:t:r}#(XDG|LOCAL|HOME|OPT):}
-      (( ${+FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}default]} )) || source $FAST_BASE_DIR/secondary_theme.zsh
+      (( ${+FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}default]} )) || source $FAST_WORK_DIR/secondary_theme.zsh
     else
       __idx=0
     fi

@@ -9,6 +9,9 @@ zmodload zsh/zutil 2>/dev/null
 emulate -LR zsh
 setopt extendedglob typesetsilent warncreateglobal
 
+typeset -g FAST_WORK_DIR
+: ${FAST_WORK_DIR:=$FAST_BASE_DIR}
+
 local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY OPT_SHOW OPT_COPY OPT_OV_RESET
 local OPT_PALETTE
 local -A opthash
@@ -40,7 +43,7 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 }
 
 [[ -n "$OPT_SHOW" ]] && {
-    ( source "$FAST_BASE_DIR"/current_theme.zsh 2>/dev/null && print "Current theme: $FAST_THEME_NAME" || print "No theme is set"; )
+    ( source "$FAST_WORK_DIR"/current_theme.zsh 2>/dev/null && print "Current theme: $FAST_THEME_NAME" || print "No theme is set"; )
     return 0
 }
 
@@ -54,9 +57,9 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
     return 0
 }
 
-[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set, restart is required)"; return 0; }
+[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_WORK_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set, restart is required)"; return 0; }
 
-[[ -n "$OPT_OV_RESET" ]] && { command rm -f "$FAST_BASE_DIR"/theme_overlay.zsh; [[ -z "$OPT_QUIET" ]] && print "Overlay-reset done, it is inactive (restart is required)"; return 0; }
+[[ -n "$OPT_OV_RESET" ]] && { command rm -f "$FAST_WORK_DIR"/theme_overlay.zsh; [[ -z "$OPT_QUIET" ]] && print "Overlay-reset done, it is inactive (restart is required)"; return 0; }
 
 [[ -n "$OPT_LIST" ]] && {
     [[ -z "$OPT_QUIET" ]] && print -r -- "Available themes:"
@@ -201,13 +204,13 @@ else
 fi
 
 [[ -z "$OPT_SECONDARY" ]] && { [[ "$THEME_NAME" = "overlay" ]] && local outfile="theme_overlay.zsh" || local outfile="current_theme.zsh"; } || local outfile="secondary_theme.zsh"
-command rm -f "$FAST_BASE_DIR"/"$outfile"
+command rm -f "$FAST_WORK_DIR"/"$outfile"
 
 # Set a zstyle and a parameter to carry theme name
 if [[ -z "$OPT_SECONDARY" ]]; then
     [[ "$THEME_NAME" != "overlay" ]] && {
-        print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$THEME_NAME"'"' >>! "$FAST_BASE_DIR"/"$outfile"
-        print -r -- 'typeset -g FAST_THEME_NAME="'"$THEME_NAME"'"' >>! "$FAST_BASE_DIR"/"$outfile"
+        print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
+        print -r -- 'typeset -g FAST_THEME_NAME="'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
         zstyle :plugin:fast-syntax-highlighting theme "$THEME_NAME"
         typeset -g FAST_THEME_NAME="$THEME_NAME"
     }
@@ -256,14 +259,14 @@ for k in "${order[@]}"; do
         print -r -- ': ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}'"$k"']::='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
         FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
     else
-        print -r -- ': ${FAST_HIGHLIGHT_STYLES['"${FAST_THEME_NAME}$k"']:='"$result"'}' >>! "$FAST_BASE_DIR"/"$outfile"
+        print -r -- ': ${FAST_HIGHLIGHT_STYLES['"${FAST_THEME_NAME}$k"']:='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
         FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
     fi
 done
 
 # This can overwrite some of *_STYLES fields
 # Re-apply overlay on top of the theme we switched to
-[[ "$THEME_NAME" != "overlay" ]] && [[ -r "$FAST_BASE_DIR"/theme_overlay.zsh ]] && source "$FAST_BASE_DIR"/theme_overlay.zsh
+[[ "$THEME_NAME" != "overlay" ]] && [[ -r "$FAST_WORK_DIR"/theme_overlay.zsh ]] && source "$FAST_WORK_DIR"/theme_overlay.zsh
 
 [[ -z "$OPT_QUIET" ]] && {
     if [[ "$THEME_NAME" != "overlay" ]]; then
