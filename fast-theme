@@ -252,11 +252,9 @@ for k in "${order[@]}"; do
     fi
 
     if [[ "$THEME_NAME" = "overlay" ]]; then
-        [[ -n "$result" ]] && {
-            (( ++ ov_counter ))
-            print -r -- ': ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}'"$k"']::='"$result"'}' >>! "$FAST_BASE_DIR"/"$outfile"
-            FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
-        }
+        (( ++ ov_counter ))
+        print -r -- ': ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}'"$k"']::='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
+        FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
     else
         print -r -- ': ${FAST_HIGHLIGHT_STYLES['"${FAST_THEME_NAME}$k"']:='"$result"'}' >>! "$FAST_BASE_DIR"/"$outfile"
         FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
