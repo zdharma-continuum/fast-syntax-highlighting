@@ -101,11 +101,20 @@ Other extensions:
 
     ![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/for-loop-cmp.png)
 
+14. Ideal string highlighting – no quoting can disturb highlighting of `"`-quoted (and `'`-quoted) text:
+
+    ![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/ideal-string.png)
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
 
 # Updates (2018)
+**2018-08-09**
+
+Added ideal string highlighting – FSH now handles any legal quoting and combination of `"`,`'` and `\` when
+highlighting program arguments. See the introduction for an example (item #14).
+
 **2018-08-02**
 
 Global aliases are now supported:
