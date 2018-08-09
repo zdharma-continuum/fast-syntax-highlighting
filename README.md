@@ -79,10 +79,13 @@ Other extensions:
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/eval_cmp.png)
 
 10. New architecture – **chroma functions** – highlighting that is **specific** for given command. There
-    are two chromas currently, for `git` (verifies correct remote & branch, also see below)  and `grep`
-    (highlights regular expression):
+    are chromas for `git` (verifies correct remote & branch, also see below), `grep` (highlights regular
+    expression):
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/git_chroma.png)
+
+    Also for `awk`, `make`, `perl`, `printf`, `ruby`, `sh`, `source` and more. The chromas can be considered
+    "plugins" for specific commands.
 
 11. Ideal highlighting of brackets (pairing, etc.) – no quoting can disturb the result:
 
