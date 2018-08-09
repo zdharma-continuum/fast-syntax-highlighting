@@ -290,7 +290,7 @@ typeset -ga ZLAST_COMMANDS
   # __arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
-  integer __arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} __PBUFLEN=${#1} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize __delimited=0
+  integer __arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} __PBUFLEN=${#1} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize __delimited=0 itmp iitmp
   local -a match mbegin mend __inputs __list
 
   # This comment explains the numbers:
@@ -750,8 +750,8 @@ typeset -ga ZLAST_COMMANDS
                  ;;
         '--'*)   [[ $__arg == "--" ]] && { _was_double_hyphen=1; __style=${FAST_THEME_NAME}double-hyphen-option; } || { (( !_was_double_hyphen )) && __style=${FAST_THEME_NAME}double-hyphen-option || __style=${FAST_THEME_NAME}default; };;
         '-'*)    (( !_was_double_hyphen )) && __style=${FAST_THEME_NAME}single-hyphen-option || __style=${FAST_THEME_NAME}default;;
-        '"'*|"'"*)
-                 if (( this_word & 256 )); then
+        [\"\']*|[^\"\\]##([\\][\\])#\"*|[^\'\\]##([\\][\\])#\'*)
+                 if (( this_word & 256 )) && [[ $__arg = [\'\"]* ]]; then
                    if [[ -n ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]} ]]; then
                      __idx=1
                      _mybuf=$FAST_THEME_NAME
@@ -760,35 +760,57 @@ typeset -ga ZLAST_COMMANDS
                    else
                      __idx=0
                    fi
-                   -fast-highlight-process "$PREBUFFER" ${__arg[2,__asize]%[\'\"]} $(( _start_pos + 1 ))
+                   -fast-highlight-process "$PREBUFFER" ${${__arg%[\'\"]}#[\'\"]} $(( _start_pos + 1 ))
                    (( __idx )) && FAST_THEME_NAME=$_mybuf
                    already_added=1
                  else
-                   if [[ $__arg = "'"* ]]; then
-                     __style=${FAST_THEME_NAME}single-quoted-argument
-                   else
-                     (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
-                     -fast-highlight-string
+                   # Reusing existing vars, treat this code like C++ STL
+                   # header, full of underscores and unhelpful var names
+                   itmp=0 __workbuf=$__arg __tmp="" cdpath_dir=$__arg
+                   while [[ $__workbuf = (#b)[^\"\'\\]#(([\"\'])|[\\](*))(*) ]]; do
+                     [[ -n ${match[3]} ]] && {
+                       itmp+=${mbegin[1]}
+                       # Optionally skip 1 quoted char
+                       [[ $__tmp = \' ]] && __workbuf=${match[3]} || { itmp+=1; __workbuf=${match[3]:1}; }
+                     } || {
+                       itmp+=${mbegin[1]}
+                       __workbuf=${match[4]}
+                       # Toggle quoting
+                       [[ ( ${match[1]} = \" && $__tmp != \' ) || ( ${match[1]} = \' && $__tmp != \" ) ]] && {
+                         [[ $__tmp = [\"\'] ]] && {
+                           # End of quoting
+                           (( __start=_start_pos-__PBUFLEN+iitmp-1, __end=_start_pos-__PBUFLEN+itmp, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}${${${__tmp#\'}:+double-quoted-argument}:-single-quoted-argument}]}")
+                           already_added=1
+
+                           [[ $__tmp = \" ]] && {
+                             __arg=${cdpath_dir[iitmp+1,itmp-1]}
+                             (( _start_pos += iitmp - 1 + 1 ))
+                             -fast-highlight-string
+                             (( _start_pos = _start_pos - iitmp + 1 - 1 ))
+                           }
+                           # The end-of-quoting proper algorithm action
+                           __tmp=
+                         } || {
+                           # Beginning of quoting
+                           iitmp=itmp
+                           # The beginning-of-quoting proper algorithm action
+                           __tmp=${match[1]}
+                         }
+                       }
+                     }
+                   done
+                   [[ $__tmp = [\"\'] ]] && {
+                     (( __start=_start_pos-__PBUFLEN+iitmp-1, __end=_start_pos-__PBUFLEN+__asize, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}${${${__tmp#\'}:+double-quoted-argument}:-single-quoted-argument}]}")
                      already_added=1
-                   fi
+
+                     [[ $__tmp = \" ]] && {
+                       __arg=${cdpath_dir[iitmp+1,__asize]}
+                       (( _start_pos += iitmp - 1 + 1 ))
+                       -fast-highlight-string
+                       (( _start_pos = _start_pos - iitmp + 1 - 1 ))
+                     }
+                   }
                  fi
-                 ;;
-        [^\"\\]##([\\][\\])#\"*)
-                 # ADD
-                 local ctmp="\""
-                 integer itmp=${__arg[(i)$ctmp]}-1
-                 integer jtmp=${__arg[(b:itmp+2:i)$ctmp]}
-                 (( __start=_start_pos-__PBUFLEN+itmp, __end=_start_pos-__PBUFLEN+jtmp, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
-                 -fast-highlight-string
-                 already_added=1
-                 ;;
-        [^\'\\]##([\\][\\])#\'*)
-                 # ADD
-                 local ctmp="'"
-                 integer itmp=${__arg[(i)$ctmp]}-1
-                 integer jtmp=${__arg[(b:itmp+2:i)$ctmp]}
-                 (( __start=_start_pos-__PBUFLEN+itmp, __end=_start_pos-__PBUFLEN+jtmp, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
-                 already_added=1
                  ;;
         \$\'*)
                  # ADD
@@ -1162,6 +1184,8 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
 # - B matches ${(...)var[abc]}
 # - C matches $
 # - D matches words [a-zA-Z]## (variables)
+#
+# Parameters used: _mybuf, __idx, _end_idx, __style
 -fast-highlight-math-string()
 {
   _mybuf=$__arg
