@@ -596,7 +596,7 @@ typeset -ga ZLAST_COMMANDS
                           [[ $__arg = *[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
                           # Handle array assignment
-                          [[ $__arg = (#b)*=(\()[^\)]#(\))(#c0,1)* ]] && {
+                          [[ $__arg = (#b)*=(\()*(\))* || $__arg = (#b)*=(\()* ]] && {
                               (( __start=_start_pos-__PBUFLEN+${mbegin[1]}-1, __end=__start+1, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}assign-array-bracket]}")
                               # Counting complex brackets (for brackets-highlighter): 2. ( in array assign
                               _FAST_COMPLEX_BRACKETS+=( $__start )
@@ -675,11 +675,11 @@ typeset -ga ZLAST_COMMANDS
                           # anonymous function
                           __style=${FAST_THEME_NAME}reserved-word
                         elif [[ $__arg == $'\x28' ]]; then
-                          # subshell (
+                          # subshell (, stack: letter 'R'
                           __style=${FAST_THEME_NAME}reserved-word
                           braces_stack='R'$braces_stack
                         elif [[ $__arg == $'\x29' ]]; then
-                          # )
+                          # ), stack: letter 'R' for subshell
                           [[ $braces_stack = R* ]] && { braces_stack=${braces_stack#R}; __style=${FAST_THEME_NAME}reserved-word; }
                         elif (( this_word & 14 )); then
                           __style=${FAST_THEME_NAME}default
