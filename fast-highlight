@@ -179,6 +179,8 @@ FAST_HIGHLIGHT+=(
   #chroma-which   chroma/-which.ch
   chroma-printf  chroma/-printf.ch
   chroma-ruby    chroma/-ruby.ch
+  chroma-whatis  chroma/-whatis.ch
+  chroma-man     chroma/-whatis.ch
 )
 
 # Assignments seen, to know if math parameter exists
