@@ -512,7 +512,7 @@ typeset -ga ZLAST_COMMANDS
      # try-always construct
      __style=${FAST_THEME_NAME}reserved-word # de facto a reserved word, although not de jure
      (( next_word = 1 | (this_word & BIT_case_code) ))
-   elif (( this_word & 1 )) && (( in_redirection == 0 )) || [[ ${braces_stack[1]} = 'T' ]]; then
+   elif (( this_word & 1 )) && (( in_redirection == 0 )) || [[ $braces_stack = T* ]]; then
      if (( __arg_type == 1 )); then
       __style=${FAST_THEME_NAME}precommand
       [[ $__arg = "command" || $__arg = "exec" ]] && (( next_word = next_word | 64 ))
@@ -527,7 +527,7 @@ typeset -ga ZLAST_COMMANDS
          [[ $_mybuf = (#b)\$([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(/*|) || $_mybuf = (#b)\$\{([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)\}(/*|) ]] && \
          (( ${+parameters[${match[1]}]} )); then
          -fast-highlight-main-type ${(P)match[1]}${match[2]}
-       elif [[ ${braces_stack[1]} = 'T' ]]; then
+       elif [[ $braces_stack = T* ]]; then
          REPLY=none
        else
          : ${expanded_path::=${~_mybuf}}
@@ -539,9 +539,9 @@ typeset -ga ZLAST_COMMANDS
                         [[ $__arg = "[[" ]] && __style=${FAST_THEME_NAME}builtin || __style=${FAST_THEME_NAME}reserved-word
                         if [[ $__arg == $'\x7b' ]]; then # {
                           braces_stack='Y'$braces_stack
-                        elif [[ $__arg == $'\x7d' && $braces_stack[1] == "Y" ]]; then # }
+                        elif [[ $__arg == $'\x7d' && $braces_stack = Y* ]]; then # }
                           # We're at command word, so no need to check right_brace_is_recognised_everywhere
-                          braces_stack[1]=""
+                          braces_stack=${braces_stack#Y}
                           __style=${FAST_THEME_NAME}reserved-word
                           (( next_word = next_word | 16 ))
                         elif [[ $__arg == "[[" ]]; then
@@ -591,7 +591,7 @@ typeset -ga ZLAST_COMMANDS
         hashed)         __style=${FAST_THEME_NAME}hashed-command;;
         dirpath)        __style=${FAST_THEME_NAME}path-to-dir;;
         none)           # Assign?
-                        if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( ${braces_stack[1]} = 'T' && ${__arg_type} != 3 ) ]]; then
+                        if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( $braces_stack = T* && ${__arg_type} != 3 ) ]]; then
                           __style=${FAST_THEME_NAME}assign
                           [[ $__arg = *[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
@@ -680,7 +680,7 @@ typeset -ga ZLAST_COMMANDS
                           braces_stack='R'$braces_stack
                         elif [[ $__arg == $'\x29' ]]; then
                           # )
-                          [[ $braces_stack[1] == "R" ]] && { braces_stack[1]=""; __style=${FAST_THEME_NAME}reserved-word; }
+                          [[ $braces_stack = R* ]] && { braces_stack=${braces_stack#R}; __style=${FAST_THEME_NAME}reserved-word; }
                         elif (( this_word & 14 )); then
                           __style=${FAST_THEME_NAME}default
                         elif [[ $__arg = (';;'|';&'|';|') ]] && (( this_word & BIT_case_code )); then
@@ -731,15 +731,16 @@ typeset -ga ZLAST_COMMANDS
                    already_added=1
                    # Counting complex brackets (for brackets-highlighter): 3b. ) in array assign
                    _FAST_COMPLEX_BRACKETS+=( $__start )
-                 elif [[ $braces_stack[1] == "R" ]]; then
-                   braces_stack[1]=""
+                 elif [[ $braces_stack = R* ]]; then
+                   braces_stack=${braces_stack#R}
                    __style=${FAST_THEME_NAME}reserved-word
                  # Zsh doesn't tokenize final ) if it's just single ')',
                  # but logically what's below is correct, so it is kept
                  # in case Zsh will be changed / fixed, etc.
-                 elif [[ ${braces_stack[1]} = "F" ]]; then
+                 elif [[ $braces_stack = F* ]]; then
                    __style=${FAST_THEME_NAME}builtin
-                 fi;;
+                 fi
+                 ;;
         $'\x28\x29') # '()' - possibly a function definition
                  # || false # TODO: or if the previous word was a command word
                  (( FAST_HIGHLIGHT[multi_func_def] )) && (( next_word = next_word | 1 ))
@@ -820,8 +821,8 @@ typeset -ga ZLAST_COMMANDS
                  }
                  ;;
         '))')    # 'F' - (( after for
-                 [[ ${braces_stack[1]} = "F" ]] && {
-                   braces_stack[1]=""
+                 [[ $braces_stack = F* ]] && {
+                   braces_stack=${braces_stack#F}
                    __style=${FAST_THEME_NAME}builtin
                    # Counting complex brackets (for brackets-highlighter): 12. )) as for-syntax
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
@@ -834,7 +835,7 @@ typeset -ga ZLAST_COMMANDS
                  already_added=1
                  ;;
         *)       # F - (( after for
-                 if [[ ${braces_stack[1]} = "F" ]]; then
+                 if [[ $braces_stack = F* ]]; then
                    -fast-highlight-string
                    _mybuf=$__arg
                    __idx=_start_pos
@@ -873,13 +874,13 @@ typeset -ga ZLAST_COMMANDS
                    (( highlight_glob )) && __style=${FAST_THEME_NAME}globbing || __style=${FAST_THEME_NAME}default
                  elif [[ $__arg = \$* ]]; then
                    __style=${FAST_THEME_NAME}variable
-                 elif [[ $__arg = $'\x7d' && $braces_stack[1] == "Y" && ${FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]} = "1" ]]; then
+                 elif [[ $__arg = $'\x7d' && $braces_stack = Y* && ${FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]} = "1" ]]; then
                    # right brace, i.e. $'\x7d' == }
                    # Parsing rule: # {
                    #
                    #     Additionally, `tt(})' is recognized in any position if neither the
                    #     tt(IGNORE_BRACES) option nor the tt(IGNORE_CLOSE_BRACES) option is set."""
-                   braces_stack[1]=""
+                   braces_stack=${braces_stack#Y}
                    __style=${FAST_THEME_NAME}reserved-word
                    (( next_word = next_word | 16 ))
                  elif [[ $__arg = (';;'|';&'|';|') ]] && (( this_word & BIT_case_code )); then
@@ -1172,11 +1173,11 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
     _end_idx=__idx+${mend[1]}-${mbegin[1]}+1
     _mybuf=${match[7]}
 
-    [[ ${match[1][1]} = [0-9] ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]} || {
-      [[ ${match[1][1]} = [a-zA-Z] ]] && {
+    [[ ${match[1]} = [0-9]* ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]} || {
+      [[ ${match[1]} = [a-zA-Z]* ]] && {
         [[ -n ${(P)match[1]} || ${FAST_ASSIGNS_SEEN[${match[1]}]} = 1 ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathvar]} || __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}
       } || {
-        [[ ${match[1][1]} = "$" ]] && {
+        [[ ${match[1]} = "$"* ]] && {
           match[1]=${match[1]//[\{\}\+]/}
           [[ ${match[1]} = "$" || -n ${(P)${match[1]:1}} || ${FAST_ASSIGNS_SEEN[${match[1]:1}]} = 1 ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]} || __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}
         }
