@@ -94,6 +94,10 @@ Other extensions:
 
     ![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/herestring.png)
 
+13. Highlighting of for-loop, also with support for the *alternate syntax* (i.e. braces instead of do...done):
+
+    ![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/for-loop-cmp.png)
+
 Performance differencies can be observed at Asciinema recording, where `10 kB` function is being edited:
 
 [![asciicast](https://asciinema.org/a/112367.png)](https://asciinema.org/a/112367)
@@ -122,7 +126,8 @@ set_fast_theme() {
 ```
 
 If you have set theme before an update of styles (e.g. recent addition of bracket highlighting)
-then please repeat `fast-theme {theme}` call to regenerate theme files.
+then please repeat `fast-theme {theme}` call to regenerate theme files. (**2018-08-09**: FSH
+now has full user-theme support, refer to [appropriate section of README](#customization)).
 
 **2018-07-30**
 
