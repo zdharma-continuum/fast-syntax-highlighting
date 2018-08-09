@@ -30,7 +30,7 @@ else
     if [[ -z "${FAST_WHATIS_CACHE[$__wrd]}" ]]; then
         if (( FAST_HIGHLIGHT[whatis_chroma_type] == 2 )); then
             out=$(whatis "$__wrd")
-            [[ "$out" = *nothing\ appropriate* ]] && check=1 || check=0
+            [[ "$out" != *nothing\ appropriate* ]] && check=1 || check=0
         else
             whatis "$__wrd" > /dev/null && check=1 || check=0
         fi
