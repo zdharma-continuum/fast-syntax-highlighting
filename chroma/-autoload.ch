@@ -49,7 +49,7 @@ local -a __results
         # Count non-option tokens.
         (( FAST_HIGHLIGHT[chroma-autoload-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-autoload-counter] ))
 
-        if [[ "$__wrd" != \$* && "$__wrd" != \"\$* ]]; then
+        if [[ $__wrd != (\$|\"\$)* && $__wrd != (/|\"/|\'/)* && $__wrd != \`* ]]; then
             __results=( ${^fpath}/$__wrd(N) )
             [[ "${#__results}" -gt 0 ]] && __style=${FAST_THEME_NAME}correct-subtle || __style=${FAST_THEME_NAME}incorrect-subtle
         fi
