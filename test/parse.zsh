@@ -16,15 +16,19 @@ ZERO="${(%):-%N}"
 
 if [[ -e "${ZERO}/../fast-highlight" ]]; then
     source "${ZERO}/../fast-highlight"
+    source "${ZERO}/../fast-string-highlight"
     fpath+=( "${ZERO}/.." )
 elif [[ -e "../fast-highlight" ]]; then
     source "../fast-highlight"
+    source "../fast-string-highlight"
     fpath+=( "$PWD/.." )
 elif [[ -e "${ZERO}/fast-highlight" ]]; then
     source "${ZERO}/fast-highlight"
+    source "${ZERO}/fast-string-highlight"
     fpath+=( "${ZERO}" )
 elif [[ -e "./fast-highlight" ]]; then
     source "./fast-highlight"
+    source "./fast-string-highlight"
     fpath+=( "./" )
 else
     print -u2 "Could not find fast-highlight, aborting"
@@ -34,10 +38,10 @@ fi
 zmodload zsh/zprof
 autoload is-at-least chroma/-git.ch
 
-setopt interactive_comments
+setopt interactive_comments extendedglob
 
 # Own input?
-if [[ "$1" = "-o" || "$1" = "-oo" || "$1" = "-ooo" || "$1" = "-git" || "$1" = "-hue" ]]; then
+if [[ "$1" = "-o" || "$1" = "-oo" || "$1" = "-ooo" || "$1" = "-git" || "$1" = "-hue" || "$1" = "-hol" ]]; then
     typeset -a input
     input=()
     if [[ "$1" = "-o" ]]; then
@@ -109,6 +113,41 @@ git checkout cb66b11
         (( ${+ZSH_EXECUTION_STRING} == 0 )) && { print -zr "$in"; return 0; }
 
         input+=( "$in" "$in" )
+    elif [[ "$1" = "-hol" ]]; then
+        local in="var=\$( other )
+local var2=\$(( other + 1 ))
+() { eval \"\$var\"; }
+sudo -i -s ls -1 >/tmp/ls-log.txt /var/log
+IFS=\$'\\n' print -rl -- \$(command ls -1 | tee -a /tmp/ls-1.txt)
+var3=\$(( HISTSIZE + 10 + \$var ))
+local var4=\$( other command )
+touch \$(( HISTSIZE + \$SAVEHIST + 10 ))
+case \$other in
+    \$var)
+        ( echo OK; )
+        ;;
+    \$var3)
+        ( if { true } { noglob echo yes } )
+esac
+( builtin cd /var/log; ls -1; )
+noglob cat <<<\"\$PATH\" | tr : \"\\n\"
+if [[ \"\$var\" -gt 10 ]]; then
+    (( var = HISTSIZE + \$SAVEHIST ))
+fi
+/var/log
+sidx=\${buffer[(in:ii:)\\\$\\(?#[^\\\\\\\\]\\)]} # find opening cmd-subst
+{
+    exec {MYFD}<&0 {MYFD2}>&1
+    ( read <&\$MYFD line; echo \$line >&\$MYFD2 && { builtin print \${match[1]}Written. } )
+} always {
+    (( MYFD > 0 )) && { print -rl -- -myfd:\$MYFD >&\$MYFD2 && print Sent.; }
+}
+for (( i = 0; i <= 2; ++ i )) { print \$i; }
+"
+
+        (( ${+ZSH_EXECUTION_STRING} == 0 )) && { print -zr "$in"; return 0; }
+
+        input+=( "$in" )
     fi
 
     typeset -a long_input
@@ -120,8 +159,6 @@ git checkout cb66b11
     typeset -F SECONDS
     SECONDS=0
 
-    -fast-highlight-init
-
     local right_brace_is_recognised_everywhere
     integer path_dirs_was_set multi_func_def ointeractive_comments
     -fast-highlight-fill-option-variables
@@ -129,7 +166,11 @@ git checkout cb66b11
     local BUFFER
     for BUFFER in "${long_input[@]}"; do
         reply=( )
-        -fast-highlight-process "" "$BUFFER" "0"
+        () {
+            -fast-highlight-init
+            -fast-highlight-process "" "$BUFFER" "0"
+            -fast-highlight-string-process "" "$BUFFER"
+        }
     done
 
     print "Running time: $SECONDS"
@@ -149,7 +190,10 @@ elif [[ -r "$1" ]]; then
     integer path_dirs_was_set multi_func_def ointeractive_comments
     -fast-highlight-fill-option-variables
 
-    -fast-highlight-process "" "$BUFFER" "0"
+    () {
+        -fast-highlight-process "" "$BUFFER" "0"
+        -fast-highlight-string-process "" "$BUFFER"
+    }
 
     print "Running time: $SECONDS"
     zprof | head
