@@ -30,7 +30,7 @@ local -a __lines_list reply2
     FAST_HIGHLIGHT[chroma-make-custom-file]="Makefile"
     FAST_HIGHLIGHT[chroma-make-got-custom-dir-opt]=0
     FAST_HIGHLIGHT[chroma-make-got-custom-file-opt]=0
-    __style=${FAST_THEME_NAME}command
+    return 1
 } || {
     # Following call, i.e. not the first one.
 

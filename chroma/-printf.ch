@@ -28,9 +28,7 @@ local -a __results
     FAST_HIGHLIGHT[chroma-printf-counter-all]=1
     FAST_HIGHLIGHT[chroma-printf-message]=""
     FAST_HIGHLIGHT[chroma-printf-skip-two]=0
-    __style=${FAST_THEME_NAME}command
-    __output=""
-
+    return 1
 # Following call (not first one).
 } || {
     (( FAST_HIGHLIGHT[chroma-printf-counter-all] += 1, __idx2 = FAST_HIGHLIGHT[chroma-printf-counter-all] ))

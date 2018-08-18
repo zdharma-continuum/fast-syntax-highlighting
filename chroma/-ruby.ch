@@ -26,7 +26,7 @@ integer __idx1 __idx2
     # allows to use a single global hash only, instead of multiple
     # global variables.
     FAST_HIGHLIGHT[chrome-ruby-got-eswitch]=0
-    __style=${FAST_THEME_NAME}command
+    return 1
 } || {
     # Following call, i.e. not the first one.
 
