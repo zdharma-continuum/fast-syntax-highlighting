@@ -18,9 +18,8 @@
 (( next_word = 2 | 8192 ))
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-local __style __output __chars __val
+local __style __val
 integer __idx1 __idx2
-local -a __results
 
 # First call, i.e. command starts, i.e. "grep" token etc.
 (( __first_call )) && {
@@ -61,11 +60,6 @@ local -a __results
                 done
             fi
         fi
-    fi
-
-    #FAST_HIGHLIGHT[chroma-printf-message]+=$'\n'"whatis: $__output"
-    if (( ${#${(z)BUFFER}} <= FAST_HIGHLIGHT[chroma-printf-counter-all] )); then
-        [[ -n "${FAST_HIGHLIGHT[chroma-printf-message]}" ]] && zle -M "${FAST_HIGHLIGHT[chroma-printf-message]#$'\n'}"
     fi
 }
 
