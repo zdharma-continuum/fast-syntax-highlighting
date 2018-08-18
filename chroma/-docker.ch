@@ -30,7 +30,7 @@ local -a __lines_list
     FAST_HIGHLIGHT[chroma-docker-got-subcommand]=0
     FAST_HIGHLIGHT[chroma-docker-subcommand]=""
     FAST_HIGHLIGHT[chrome-docker-got-msg1]=0
-    __style=${FAST_THEME_NAME}command
+    return 1
 } || {
     # Following call, i.e. not the first one
 

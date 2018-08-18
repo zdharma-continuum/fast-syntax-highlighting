@@ -22,7 +22,7 @@ local -a __lines_list
 (( __first_call )) && {
     # Called for the first time - new command
     FAST_HIGHLIGHT[chrome-git-got-c]=0
-    __style=${FAST_THEME_NAME}command
+    return 1
 } || {
     # Following call, i.e. not the first one
 

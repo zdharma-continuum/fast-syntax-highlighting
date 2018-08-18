@@ -28,8 +28,7 @@ local -a __results
     FAST_HIGHLIGHT[chroma-scp-counter-all]=1
     FAST_HIGHLIGHT[chroma-scp-message]=""
     FAST_HIGHLIGHT[chroma-scp-skip-two]=0
-    __style=${FAST_THEME_NAME}command
-
+    return 1
 } || {
     (( FAST_HIGHLIGHT[chroma-scp-counter-all] += 1, __idx2 = FAST_HIGHLIGHT[chroma-scp-counter-all] ))
 

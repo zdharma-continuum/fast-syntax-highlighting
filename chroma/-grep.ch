@@ -22,8 +22,7 @@ integer __idx1 __idx2
 # First call, i.e. command starts, i.e. "grep" token etc.
 (( __first_call )) && {
     FAST_HIGHLIGHT[chroma-grep-counter]=0
-    __style=${FAST_THEME_NAME}command
-
+    return 1
 } || {
     # Following call, i.e. not the first one.
 

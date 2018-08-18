@@ -23,8 +23,7 @@ integer __idx1 __idx2
 (( __first_call )) && {
     FAST_HIGHLIGHT[chroma-awk-counter]=0
     FAST_HIGHLIGHT[chroma-awk-f-seen]=0
-    __style=${FAST_THEME_NAME}command
-
+    return 1
 } || {
     # Following call, i.e. not the first one.
 

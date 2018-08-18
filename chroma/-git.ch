@@ -30,7 +30,7 @@ local -a __lines_list
     FAST_HIGHLIGHT[chroma-git-subcommand]=""
     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
     FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=0
-    __style=${FAST_THEME_NAME}command
+    return 1
 } || {
     # Following call, i.e. not the first one
 
