@@ -182,6 +182,20 @@ FAST_HIGHLIGHT+=(
   chroma-whatis  chroma/-whatis.ch
   chroma-man     chroma/-whatis.ch
   chroma-alias   chroma/-alias.ch
+  chroma-hg      chroma/-subcommand.ch
+  chroma-cvs     chroma/-subcommand.ch
+  chroma-pip     chroma/-subcommand.ch
+  chroma-pip2    chroma/-subcommand.ch
+  chroma-pip3    chroma/-subcommand.ch
+  chroma-gem     chroma/-subcommand.ch
+  chroma-cabal   chroma/-subcommand.ch
+  chroma-npm     chroma/-subcommand.ch
+  chroma-yarn    chroma/-subcommand.ch
+  chroma-apt-get chroma/-subcommand.ch
+  chroma-apt-cache chroma/-subcommand.ch
+  chroma-aptitude chroma/-subcommand.ch
+  chroma-keyctl  chroma/-subcommand.ch
+  chroma-systemctl chroma/-subcommand.ch
 )
 
 # Assignments seen, to know if math parameter exists
