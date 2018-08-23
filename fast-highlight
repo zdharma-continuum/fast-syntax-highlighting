@@ -158,13 +158,16 @@ FAST_HIGHLIGHT+=(
   chroma-autoload   chroma/-autoload.ch
   chroma-docker     chroma/-docker.ch
   chroma-example    chroma/-example.ch
-  chroma-git        chroma/-git.ch
   chroma-make       chroma/-make.ch
   chroma-perl       chroma/-perl.ch
   chroma-printf     chroma/-printf.ch
   chroma-ruby       chroma/-ruby.ch
   chroma-scp        chroma/-scp.ch
   chroma-ssh        chroma/-ssh.ch
+
+  chroma-git        chroma/-git.ch
+  chroma-hub        chroma/-git.ch
+  chroma-lab        chroma/-git.ch
 
   chroma-egrep      chroma/-grep.ch
   chroma-fgrep      chroma/-grep.ch
