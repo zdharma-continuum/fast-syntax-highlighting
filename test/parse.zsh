@@ -129,7 +129,7 @@ case \$other in
     \$var3)
         ( if { true } { noglob echo yes } )
 esac
-( builtin cd /var/log; ls -1; )
+( builtin cd /var/log; ls -1; noglob cd \"/var/log\" 'log' )
 noglob cat <<<\"\$PATH\" | tr : \"\\n\"
 if [[ \"\$var\" -gt 10 ]]; then
     (( var = HISTSIZE + \$SAVEHIST ))
@@ -140,8 +140,9 @@ sidx=\${buffer[(in:ii:)\\\$\\(?#[^\\\\\\\\]\\)]} # find opening cmd-subst
     exec {MYFD}<&0 {MYFD2}>&1
     ( read <&\$MYFD line; echo \$line >&\$MYFD2 && { builtin print \${match[1]}Written. } )
 } always {
-    (( MYFD > 0 )) && { print -rl -- -myfd:\$MYFD >&\$MYFD2 && print Sent.; }
+    (( MYFD > 0 )) && { print -rl -- -myfd:\$MYFD >&\$MYFD2 && print \"Sent.\" '(to filedescriptor)'; }
 }
+command sleep \"\$(( \$a + b + \${cde} + \${(s::)fgh[ijk]} + \\\$l + \\m + \\\"  ))\"
 for (( i = 0; i <= 2; ++ i )) { print \$i; }
 "
 
