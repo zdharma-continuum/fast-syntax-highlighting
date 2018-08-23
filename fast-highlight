@@ -154,34 +154,52 @@ typeset -gA FAST_HIGHLIGHT
 : ${FAST_HIGHLIGHT[use_brackets]:=1}
 
 FAST_HIGHLIGHT+=(
-  chroma-grep    chroma/-grep.ch   # Triple
-  chroma-egrep   chroma/-grep.ch
-  chroma-fgrep   chroma/-grep.ch
-  chroma-awk     chroma/-awk.ch    # Triple
-  chroma-gawk    chroma/-awk.ch
-  chroma-mawk    chroma/-awk.ch
-  chroma-source  chroma/-source.ch # Double
-  chroma-.       chroma/-source.ch
-  chroma-sh      chroma/-sh.ch     # Five targets
-  chroma-zsh     chroma/-sh.ch
-  chroma-bash    chroma/-sh.ch
-  chroma-fish    chroma/-sh.ch
-  chroma-tmux    chroma/-sh.ch
-  #chroma-vim     chroma/-vim.ch
-  chroma-make    chroma/-make.ch
-  chroma-perl    chroma/-perl.ch
-  chroma-git     chroma/-git.ch
-  chroma-example chroma/-example.ch
-  chroma-docker  chroma/-docker.ch
-  chroma-autoload chroma/-autoload.ch
-  chroma-ssh     chroma/-ssh.ch
-  chroma-scp     chroma/-scp.ch
-  #chroma-which   chroma/-which.ch
-  chroma-printf  chroma/-printf.ch
-  chroma-ruby    chroma/-ruby.ch
-  chroma-whatis  chroma/-whatis.ch
-  chroma-man     chroma/-whatis.ch
-  chroma-alias   chroma/-alias.ch
+  chroma-alias      chroma/-alias.ch
+  chroma-autoload   chroma/-autoload.ch
+  chroma-docker     chroma/-docker.ch
+  chroma-example    chroma/-example.ch
+  chroma-git        chroma/-git.ch
+  chroma-make       chroma/-make.ch
+  chroma-perl       chroma/-perl.ch
+  chroma-printf     chroma/-printf.ch
+  chroma-ruby       chroma/-ruby.ch
+  chroma-scp        chroma/-scp.ch
+  chroma-ssh        chroma/-ssh.ch
+
+  chroma-egrep      chroma/-grep.ch
+  chroma-fgrep      chroma/-grep.ch
+  chroma-grep       chroma/-grep.ch
+
+  chroma-awk        chroma/-awk.ch
+  chroma-gawk       chroma/-awk.ch
+  chroma-mawk       chroma/-awk.ch
+
+  chroma-source     chroma/-source.ch
+  chroma-.          chroma/-source.ch
+
+  chroma-bash       chroma/-sh.ch
+  chroma-fish       chroma/-sh.ch
+  chroma-sh         chroma/-sh.ch
+  chroma-tmux       chroma/-sh.ch
+  chroma-zsh        chroma/-sh.ch
+
+  chroma-whatis     chroma/-whatis.ch
+  chroma-man        chroma/-whatis.ch
+
+  chroma-hg         chroma/-subcommand.ch
+  chroma-cvs        chroma/-subcommand.ch
+  chroma-pip        chroma/-subcommand.ch
+  chroma-pip2       chroma/-subcommand.ch
+  chroma-pip3       chroma/-subcommand.ch
+  chroma-gem        chroma/-subcommand.ch
+  chroma-cabal      chroma/-subcommand.ch
+  chroma-npm        chroma/-subcommand.ch
+  chroma-yarn       chroma/-subcommand.ch
+  chroma-apt-get    chroma/-subcommand.ch
+  chroma-apt-cache  chroma/-subcommand.ch
+  chroma-aptitude   chroma/-subcommand.ch
+  chroma-keyctl     chroma/-subcommand.ch
+  chroma-systemctl  chroma/-subcommand.ch
 )
 
 # Assignments seen, to know if math parameter exists
