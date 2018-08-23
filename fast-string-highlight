@@ -36,8 +36,10 @@ function -fast-highlight-string-process {
                     fi
                 fi
             }
+
             [[ ${match[1]} = \" && $__quoting != \' ]] && { [[ $__quoting = '"' ]] && __quoting="" || __quoting='"'; }
             [[ ${match[1]} = \' && $__quoting != \" ]] && { [[ $__quoting = "'" ]] && __quoting="" || __quoting="'"; }
+
             _mybuf=${match[4]}
         }
     done

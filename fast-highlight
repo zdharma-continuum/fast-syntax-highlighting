@@ -119,8 +119,8 @@ __FAST_HIGHLIGHT_TOKEN_TYPES=(
   # Tokens that, at (naively-determined) "command position", are followed by
   # a de jure command position.  All of these are reserved words.
 
-  $'\x7b'   2 # block
-  $'\x28'   2 # subshell
+  $'\x7b'   2 # block '{'
+  $'\x28'   2 # subshell '('
   '()'      2 # anonymous function
   'while'   2
   'until'   2
@@ -200,6 +200,9 @@ FAST_HIGHLIGHT+=(
   chroma-aptitude   chroma/-subcommand.ch
   chroma-keyctl     chroma/-subcommand.ch
   chroma-systemctl  chroma/-subcommand.ch
+
+  #chroma-which   chroma/-which.ch
+  #chroma-vim     chroma/-vim.ch
 )
 
 # Assignments seen, to know if math parameter exists
@@ -311,7 +314,7 @@ typeset -ga ZLAST_COMMANDS
   # __arg_type can be 0, 1, 2 or 3, i.e. precommand, control flow, command separator
   # __idx and _end_idx are used in sub-functions
   # for this_word and next_word look below at commented integers and at state machine description
-  integer __arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} __PBUFLEN=${#1} already_added offset __idx _end_idx this_word=1 next_word=0 insane_alias __pos  __asize __delimited=0 itmp iitmp
+  integer __arg_type=0 MBEGIN MEND in_redirection __len=${#__buf} __PBUFLEN=${#1} already_added offset __idx _end_idx this_word=1 next_word=0 __pos  __asize __delimited=0 itmp iitmp
   local -a match mbegin mend __inputs __list
 
   # This comment explains the numbers:
@@ -457,9 +460,7 @@ typeset -ga ZLAST_COMMANDS
 
     # Special-case the first word after 'sudo'.
     if (( ! in_redirection )); then
-      if (( this_word & 4 )) && [[ $__arg != -* ]]; then
-        (( this_word = this_word ^ 4 ))
-      fi
+      (( this_word & 4 )) && [[ $__arg != -* ]] && (( this_word = this_word ^ 4 ))
 
       # Parse the sudo command line
       if (( this_word & 4 )); then
@@ -472,14 +473,11 @@ typeset -ga ZLAST_COMMANDS
           # This prevents misbehavior with sudo -u -otherargument
           '-'*)
                        (( this_word = this_word & ~1 ))
-                       (( next_word = next_word | 1 ))
-                       (( next_word = next_word | 4 ))
+                       (( next_word = next_word | 1 | 4 ))
                        ;;
-          *)           ;;
         esac
       elif (( this_word & 8 )); then
-        (( next_word = next_word | 4 ))
-        (( next_word = next_word | 1 ))
+        (( next_word = next_word | 4 | 1 ))
       elif (( this_word & 64 )); then
         [[ $__arg = -[pvV-]## && $active_command = "command" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
         [[ $__arg = -[cla-]## && $active_command = "exec" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
@@ -533,22 +531,20 @@ typeset -ga ZLAST_COMMANDS
      # try-always construct
      __style=${FAST_THEME_NAME}reserved-word # de facto a reserved word, although not de jure
      (( next_word = 1 | (this_word & BIT_case_code) ))
-   elif (( this_word & 1 )) && (( in_redirection == 0 )) || [[ $braces_stack = T* ]]; then
+   elif (( (this_word & 1) && (in_redirection == 0) )) || [[ $braces_stack = T* ]]; then
      if (( __arg_type == 1 )); then
       __style=${FAST_THEME_NAME}precommand
       [[ $__arg = "command" || $__arg = "exec" ]] && (( next_word = next_word | 64 ))
      elif [[ $__arg = "sudo" ]]; then
       __style=${FAST_THEME_NAME}precommand
-      (( next_word = next_word & ~2 ))
-      (( next_word = next_word | 4 ))
-      (( next_word = next_word | 1 ))
+      (( next_word = (next_word & ~2) | 4 | 1 ))
      else
        _mybuf=${${(Q)__arg}#\"}
        if [[ $_mybuf == \$* ]] && (( ${+parameters} )) && \
          [[ $_mybuf = (#b)\$([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(/*|) || $_mybuf = (#b)\$\{([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)\}(/*|) ]] && \
          (( ${+parameters[${match[1]}]} )); then
          -fast-highlight-main-type ${(P)match[1]}${match[2]}
-       elif [[ $braces_stack = T* ]]; then
+       elif [[ $braces_stack = T* ]]; then # T - typedef, etc.
          REPLY=none
        else
          : ${expanded_path::=${~_mybuf}}
@@ -558,9 +554,9 @@ typeset -ga ZLAST_COMMANDS
       case $REPLY in
         reserved)       # reserved word
                         [[ $__arg = "[[" ]] && __style=${FAST_THEME_NAME}builtin || __style=${FAST_THEME_NAME}reserved-word
-                        if [[ $__arg == $'\x7b' ]]; then # {
+                        if [[ $__arg == $'\x7b' ]]; then # '{'
                           braces_stack='Y'$braces_stack
-                        elif [[ $__arg == $'\x7d' && $braces_stack = Y* ]]; then # }
+                        elif [[ $__arg == $'\x7d' && $braces_stack = Y* ]]; then # '}'
                           # We're at command word, so no need to check right_brace_is_recognised_everywhere
                           braces_stack=${braces_stack#Y}
                           __style=${FAST_THEME_NAME}reserved-word
@@ -581,24 +577,12 @@ typeset -ga ZLAST_COMMANDS
         'suffix alias') __style=${FAST_THEME_NAME}suffix-alias;;
         'global alias') __style=${FAST_THEME_NAME}global-alias;;
         alias)
-                          insane_alias=0
-                          case $__arg in
-                            # Issue #263: aliases with '=' on their LHS.
-                            #
-                            # There are three cases:
-                            #
-                            # - Unsupported, breaks 'alias -L' output, but invokable:
-                            ('='*) :;;
-                            # - Unsupported, not invokable:
-                            (*'='*) insane_alias=1;;
-                            # - The common case:
-                            (*) :;;
-                          esac
-                          if (( insane_alias )); then
+                          if [[ $__arg = ?*'='* ]]; then
+                            # The so called (by old code) "insane_alias"
                             __style=${FAST_THEME_NAME}unknown-token
                           else
                             __style=${FAST_THEME_NAME}alias
-                            zmodload -e zsh/parameter && alias_target=${aliases[$__arg]} || alias_target="${"$(alias -- $__arg)"#*=}"
+                            (( ${+aliases} )) && alias_target=${aliases[$__arg]} || alias_target="${"$(alias -- $__arg)"#*=}"
                             [[ ${__FAST_HIGHLIGHT_TOKEN_TYPES[$alias_target]} = "1" && $__arg_type != "1" ]] && __FAST_HIGHLIGHT_TOKEN_TYPES[$__arg]="1"
                           fi
                         ;;
@@ -614,7 +598,7 @@ typeset -ga ZLAST_COMMANDS
         none)           # Assign?
                         if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( $braces_stack = T* && ${__arg_type} != 3 ) ]]; then
                           __style=${FAST_THEME_NAME}assign
-                          [[ $__arg = *[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
+                          [[ $__arg = ?*[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
                           # Handle array assignment
                           [[ $__arg = (#b)*=(\()*(\))* || $__arg = (#b)*=(\()* ]] && {
@@ -918,7 +902,7 @@ typeset -ga ZLAST_COMMANDS
                  elif [[ $__arg = \$* ]]; then
                    __style=${FAST_THEME_NAME}variable
                  elif [[ $__arg = $'\x7d' && $braces_stack = Y* && ${FAST_HIGHLIGHT[right_brace_is_recognised_everywhere]} = "1" ]]; then
-                   # right brace, i.e. $'\x7d' == }
+                   # right brace, i.e. $'\x7d' == '}'
                    # Parsing rule: # {
                    #
                    #     Additionally, `tt(})' is recognized in any position if neither the
