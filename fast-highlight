@@ -494,7 +494,8 @@ typeset -ga ZLAST_COMMANDS
    fi
 
    (( this_word & 1 )) && {
-     active_command=$__arg
+     # !in_redirection needed particularly for exec {A}>b {C}>d
+     (( !in_redirection )) && active_command=$__arg
      _mybuf=${aliases[$active_command]:-$active_command}
      [[ -n ${FAST_HIGHLIGHT[chroma-${_mybuf%% *}]} ]] && {
        __list=( ${(z@)_mybuf} )
