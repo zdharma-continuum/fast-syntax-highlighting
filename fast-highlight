@@ -156,6 +156,7 @@ typeset -gA FAST_HIGHLIGHT
 FAST_HIGHLIGHT+=(
   chroma-alias      chroma/-alias.ch
   chroma-autoload   chroma/-autoload.ch
+  chroma-autorandr  chroma/-autorandr.ch
   chroma-docker     chroma/-docker.ch
   chroma-example    chroma/-example.ch
   chroma-make       chroma/-make.ch
