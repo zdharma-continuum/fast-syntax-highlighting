@@ -162,7 +162,7 @@ Run `fast-theme -l` to list available themes.
   />
 </div>
 
-### for-loops
+### for-loops and alternate syntax (brace `{`/`}` blocks)
 
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
@@ -207,6 +207,26 @@ Highlighting that is specific for a given command.
 The [chromas](https://github.com/zdharma/fast-syntax-highlighting/tree/master/chroma)
 that are enabled by default can be found
 [here](https://github.com/zdharma/fast-syntax-highlighting/blob/master/fast-highlight#L156).
+
+### Math-mode highlighting
+
+<div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
+  <img
+    src="https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/math.gif"
+    alt="image could not be loaded"
+    style="color:red;background-color:black;font-weight:bold"
+  />
+</div>
+
+### Zcalc highlighting
+
+<div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
+  <img
+    src="https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/zcalc.png"
+    alt="image could not be loaded"
+    style="color:red;background-color:black;font-weight:bold"
+  />
+</div>
 
 # Performance
 Performance differences can be observed in this Asciinema recording, where a `10 kB` function is being edited.
