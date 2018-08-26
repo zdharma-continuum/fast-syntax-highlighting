@@ -44,7 +44,7 @@ local -a __lines_list
         if (( FAST_HIGHLIGHT[chroma-docker-got-subcommand] == 0 )); then
             FAST_HIGHLIGHT[chroma-docker-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-docker-subcommand]="$__wrd"
-            __style=${FAST_THEME_NAME}builtin
+            __style=${FAST_THEME_NAME}reserved-word
             (( FAST_HIGHLIGHT[chroma-docker-counter] += 1 ))
         else
             __wrd="${__wrd//\`/x}"
