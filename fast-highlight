@@ -198,6 +198,10 @@ FAST_HIGHLIGHT+=(
   chroma-cabal      chroma/-subcommand.ch
   chroma-npm        chroma/-subcommand.ch
   chroma-yarn       chroma/-subcommand.ch
+  chroma-brew       chroma/-subcommand.ch
+  chroma-port       chroma/-subcommand.ch
+  chroma-yum        chroma/-subcommand.ch
+  chroma-dnf        chroma/-subcommand.ch
   chroma-apt-get    chroma/-subcommand.ch
   chroma-apt-cache  chroma/-subcommand.ch
   chroma-aptitude   chroma/-subcommand.ch
