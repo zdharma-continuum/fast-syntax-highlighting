@@ -30,6 +30,7 @@ local -a __lines_list
     FAST_HIGHLIGHT[chroma-git-subcommand]=""
     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
     FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=0
+    FAST_HIGHLIGHT[chroma-git-checkout-new]=0
     return 1
 } || {
     # Following call, i.e. not the first one
@@ -102,21 +103,25 @@ local -a __lines_list
                     fi
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]]; then
-                [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 1 ]] && {
-                    (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
-                    if (( __idx1 == 2 )); then
-                        if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
-                            __style=${FAST_THEME_NAME}correct-subtle
-                        elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" && -e "$__wrd" ]]; then
-                            __style=${FAST_THEME_NAME}path
-                        else
-                            __style=${FAST_THEME_NAME}incorrect-subtle
+                if [[ "$__wrd" = "-b" && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
+                    FAST_HIGHLIGHT[chroma-git-checkout-new]=1
+                elif [[ "${FAST_HIGHLIGHT[chroma-git-checkout-new]}" = 0 ]]; then
+                    [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 1 ]] && {
+                        (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
+                        if (( __idx1 == 2 )); then
+                            if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
+                                __style=${FAST_THEME_NAME}correct-subtle
+                            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" && -e "$__wrd" ]]; then
+                                __style=${FAST_THEME_NAME}path
+                            else
+                                __style=${FAST_THEME_NAME}incorrect-subtle
+                            fi
                         fi
-                    fi
-                } || {
-                    [[ "$__wrd" = "--" ]] && FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
-                    __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
-                }
+                    } || {
+                        [[ "$__wrd" = "--" ]] && FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
+                        __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
+                    }
+                fi
             fi
         fi
     fi
