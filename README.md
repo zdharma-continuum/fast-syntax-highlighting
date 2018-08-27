@@ -95,6 +95,8 @@ Run `fast-theme -l` to list available themes.
 
 ### Variables
 
+Comparing to the project `zsh-users/zsh-syntax-highlighting` (upper line):
+
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
     src="https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/parameter.png"
