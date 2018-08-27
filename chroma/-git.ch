@@ -55,12 +55,12 @@ local -a __lines_list
                     (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                     if (( __idx1 == 2 )); then
                         -fast-run-git-command "git remote" "chroma-git-remotes" ""
-                        [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}unknown-token || __style=${FAST_THEME_NAME}reserved-word
+                        [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}incorrect-subtle || __style=${FAST_THEME_NAME}correct-subtle
                     elif (( __idx1 == 3 )); then
                         -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" \
                                 "chroma-git-branches" \
                                 "refs/heads"
-                        [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}unknown-token || __style=${FAST_THEME_NAME}reserved-word
+                        [[ -z ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}incorrect-subtle || __style=${FAST_THEME_NAME}correct-subtle
                     fi
                 } || {
                     [[ "$__wrd" = "--" ]] && FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
@@ -87,7 +87,7 @@ local -a __lines_list
                             (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos-${#PREBUFFER}+__idx2-1, __start >= 0 )) && \
                                 reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
                             (( __start=__start_pos-${#PREBUFFER}+__idx2-1, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
-                                reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}unknown-token]}")
+                                reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
                         fi
                     fi
                 elif [[ "$__wrd" = "--" && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
@@ -106,11 +106,11 @@ local -a __lines_list
                     (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                     if (( __idx1 == 2 )); then
                         if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
-                            __style=${FAST_THEME_NAME}builtin
+                            __style=${FAST_THEME_NAME}correct-subtle
                         elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" && -e "$__wrd" ]]; then
                             __style=${FAST_THEME_NAME}path
                         else
-                            __style=${FAST_THEME_NAME}unknown-token
+                            __style=${FAST_THEME_NAME}incorrect-subtle
                         fi
                     fi
                 } || {
