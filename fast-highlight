@@ -54,6 +54,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[default]:=none}
 : ${FAST_HIGHLIGHT_STYLES[unknown-token]:=fg=red,bold}
 : ${FAST_HIGHLIGHT_STYLES[reserved-word]:=fg=yellow}
+: ${FAST_HIGHLIGHT_STYLES[subcommand]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[alias]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[suffix-alias]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[global-alias]:=bg=blue}

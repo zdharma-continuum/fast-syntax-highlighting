@@ -31,7 +31,7 @@ elif [[ -z ${FAST_HIGHLIGHT[chroma-nmcli-subcommand-a]} ]]; then
             && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
     else
         (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
-        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}subcommand]}")
     fi
     FAST_HIGHLIGHT[chroma-nmcli-subcommand-a]="$subcommand"
 elif [[ -z ${FAST_HIGHLIGHT[chroma-nmcli-subcommand-b]} ]]; then
@@ -43,7 +43,7 @@ elif [[ -z ${FAST_HIGHLIGHT[chroma-nmcli-subcommand-b]} ]]; then
             && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
     else
         (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
-        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}subcommand]}")
     fi
     FAST_HIGHLIGHT[chroma-nmcli-subcommand-b]="$subcommand"
 else

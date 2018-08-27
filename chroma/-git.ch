@@ -44,7 +44,7 @@ local -a __lines_list
         if (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
             FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
-            __style=${FAST_THEME_NAME}reserved-word
+            __style=${FAST_THEME_NAME}subcommand
             (( FAST_HIGHLIGHT[chroma-git-counter] += 1 ))
         else
             __wrd="${__wrd//\`/x}"

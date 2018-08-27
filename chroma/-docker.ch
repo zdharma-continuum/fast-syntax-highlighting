@@ -44,7 +44,7 @@ local -a __lines_list
         if (( FAST_HIGHLIGHT[chroma-docker-got-subcommand] == 0 )); then
             FAST_HIGHLIGHT[chroma-docker-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-docker-subcommand]="$__wrd"
-            __style=${FAST_THEME_NAME}reserved-word
+            __style=${FAST_THEME_NAME}subcommand
             (( FAST_HIGHLIGHT[chroma-docker-counter] += 1 ))
         else
             __wrd="${__wrd//\`/x}"
@@ -55,7 +55,7 @@ local -a __lines_list
                     (( FAST_HIGHLIGHT[chroma-docker-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-docker-counter] ))
 
                     if (( __idx1 == 2 )); then
-                        __style=${FAST_THEME_NAME}reserved-word
+                        __style=${FAST_THEME_NAME}subcommand
                     elif (( __idx1 == 3 )); then
                         -fast-run-command "docker images -q" chroma-docker-list ""
                         [[ -n "${__lines_list[(r)$__wrd]}" ]] && {
