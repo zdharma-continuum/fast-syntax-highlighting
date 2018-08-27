@@ -54,7 +54,8 @@ else
             __wrd="${__wrd//\`/x}"
             __arg="${__arg//\`/x}"
             __wrd="${(Q)__wrd}"
-            if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]] \
+            if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ||
+                "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "pull" ]] \
                 && [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]] then
                 (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                 if (( __idx1 == 2 )); then
