@@ -95,7 +95,7 @@ Run `fast-theme -l` to list available themes.
 
 ### Variables
 
-Comparing to the project `zsh-users/zsh-syntax-highlighting` (upper line):
+Comparing to the project `zsh-users/zsh-syntax-highlighting` (the upper line):
 
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
@@ -124,6 +124,8 @@ Comparing to the project `zsh-users/zsh-syntax-highlighting` (upper line):
 </div>
 
 ### Conditions
+
+Comparing to the project `zsh-users/zsh-syntax-highlighting` (the upper line):
 
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
@@ -156,6 +158,8 @@ Comparing to the project `zsh-users/zsh-syntax-highlighting` (upper line):
 
 ### `exec` descriptor-variables
 
+Comparing to the project `zsh-users/zsh-syntax-highlighting` (the upper line):
+
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
     src="https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/execfd_cmp.png"
@@ -176,6 +180,8 @@ Comparing to the project `zsh-users/zsh-syntax-highlighting` (upper line):
 
 ### Function definitions
 
+Comparing to the project `zsh-users/zsh-syntax-highlighting` (the upper 2 lines):
+
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
     src="https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/function.png"
@@ -185,6 +191,8 @@ Comparing to the project `zsh-users/zsh-syntax-highlighting` (upper line):
 </div>
 
 ### Recursive `eval` and `$( )` highlighting
+
+Comparing to the project `zsh-users/zsh-syntax-highlighting` (the upper line):
 
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
