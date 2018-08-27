@@ -12,7 +12,7 @@ elif [[ "$2" = -* ]]; then
 elif [[ -z "${FAST_HIGHLIGHT[chroma-subcommand]}" ]]; then
     FAST_HIGHLIGHT[chroma-subcommand]="$__wrd"
     (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
-        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}subcommand]}")
 else
     return 1
 fi

@@ -122,6 +122,7 @@ map=(
     default                     "-"
     unknown-token               "-"
     reserved-word               "-"
+    subcommand                  "- reserved-word"
     alias                       "- command builtin"
     suffix-alias                "- alias command builtin"
     builtin                     "-"
@@ -184,7 +185,7 @@ order=(
     for-loop-separator exec-descriptor here-string-tri here-string-word secondary
     case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-bg
     path-to-dir paired-bracket bracket-level-1 bracket-level-2 bracket-level-3
-    global-alias
+    global-alias subcommand
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
