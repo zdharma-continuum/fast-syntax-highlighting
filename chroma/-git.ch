@@ -107,7 +107,9 @@ else
                     __style=${FAST_THEME_NAME}incorrect-subtle
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]] \
-                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]]; then
+                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]] \
+                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "merge" ]] \
+                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "rebase" ]]; then
                 if [[ "$__wrd" = "-b" && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
                     FAST_HIGHLIGHT[chroma-git-checkout-new]=1
                     __style=${FAST_THEME_NAME}single-hyphen-option
