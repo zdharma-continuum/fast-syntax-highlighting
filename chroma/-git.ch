@@ -49,6 +49,7 @@ else
             FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
             if (( __start_pos >= 0 )); then
+                # if subcommand exists
                 if git help -a | grep "^  [a-z]" | tr ' ' '\n' | grep -x "$__wrd" > /dev/null; then
                     __style=${FAST_THEME_NAME}subcommand
                 else
@@ -69,23 +70,29 @@ else
                 elif (( __idx1 == 3 )); then
                     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
                 fi
+                # if not first or second argument
                 if (( __idx1 > 3 )); then
                     __style=${FAST_THEME_NAME}incorrect-subtle
+                # if remote/ref exists
                 elif [[ -n ${__lines_list[(r)$__wrd]} ]]; then
                     __style=${FAST_THEME_NAME}correct-subtle
+                # if ref dose not exist and subcommand is push
                 elif (( __idx1 == 3 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
                     __style=${FAST_THEME_NAME}incorrect-subtle
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
                 match[1]=""
                 match[2]=""
+                # if previous argument is -m or current argument is --message=something
                 if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 )) \
                     || [[ "$__wrd" = (#b)(--message=)(*) && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
                     if [[ -n "${match[1]}" ]]; then
                         __wrd="${(Q)${match[2]//\`/x}}"
+                        # highlight (--message=)something
                         (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos-${#PREBUFFER}+10, __start >= 0 )) && \
                             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
+                        # highlight --message=(something)
                         (( __start=__start_pos-${#PREBUFFER}+10, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
                             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
                     else
@@ -110,6 +117,7 @@ else
                             fi
                         fi
                     fi
+                # if before --
                 elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
                     if [[ "$__wrd" = "-m" ]]; then
                         FAST_HIGHLIGHT[chrome-git-got-msg1]=1
@@ -117,6 +125,7 @@ else
                     else
                         return 1
                     fi
+                # if after -- is file
                 elif [[ -e "$__wrd" ]]; then
                     __style=${FAST_THEME_NAME}path
                 else
@@ -130,13 +139,17 @@ else
                 if [[ "$__wrd" = "-b" && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
                     FAST_HIGHLIGHT[chroma-git-checkout-new]=1
                     __style=${FAST_THEME_NAME}single-hyphen-option
+                # if command is not checkout -b something
                 elif [[ "${FAST_HIGHLIGHT[chroma-git-checkout-new]}" = 0 ]]; then
+                    # if not option
                     if [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 1 ]]; then
                         (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                         if (( __idx1 == 2 )) || \
                             [[ "$__idx1" = 3 && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]]; then
+                            # if is ref
                             if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
                                 __style=${FAST_THEME_NAME}correct-subtle
+                            # if is file and subcommand is checkout or diff
                             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" \
                                 || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] && [[ -e "$__wrd" ]]; then
                                 __style=${FAST_THEME_NAME}path
@@ -144,9 +157,11 @@ else
                                 __style=${FAST_THEME_NAME}incorrect-subtle
                             fi
                         fi
+                    # if option
                     else
                         return 1
                     fi
+                # if option
                 elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 && "$__wrd" = -* ]]; then
                     return 1
                 fi
