@@ -18,7 +18,8 @@
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 local __style
 integer __idx1 __idx2
-local -a __lines_list
+local -a __lines_list chroma_git_remote_subcommands
+chroma_git_remote_subcommands=(add rename remove set-head set-branches get-url set-url set-url set-url show prune update)
 
 if (( __first_call )); then
     # Called for the first time - new command
@@ -166,6 +167,28 @@ else
                 # if option
                 elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 && "$__wrd" = -* ]]; then
                     return 1
+                fi
+            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "remote" && "$__wrd" != -* ]]; then
+                (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
+                if [[ "$__idx1" = 2 ]]; then
+                    if (( ${chroma_git_remote_subcommands[(I)$__wrd]} )); then
+                        FAST_HIGHLIGHT[chroma-git-remote-subcommand]="$__wrd"
+                        __style=${FAST_THEME_NAME}subcommand
+                    else
+                        __style=${FAST_THEME_NAME}incorrect-subtle
+                    fi
+                elif [[ "$__idx1" = 3 && "$FAST_HIGHLIGHT[chroma-git-remote-subcommand]" = "add" ]]; then
+                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
+                        __style=${FAST_THEME_NAME}incorrect-subtle
+                    fi
+                elif [[ "$__idx1" = 3 && -n "$FAST_HIGHLIGHT[chroma-git-remote-subcommand]" ]]; then
+                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
+                        __style=${FAST_THEME_NAME}correct-subtle
+                    else
+                        __style=${FAST_THEME_NAME}incorrect-subtle
+                    fi
                 fi
             else
                 return 1
