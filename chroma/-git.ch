@@ -69,13 +69,11 @@ else
                 elif (( __idx1 == 3 )); then
                     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
                 fi
-                if (( __idx1 == 2 || __idx1 == 3 )); then
-                    if [[ -z ${__lines_list[(r)$__wrd]} ]]; then
-                        __style=${FAST_THEME_NAME}incorrect-subtle
-                    else
-                        __style=${FAST_THEME_NAME}correct-subtle
-                    fi
-                else
+                if (( __idx1 > 3 )); then
+                    __style=${FAST_THEME_NAME}incorrect-subtle
+                elif [[ -n ${__lines_list[(r)$__wrd]} ]]; then
+                    __style=${FAST_THEME_NAME}correct-subtle
+                elif (( __idx1 == 3 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
                     __style=${FAST_THEME_NAME}incorrect-subtle
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
