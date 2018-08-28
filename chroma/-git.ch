@@ -135,6 +135,7 @@ else
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]] \
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "merge" ]] \
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] \
+                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "reset" ]] \
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "rebase" ]]; then
                 if [[ "$__wrd" = "-b" && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
                     FAST_HIGHLIGHT[chroma-git-checkout-new]=1
@@ -151,6 +152,7 @@ else
                                 __style=${FAST_THEME_NAME}correct-subtle
                             # if is file and subcommand is checkout or diff
                             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" \
+                                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "reset" \
                                 || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] && [[ -e "$__wrd" ]]; then
                                 __style=${FAST_THEME_NAME}path
                             else
