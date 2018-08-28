@@ -1,5 +1,5 @@
-[![patreon](https://img.shields.io/badge/-Patreon-orange.svg?longCache=true&style=for-the-badge)](https://www.patreon.com/psprint)
 [![paypal](https://img.shields.io/badge/-Donate-yellow.svg?longCache=true&style=for-the-badge)](https://www.paypal.me/ZdharmaInitiative)
+[![patreon](https://img.shields.io/badge/-Patreon-orange.svg?longCache=true&style=for-the-badge)](https://www.patreon.com/psprint)
 <br/>New: You can request a feature when donating, even fancy or advanced ones get implemented this way. [There are
 reports](DONATIONS.md) about what is being done with the money received.
 
