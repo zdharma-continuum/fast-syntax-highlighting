@@ -69,6 +69,7 @@ else
                 if (( __idx1 == 2 )); then
                     -fast-run-git-command "git remote" "chroma-git-remotes" ""
                 elif (( __idx1 == 3 )); then
+                    __wrd="${__wrd%%:*}"
                     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
                 fi
                 # if not first or second argument
@@ -76,10 +77,12 @@ else
                     __style=${FAST_THEME_NAME}incorrect-subtle
                 # if remote/ref exists
                 elif [[ -n ${__lines_list[(r)$__wrd]} ]]; then
-                    __style=${FAST_THEME_NAME}correct-subtle
+                    (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
+                        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
                 # if ref dose not exist and subcommand is push
                 elif (( __idx1 == 3 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
-                    __style=${FAST_THEME_NAME}incorrect-subtle
+                    (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
+                        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
                 match[1]=""
