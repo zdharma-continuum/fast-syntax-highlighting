@@ -156,7 +156,10 @@ else
 fi
 
 # Add region_highlight entry (via `reply' array)
-[[ -n "$__style" ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
+if [[ -n "$__style" ]]; then
+    (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
+        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
+fi
 
 # We aren't passing-through, do obligatory things ourselves
 (( this_word = next_word ))
