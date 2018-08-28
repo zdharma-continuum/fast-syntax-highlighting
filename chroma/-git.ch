@@ -74,13 +74,22 @@ else
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
                 match[1]=""
+                match[2]=""
                 if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 )) \
-                    || [[ "$__wrd" = (#b)--message=(*) && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
+                    || [[ "$__wrd" = (#b)(--message=)(*) && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
-                    [[ -n "${match[1]}" ]] && { __wrd="${(Q)${match[1]//\`/x}}"; }
-                    if (( ${#__wrd} <= 72 )); then
-                        __style=${FAST_THEME_NAME}double-quoted-argument
+                    if [[ -n "${match[1]}" ]]; then
+                        __wrd="${(Q)${match[2]//\`/x}}"
+                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos-${#PREBUFFER}+10, __start >= 0 )) && \
+                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
+                        (( __start=__start_pos-${#PREBUFFER}+10, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
+                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
+                        (( __start_pos+=10 ))
                     else
+                        (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
+                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
+                    fi
+                    if (( ${#__wrd} > 72 )); then
                         for (( __idx1 = 1, __idx2 = 1; __idx1 <= 72; ++ __idx1, ++ __idx2 )); do
                             while [[ "${__arg[__idx2]}" != "${__wrd[__idx1]}" ]]; do
                                 (( ++ __idx2 ))
