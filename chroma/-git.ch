@@ -48,7 +48,13 @@ else
         if (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
             FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
-            __style=${FAST_THEME_NAME}subcommand
+            if (( __start_pos >= 0 )); then
+                if git help -a | grep "^  [a-z]" | tr ' ' '\n' | grep -x "$__wrd" > /dev/null; then
+                    __style=${FAST_THEME_NAME}subcommand
+                else
+                    __style=${FAST_THEME_NAME}incorrect-subtle
+                fi
+            fi
             (( FAST_HIGHLIGHT[chroma-git-counter] += 1 ))
         else
             __wrd="${__wrd//\`/x}"
