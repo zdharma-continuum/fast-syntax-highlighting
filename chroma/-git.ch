@@ -32,6 +32,7 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
     FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=0
     FAST_HIGHLIGHT[chroma-git-checkout-new]=0
+    FAST_HIGHLIGHT[chroma-git-fetch-multiple]=0
     return 1
 else
     # Following call, i.e. not the first one
@@ -63,27 +64,41 @@ else
             __arg="${__arg//\`/x}"
             __wrd="${(Q)__wrd}"
             if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" \
-                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "pull" ]] \
+                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "pull" \
                 || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "fetch" ]] \
-                && [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]]; then
-                (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
-                if (( __idx1 == 2 )); then
-                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
-                elif (( __idx1 == 3 )); then
-                    __wrd="${__wrd%%:*}"
-                    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
+                && (( ${FAST_HIGHLIGHT[chroma-git-fetch-multiple]} == 0 )); then
+                # if not option
+                if [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]]; then
+                    (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
+                    if (( __idx1 == 2 )); then
+                        -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                    else
+                        __wrd="${__wrd%%:*}"
+                        -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
+                    fi
+                    # if remote/ref exists
+                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
+                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
+                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
+                    # if ref dose not exist and subcommand is push
+                    elif (( __idx1 != 2 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
+                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
+                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+                    fi
+                # if option
+                else
+                    if [[ "$__wrd" = "--multiple" && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "fetch" ]]; then
+                        FAST_HIGHLIGHT[chroma-git-fetch-multiple]=1
+                        __style=${FAST_THEME_NAME}double-hyphen-option
+                    else
+                        return 1
+                    fi
                 fi
-                # if not fetch and not first or second argument
-                if (( __idx1 > 3 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" != "fetch" ]]; then
-                    __style=${FAST_THEME_NAME}incorrect-subtle
-                # if remote/ref exists
-                elif [[ -n ${__lines_list[(r)$__wrd]} ]]; then
-                    (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
-                        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
-                # if ref dose not exist and subcommand is push
-                elif (( __idx1 == 3 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
-                    (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
-                        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+            elif (( ${FAST_HIGHLIGHT[chroma-git-fetch-multiple]} )) \
+                && [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]]; then
+                -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
+                    __style=${FAST_THEME_NAME}correct-subtle
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
                 match[1]=""
