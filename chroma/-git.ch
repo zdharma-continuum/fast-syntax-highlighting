@@ -52,11 +52,10 @@ else
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
             if (( __start_pos >= 0 )); then
                 # if subcommand exists
-                if git help -a | grep "^  [a-z]" | tr ' ' '\n' | grep -x "$__wrd" > /dev/null; then
+                if git help -a | grep "^  [a-z]" | tr ' ' '\n' | grep -x "$__wrd" > /dev/null || git config "alias.$__wrd" > /dev/null; then
                     __style=${FAST_THEME_NAME}subcommand
                 else
-                    #__style=${FAST_THEME_NAME}incorrect-subtle
-                    ((1))
+                    __style=${FAST_THEME_NAME}incorrect-subtle
                 fi
             fi
             (( FAST_HIGHLIGHT[chroma-git-counter] += 1 ))
