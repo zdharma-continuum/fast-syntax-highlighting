@@ -55,7 +55,8 @@ else
                 if git help -a | grep "^  [a-z]" | tr ' ' '\n' | grep -x "$__wrd" > /dev/null; then
                     __style=${FAST_THEME_NAME}subcommand
                 else
-                    __style=${FAST_THEME_NAME}incorrect-subtle
+                    #__style=${FAST_THEME_NAME}incorrect-subtle
+                    ((1))
                 fi
             fi
             (( FAST_HIGHLIGHT[chroma-git-counter] += 1 ))
