@@ -198,8 +198,10 @@ FAST_HIGHLIGHT+=(
   chroma-pip2       chroma/-subcommand.ch
   chroma-pip3       chroma/-subcommand.ch
   chroma-gem        chroma/-subcommand.ch
+  chroma-yard       chroma/-subcommand.ch
   chroma-cabal      chroma/-subcommand.ch
   chroma-npm        chroma/-subcommand.ch
+  chroma-nvm        chroma/-subcommand.ch
   chroma-yarn       chroma/-subcommand.ch
   chroma-brew       chroma/-subcommand.ch
   chroma-port       chroma/-subcommand.ch
@@ -210,6 +212,8 @@ FAST_HIGHLIGHT+=(
   chroma-aptitude   chroma/-subcommand.ch
   chroma-keyctl     chroma/-subcommand.ch
   chroma-systemctl  chroma/-subcommand.ch
+  chroma-asciinema  chroma/-subcommand.ch
+  chroma-ipfs       chroma/-subcommand.ch
 
   #chroma-which   chroma/-which.ch
   #chroma-vim     chroma/-vim.ch
