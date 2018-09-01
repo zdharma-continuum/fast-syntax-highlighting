@@ -155,6 +155,7 @@ typeset -gA FAST_HIGHLIGHT
 : ${FAST_HIGHLIGHT[use_brackets]:=1}
 
 FAST_HIGHLIGHT+=(
+  chroma-fast-theme chroma/-fast-theme.ch
   chroma-alias      chroma/-alias.ch
   chroma-autoload   chroma/-autoload.ch
   chroma-autorandr  chroma/-autorandr.ch
