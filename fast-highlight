@@ -163,6 +163,7 @@ FAST_HIGHLIGHT+=(
   chroma-example    chroma/-example.ch
   chroma-make       chroma/-make.ch
   chroma-nmcli      chroma/-nmcli.ch
+  chroma-node       chroma/-node.ch
   chroma-perl       chroma/-perl.ch
   chroma-printf     chroma/-printf.ch
   chroma-ruby       chroma/-ruby.ch
