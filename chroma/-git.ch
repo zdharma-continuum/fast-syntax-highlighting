@@ -33,6 +33,7 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=0
     FAST_HIGHLIGHT[chroma-git-checkout-new]=0
     FAST_HIGHLIGHT[chroma-git-fetch-multiple]=0
+    FAST_HIGHLIGHT[chroma-git-branch-change]=0
     return 1
 else
     # Following call, i.e. not the first one
@@ -208,6 +209,25 @@ else
                     else
                         __style=${FAST_THEME_NAME}incorrect-subtle
                     fi
+                fi
+            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "branch" ]]; then
+                if [[ "$__wrd" = --delete \
+                    ||  "$__wrd" = --edit-description \
+                    ||  "$__wrd" = --set-upstream-to=* \
+                    ||  "$__wrd" = --unset-upstream \
+                    ||  "$__wrd" = -d \
+                    ||  "$__wrd" = -D ]]; then
+                    FAST_HIGHLIGHT[chroma-git-branch-change]=1
+                    return 1
+                elif [[ "$__wrd" != -* ]]; then
+                    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
+                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
+                        __style=${FAST_THEME_NAME}correct-subtle
+                    elif (( FAST_HIGHLIGHT[chroma-git-branch-change] )); then
+                        __style=${FAST_THEME_NAME}incorrect-subtle
+                    fi
+                else
+                    return 1
                 fi
             else
                 return 1
