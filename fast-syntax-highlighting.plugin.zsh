@@ -300,7 +300,7 @@ autoload -Uz -- chroma/-git.ch chroma/-example.ch chroma/-grep.ch chroma/-perl.c
                 chroma/-awk.ch chroma/-vim.ch chroma/-source.ch chroma/-sh.ch chroma/-docker.ch \
                 chroma/-autoload.ch chroma/-ssh.ch chroma/-scp.ch chroma/-which.ch chroma/-printf.ch \
                 chroma/-ruby.ch chroma/-whatis.ch chroma/-alias.ch chroma/-subcommand.ch \
-                chroma/-autorandr.ch chroma/-nmcli.ch
+                chroma/-autorandr.ch chroma/-nmcli.ch chroma/-fast-theme.ch
 source "${ZERO:h}/fast-highlight"
 source "${ZERO:h}/fast-string-highlight"
 
