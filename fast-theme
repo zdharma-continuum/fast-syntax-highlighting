@@ -299,19 +299,22 @@ zcompile $FAST_WORK_DIR/$outfile
 [[ -n "$OPT_TEST" ]] && {
     print -zr '
 # This is an example code that is diverse and allows to test a theme
-text="An example quite long string $with variable in it"
-local param1="text $variable" param2='"'"'other $variable'"'"'
+echo $(cat /etc/hosts |& grep -i "hello337"); cat <<<$PATH | noglob tr : \\n > /dev/null
+text="An example quite long string $with variable $(echo in it), other: \", \$, \'"'"'"
+local param1="text ${+variable[test]}"; typeset param2='"'"'other $variable'"'"'
 math=$(( 10 + HISTSIZ + HISTSIZE + $SAVEHIST )) size=$(( 0 ))
 
 for (( ii = 1; ii <= size; ++ ii )); do
     if [[ "${cmds[ii]} string" = "| string" ]]
     then
         sidx=${buffer[(in:ii:)\$\(?#[^\\\\]\)]} # find opening cmd-subst
-        (( sidx <= len )) && {
+        (( sidx <= len + 100 )) && {
             eidx=${buffer[(b:sidx:ii)[^\\\\]\)]} # find closing cmd-subst
         }
     fi
 done
+
+repeat 0 { command zsh -i -c "cat /etc/shells | grep zsh; exit"; }
 
 '
 }
