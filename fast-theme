@@ -314,7 +314,7 @@ for (( ii = 1; ii <= size; ++ ii )); do
     fi
 done
 
-repeat 0 { command zsh -i -c "cat /etc/shells | grep zsh; exit"; }
+repeat 0 { command zsh -i -c "cat /etc/shells | grep -x '"'/bin/zsh'"'; builtin exit"; }
 
 '
 }
