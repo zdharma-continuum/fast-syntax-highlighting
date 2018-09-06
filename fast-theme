@@ -316,7 +316,7 @@ done
 
 # Regular command-line usage
 repeat 0 {
-    command zsh -i -c "cat /etc/shells* | grep -x --line-buffered -i '"'/bin/zsh'"'"
+    zsh -i -c "cat /etc/shells* | grep -x --line-buffered -i '"'/bin/zsh'"'"
     builtin exit $return_value
     fast-theme -tq default
     fsh-alias -tq default-X # alias '"'"'fsh-alias=fast-theme'"'"' works just like the previous line
