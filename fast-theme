@@ -298,12 +298,12 @@ zcompile $FAST_WORK_DIR/$outfile
 
 [[ -n "$OPT_TEST" ]] && {
     print -zr '
-# This is an example code that is diverse and allows to test a theme
-echo $(cat /etc/hosts |& grep -i "hello337"); cat <<<$PATH | noglob tr : \\n > /dev/null
-text="An example quite long string $with variable $(echo in it), other: \", \$, \'"'"'"
+# Subshell, assignments, math-mode
+echo $(cat /etc/hosts |& grep -i "hello337")
 local param1="text ${+variable[test]}"; typeset param2='"'"'other $variable'"'"'
 math=$(( 10 + HISTSIZ + HISTSIZE + $SAVEHIST )) size=$(( 0 ))
 
+# Programming-like usage, brackets
 for (( ii = 1; ii <= size; ++ ii )); do
     if [[ "${cmds[ii]} string" = "| string" ]]
     then
@@ -314,8 +314,19 @@ for (( ii = 1; ii <= size; ++ ii )); do
     fi
 done
 
-repeat 0 { command zsh -i -c "cat /etc/shells | grep -x '"'/bin/zsh'"'; builtin exit"; }
-
+# Regular command-line usage
+repeat 0 {
+    command zsh -i -c "cat /etc/shells* | grep -x --line-buffered -i '"'/bin/zsh'"'"
+    builtin exit $return_value
+    fast-theme -tq default
+    fsh-alias -tq default-X # alias '"'"'fsh-alias=fast-theme'"'"' works just like the previous line
+    command -v git | grep ".+git" && echo $'"'"'Git is installed'"'"'
+    git checkout -m --ours /etc/shells && git status-X
+    gem install asciidoctor
+    cat <<<$PATH | tr : \\n > /dev/null 2>/usr/local
+    man -a fopen fopen-X
+    CFLAGS="-g -Wall -O0" ./configure
+}
 '
 }
 

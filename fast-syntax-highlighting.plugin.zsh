@@ -313,4 +313,6 @@ zstyle -s :plugin:fast-syntax-highlighting theme __fsyh_theme
 
 unset __fsyh_theme
 
+alias fsh-alias=fast-theme
+
 -fast-highlight-fill-option-variables
