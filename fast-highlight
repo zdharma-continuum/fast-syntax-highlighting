@@ -654,11 +654,11 @@ typeset -ga ZLAST_COMMANDS
                             {
                                 itmp=${__arg[(i)=]}; __arg=${__arg[itmp,__asize]}; (( _start_pos += itmp - 1 ));
                                 [[ ${__arg[2,4]} = '$((' ]] && { -fast-highlight-math-string;
-                                   (( __start=_start_pos-__PBUFLEN+2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+                                   (( __start=_start_pos-__PBUFLEN+2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}")
                                    # Counting complex brackets (for brackets-highlighter): 4. $(( in assign argument
                                    _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
                                    (( jtmp = ${__arg[(I)\)\)]}-1, jtmp > 0 )) && {
-                                     (( __start=_start_pos-__PBUFLEN+jtmp, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+                                     (( __start=_start_pos-__PBUFLEN+jtmp, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}")
                                      # Counting complex brackets (for brackets-highlighter): 5. )) in assign argument
                                      _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
                                    }
