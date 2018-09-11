@@ -859,11 +859,11 @@ typeset -ga ZLAST_COMMANDS
                  already_added=1
                  -fast-highlight-math-string
                  # ADD
-                 (( __start=_start_pos-__PBUFLEN+1, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+                 (( __start=_start_pos-__PBUFLEN+1, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}")
                  # Counting complex brackets (for brackets-highlighter): 9. $(( as argument
                  _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
                  # ADD
-                 [[ $__arg[-2,-1] == '))' ]] && (( __start=_end_pos-__PBUFLEN-2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+                 [[ $__arg[-2,-1] == '))' ]] && (( __start=_end_pos-__PBUFLEN-2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}")
                  # Counting complex brackets (for brackets-highlighter): 10. )) for as-argument $((
                  _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
                  ;;
