@@ -100,6 +100,9 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[bracket-level-1]:=fg=green,bold}
 : ${FAST_HIGHLIGHT_STYLES[bracket-level-2]:=fg=yellow,bold}
 : ${FAST_HIGHLIGHT_STYLES[bracket-level-3]:=fg=cyan,bold}
+: ${FAST_HIGHLIGHT_STYLES[single-sq-bracket]:=fg=green}
+: ${FAST_HIGHLIGHT_STYLES[double-sq-bracket]:=fg=green}
+: ${FAST_HIGHLIGHT_STYLES[double-paren]:=fg=yellow}
 fi
 
 # This can overwrite some of *_STYLES fields
@@ -572,7 +575,7 @@ typeset -ga ZLAST_COMMANDS
 
       case $REPLY in
         reserved)       # reserved word
-                        [[ $__arg = "[[" ]] && __style=${FAST_THEME_NAME}builtin || __style=${FAST_THEME_NAME}reserved-word
+                        [[ $__arg = "[[" ]] && __style=${FAST_THEME_NAME}double-sq-bracket || __style=${FAST_THEME_NAME}reserved-word
                         if [[ $__arg == $'\x7b' ]]; then # '{'
                           braces_stack='Y'$braces_stack
                         elif [[ $__arg == $'\x7d' && $braces_stack = Y* ]]; then # '}'
@@ -605,7 +608,10 @@ typeset -ga ZLAST_COMMANDS
                             [[ ${__FAST_HIGHLIGHT_TOKEN_TYPES[$alias_target]} = "1" && $__arg_type != "1" ]] && __FAST_HIGHLIGHT_TOKEN_TYPES[$__arg]="1"
                           fi
                         ;;
-        builtin)        __style=${FAST_THEME_NAME}builtin
+        builtin)        [[ $__arg = "[" ]] && {
+                          __style=${FAST_THEME_NAME}single-sq-bracket
+                          _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) )
+                        } || __style=${FAST_THEME_NAME}builtin
                         # T - typeset, etc. mode
                         [[ $__arg = (typeset|declare|local|float|integer|export|readonly) ]] && braces_stack='T'$braces_stack
                         [[ $__arg = eval ]] && (( next_word = next_word | 256 ))
@@ -679,7 +685,7 @@ typeset -ga ZLAST_COMMANDS
                           # is how [[ ... ]] is highlighted, too.
 
                           # ADD
-                          (( __start=_start_pos-__PBUFLEN, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+                          (( __start=_start_pos-__PBUFLEN, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}")
                           already_added=1
 
                           # Counting complex brackets (for brackets-highlighter): 6. (( as command
@@ -689,13 +695,14 @@ typeset -ga ZLAST_COMMANDS
 
                           # ADD
                           [[ $__arg[-2,-1] == '))' ]] && {
-                            (( __start=_end_pos-__PBUFLEN-2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}")
+                            (( __start=_end_pos-__PBUFLEN-2, __end=__start+2, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}")
                             (( __delimited = __delimited ? 2 : __delimited ))
 
                             # Counting complex brackets (for brackets-highlighter): 7. )) for as-command ((
                             _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
                           }
                         elif [[ $__arg == '()' ]]; then
+                          _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN + 1 )) )
                           # anonymous function
                           __style=${FAST_THEME_NAME}reserved-word
                         elif [[ $__arg == $'\x28' ]]; then
@@ -728,7 +735,7 @@ typeset -ga ZLAST_COMMANDS
         ']]')
                  # A - [[
                  [[ $braces_stack = A* ]] && {
-                   __style=${FAST_THEME_NAME}builtin
+                   __style=${FAST_THEME_NAME}double-sq-bracket
                    (( __delimited = __delimited ? 2 : __delimited ))
                    # Counting complex brackets (for brackets-highlighter): 8a. ]] for as-command [[
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
@@ -742,7 +749,8 @@ typeset -ga ZLAST_COMMANDS
                  braces_stack=${braces_stack#A}
                  ;;
         ']')
-                 __style=${FAST_THEME_NAME}builtin
+                 __style=${FAST_THEME_NAME}single-sq-bracket
+                 _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) )
                  ;;
         $'\x28')
                  # '(' inside [[
@@ -771,6 +779,7 @@ typeset -ga ZLAST_COMMANDS
                  # || false # TODO: or if the previous word was a command word
                  (( FAST_HIGHLIGHT[multi_func_def] )) && (( next_word = next_word | 1 ))
                  __style=${FAST_THEME_NAME}reserved-word
+                 _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN + 1 )) )
                  # Remove possible annoying unknown-token __style, or misleading function __style
                  reply[-1]=()
                  ;;
@@ -862,7 +871,7 @@ typeset -ga ZLAST_COMMANDS
         '((')    # 'F' - (( after for
                  (( this_word & 32 )) && {
                    braces_stack='F'$braces_stack
-                   __style=${FAST_THEME_NAME}builtin && \
+                   __style=${FAST_THEME_NAME}double-paren
                    # Counting complex brackets (for brackets-highlighter): 11. (( as for-syntax
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
                    # This is set after __arg_type == 2, and also here,
@@ -873,7 +882,7 @@ typeset -ga ZLAST_COMMANDS
         '))')    # 'F' - (( after for
                  [[ $braces_stack = F* ]] && {
                    braces_stack=${braces_stack#F}
-                   __style=${FAST_THEME_NAME}builtin
+                   __style=${FAST_THEME_NAME}double-paren
                    # Counting complex brackets (for brackets-highlighter): 12. )) as for-syntax
                    _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN+1 )) )
                    (( __delimited = __delimited ? 2 : __delimited ))

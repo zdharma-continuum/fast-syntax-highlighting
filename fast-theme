@@ -176,6 +176,9 @@ map=(
     bracket-level-2             "-"
     bracket-level-3             "-"
     global-alias                "- alias suffix-alias"
+    single-sq-bracket           "-"
+    double-sq-bracket           "-"
+    double-paren                "-"
 )
 
 # In which order to generate entries
@@ -190,7 +193,7 @@ order=(
     for-loop-separator exec-descriptor here-string-tri here-string-text here-string-var secondary
     case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-bg
     path-to-dir paired-bracket bracket-level-1 bracket-level-2 bracket-level-3
-    global-alias subcommand
+    global-alias subcommand single-sq-bracket double-sq-bracket double-paren
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
