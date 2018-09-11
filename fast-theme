@@ -42,6 +42,9 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 (( ${+opthash[-p]} + ${+opthash[--palette]} )) && OPT_PALETTE="-p"
 (( ${+opthash[-w]} + ${+opthash[--workdir]} )) && OPT_CDWD="-w"
 
+local -a match mbegin mend
+local MATCH; integer MBEGIN MEND
+
 [[ -n "$OPT_CDWD" ]] && {
     builtin cd $FAST_WORK_DIR
     return 0
@@ -157,7 +160,8 @@ map=(
     for-loop-separator          "forsep commandseparator"
     exec-descriptor             "- reserved-word"
     here-string-tri             "-"
-    here-string-word            "- correct-subtle"
+    here-string-text            "- subtle-bg"
+    here-string-var             "- back-or-dollar-double-quoted-argument"
     secondary                   "-"
     case-input                  "- variable"
     case-parentheses            "- reserved-word"
@@ -182,7 +186,7 @@ order=(
     double-quoted-argument dollar-quoted-argument back-or-dollar-double-quoted-argument 
     back-dollar-quoted-argument assign redirection comment variable mathvar 
     mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
-    for-loop-separator exec-descriptor here-string-tri here-string-word secondary
+    for-loop-separator exec-descriptor here-string-tri here-string-text here-string-var secondary
     case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-bg
     path-to-dir paired-bracket bracket-level-1 bracket-level-2 bracket-level-3
     global-alias subcommand
@@ -192,7 +196,7 @@ order=(
 
 # Named colors
 local -a color
-color=( red green blue yellow cyan magenta black white )
+color=( red green blue yellow cyan magenta black white default )
 
 #
 # Execution starts here
@@ -237,7 +241,7 @@ fi
 
 # Generate current_theme.zsh or secondary_theme.zsh, traversing ini-file associative array
 local k kk
-local inikey inival result first_val
+local inikey inival result result2 first_val
 integer ov_counter=0 first
 for k in "${order[@]}"; do
     first=1
@@ -262,8 +266,32 @@ for k in "${order[@]}"; do
     if [[ "$k" = "secondary" && -z "$OPT_SECONDARY" && -n "$inival" ]]; then
         fast-theme -q --secondary "$inival"
     fi
+
+    result="" result2=""
+
     if [[ "$inival" = bg:* ]]; then
         result="bg=${inival#bg:}"
+    elif [[ "$inival" = (#b)(*),(*),(*) || "$inival" = (#b)(*),(*) ]]; then
+        if [[ "${match[1]}" = (${(~j:|:)color})* || "${match[1]}" = [0-9]##* ]]; then
+            result="fg=${match[1]}"
+        else
+            result="${match[1]}"
+        fi
+
+        # This is not used, maybe one day it will become needed
+        if [[ "${match[3]}" = custom:(${(~j:|:)color})* || "${match[3]}" = custom:[0-9]##* ]]; then
+            result2="fg=${match[3]#custom:}"
+        else
+            result2="${match[3]}"
+        fi
+
+        if [[ "${match[2]}" = bg:(${(~j:|:)color})* || "${match[2]}" = bg:[0-9]##* ]]; then
+            result+=",bg=${match[2]#bg:}"
+            [[ -n "$result2" ]] && result2+=",bg=${match[2]#bg:}" # unused
+        else
+            result+=",${match[2]}"
+            [[ -n "$result2" ]] && result2+=",${match[2]}" # unused
+        fi
     else
         if [[ "$inival" = (${(~j:|:)color})* || "$inival" = [0-9]##* ]]; then
             result="fg=$inival"

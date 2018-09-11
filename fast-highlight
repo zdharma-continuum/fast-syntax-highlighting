@@ -90,7 +90,8 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[for-loop-number]:=fg=magenta}
 : ${FAST_HIGHLIGHT_STYLES[for-loop-separator]:=fg=yellow,bold}
 : ${FAST_HIGHLIGHT_STYLES[here-string-tri]:=fg=yellow}
-: ${FAST_HIGHLIGHT_STYLES[here-string-word]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[here-string-text]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[here-string-var]:=fg=cyan,bg=blue}
 : ${FAST_HIGHLIGHT_STYLES[case-input]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[case-parentheses]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[case-condition]:=bg=blue}
@@ -986,8 +987,8 @@ typeset -ga ZLAST_COMMANDS
     elif (( this_word & 128 ))
     then
       (( next_word = (next_word | 2) & ~129 ))
-      [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]} != "none" ]] && (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]}")
-      -fast-highlight-string ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-word]:#none}
+      [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-text]} != "none" ]] && (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-text]}")
+      -fast-highlight-string ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-string-var]:#none}
       already_added=1
     elif (( this_word & (BIT_case_preamble + BIT_case_item) ))
     then
@@ -1193,7 +1194,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
       _mybuf=${match[8]}
 
       # ADD
-      (( __start=__idx-__PBUFLEN, __end=_end_idx-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}${1:+,$1}")
+      (( __start=__idx-__PBUFLEN, __end=_end_idx-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${${1:+$1}:-${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}}")
 
       __idx=_end_idx
     }
