@@ -300,10 +300,10 @@ zcompile $FAST_WORK_DIR/$outfile
     print -zr '
 # Subshell, assignments, math-mode
 echo $(cat /etc/hosts |& grep -i "hello337")
-local param1="text ${+variable[test]}"; typeset param2='"'"'other $variable'"'"'
+local param1="text ${+variable[test]} text ${var} text"; typeset param2='"'"'other $variable'"'"'
 math=$(( 10 + HISTSIZ + HISTSIZE + $SAVEHIST )) size=$(( 0 ))
 
-# Programming-like usage, brackets
+# Programming-like usage, bracket matching - through distinct colors; note the backslash quoting
 for (( ii = 1; ii <= size; ++ ii )); do
     if [[ "${cmds[ii]} string" = "| string" ]]
     then
