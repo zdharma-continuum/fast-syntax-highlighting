@@ -795,6 +795,9 @@ typeset -ga ZLAST_COMMANDS
                    (( __idx )) && FAST_THEME_NAME=$_mybuf
                    already_added=1
                  else
+                   [[ $__arg = *([^\\][\#][\#]|"(#b)"|"(#B)"|"(#m)"|"(#c")* && $highlight_glob -ne 0 ]] && \
+                     (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && \
+                       reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}globbing-ext]}")
                    # Reusing existing vars, treat this code like C++ STL
                    # header, full of underscores and unhelpful var names
                    itmp=0 __workbuf=$__arg __tmp="" cdpath_dir=$__arg
