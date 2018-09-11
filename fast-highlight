@@ -68,6 +68,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[path-to-dir]:=fg=magenta,underline}
 : ${FAST_HIGHLIGHT_STYLES[path_pathseparator]:=}
 : ${FAST_HIGHLIGHT_STYLES[globbing]:=fg=blue,bold}
+: ${FAST_HIGHLIGHT_STYLES[globbing-ext]:=fg=blue,bold}
 : ${FAST_HIGHLIGHT_STYLES[history-expansion]:=fg=blue,bold}
 : ${FAST_HIGHLIGHT_STYLES[single-hyphen-option]:=fg=cyan}
 : ${FAST_HIGHLIGHT_STYLES[double-hyphen-option]:=fg=cyan}
@@ -916,7 +917,9 @@ typeset -ga ZLAST_COMMANDS
                    fi
 
                    already_added=1
-                 elif [[ $__arg = ([*?]*|*[^\\][*?]*|*[\#][\#]*) ]]; then
+                 elif [[ $__arg = *([^\\][\#][\#]|"(#b)"|"(#B)"|"(#m)"|"(#c")* ]]; then
+                   (( highlight_glob )) && __style=${FAST_THEME_NAME}globbing-ext || __style=${FAST_THEME_NAME}default
+                 elif [[ $__arg = ([*?]*|*[^\\][*?]*) ]]; then
                    (( highlight_glob )) && __style=${FAST_THEME_NAME}globbing || __style=${FAST_THEME_NAME}default
                  elif [[ $__arg = \$* ]]; then
                    __style=${FAST_THEME_NAME}variable

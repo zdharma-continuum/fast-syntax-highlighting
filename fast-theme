@@ -136,7 +136,8 @@ map=(
     hashed-command              "- command"
     path                        "-"
     path_pathseparator          "pathseparator"
-    globbing                    "-"
+    globbing                    "- back-or-dollar-double-quoted-argument" # fallback: variable in string "text $var text"
+    globbing-ext                "- double-quoted-argument" # fallback: the string "abc..."
     history-expansion           "-"
     single-hyphen-option        "- single-quoted-argument"
     double-hyphen-option        "- double-quoted-argument"
@@ -181,7 +182,7 @@ map=(
 local -a order
 order=( 
     default unknown-token reserved-word alias suffix-alias builtin function command precommand 
-    commandseparator hashed-command path path_pathseparator globbing history-expansion 
+    commandseparator hashed-command path path_pathseparator globbing globbing-ext history-expansion
     single-hyphen-option double-hyphen-option back-quoted-argument single-quoted-argument 
     double-quoted-argument dollar-quoted-argument back-or-dollar-double-quoted-argument 
     back-dollar-quoted-argument assign redirection comment variable mathvar 
