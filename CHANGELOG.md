@@ -1,3 +1,5 @@
+# News On Updates in F-Sy-H
+
 **2018-08-09**
 
 Added ideal string highlighting – FSH now handles any legal quoting and combination of `"`,`'` and `\` when

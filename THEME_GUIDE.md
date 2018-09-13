@@ -1,4 +1,4 @@
-# Theme Guide
+# Theme Guide for F-Sy-H
 
 `fast-theme` tool is used to select a theme. There are 6 shipped themes, they can be listed with `fast-theme -l`.
 Themes are basic [INI files](https://github.com/zdharma/fast-syntax-highlighting/tree/master/themes) where each
@@ -73,4 +73,4 @@ theme setup.
 
 You can use "~" in the path, e.g. `FAST_WORK_DIR=~/.fsh` and also the `XDG:`, `LOCAL:`, `OPT:`,
 etc. short-hands, so e.g. `FAST_WORK_DIR=XDG` or `FAST_WORK_DIR=XDG:` is allowed (in this case
-it will be changed to `$HOME/.config/fsh` by default by fast-syntax-highlighting loader).
+it will be changed to `$HOME/.config/fsh` by default by F-Sy-H loader).

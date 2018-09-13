@@ -3,7 +3,7 @@
 <br/>New: You can request a feature when donating, even fancy or advanced ones get implemented this way. [There are
 reports](DONATIONS.md) about what is being done with the money received.
 
-# Fast Syntax Highlighting
+# Fast Syntax Highlighting (F-Sy-H)
 
 Feature rich syntax highlighting for Zsh.
 
