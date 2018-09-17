@@ -67,6 +67,8 @@ local -a __lines_list
                         }
                     fi
                 } || __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
+            else
+                return 1
             fi
         fi
     fi
