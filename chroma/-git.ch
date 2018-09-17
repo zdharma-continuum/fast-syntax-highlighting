@@ -174,7 +174,7 @@ else
                             # if is file and subcommand is checkout or diff
                             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" \
                                 || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "reset" \
-                                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] && [[ -e "$__wrd" ]]; then
+                                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] && [[ -e ${~__wrd} ]]; then
                                 __style=${FAST_THEME_NAME}path
                             else
                                 __style=${FAST_THEME_NAME}incorrect-subtle
