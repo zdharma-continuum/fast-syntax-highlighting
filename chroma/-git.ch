@@ -59,6 +59,7 @@ else
                     __style=${FAST_THEME_NAME}incorrect-subtle
                 fi
             fi
+            # The counter includes the subcommand itself
             (( FAST_HIGHLIGHT[chroma-git-counter] += 1 ))
         else
             __wrd="${__wrd//\`/x}"
@@ -81,8 +82,12 @@ else
                     if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
                         (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
                             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
-                    # if ref dose not exist and subcommand is push
+                    # if ref (__idx1 == 3) does not exist and subcommand is push
                     elif (( __idx1 != 2 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
+                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
+                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+                    # if not existing remote name, because not an URL (i.e. no colon)
+                    elif [[ $__idx1 -eq 2 && $__wrd != *:* ]]; then
                         (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
                             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
                     fi
