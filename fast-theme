@@ -95,7 +95,7 @@ local MATCH; integer MBEGIN MEND
     print -r -- "and any future sessions to the new theme. Using <theme-path>, i.e. a path to an ini file"
     print -r -- "means using custom, own theme. The path can use an \"XDG:\" shorthand (e.g. \"XDG:mytheme\")"
     print -r -- "that will point to ~/.config/fsh/<theme>.ini (or \$XDG_CONFIG_HOME/fsh/<theme>.ini in general"
-    print -r -- "if the variable is set in the environment). If the INI file pointed in the path is \"overlay\","
+    print -r -- "if the variable is set in the environment). If the INI file pointed in the path is \"*overlay*\","
     print -r -- "then it is not a full theme, but an additional theme-snippet that overwrites only selected"
     print -r -- "styles of the main theme."
     print -r -- ""
@@ -233,7 +233,7 @@ command rm -f "$FAST_WORK_DIR"/"$outfile"
 
 # Set a zstyle and a parameter to carry theme name
 if [[ -z "$OPT_SECONDARY" ]]; then
-    [[ "$THEME_NAME" != "overlay" ]] && {
+    [[ "$THEME_NAME" != *"overlay"* ]] && {
         print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
         print -r -- 'typeset -g FAST_THEME_NAME="'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
         zstyle :plugin:fast-syntax-highlighting theme "$THEME_NAME"
@@ -256,15 +256,15 @@ for k in "${order[@]}"; do
         [[ -n "$inikey" ]] && {
             (( !first )) && [[ -z "$OPT_QUIET" ]] && {
                 [[ $kk = default ]] && {
-                    [[ "$THEME_NAME" != "overlay" ]] && print "Missing style: $first_val"
+                    [[ "$THEME_NAME" != *"overlay"* ]] && print "Missing style: $first_val"
                 } || print "For style $first_val, went for fallback style $kk"
             }
             break
         }
         first=0
-        [[ "$THEME_NAME" = "overlay" ]] && break
+        [[ "$THEME_NAME" = *"overlay"* ]] && break
     done
-    [[ -z "$inikey" ]] && { [[ -z "$OPT_QUIET" && "$THEME_NAME" != "overlay" ]] && print "Missing style $first_val"; continue; }
+    [[ -z "$inikey" ]] && { [[ -z "$OPT_QUIET" && "$THEME_NAME" != *"overlay"* ]] && print "Missing style $first_val"; continue; }
 
     inival="${out[$inikey]}"
     if [[ "$k" = "secondary" && -z "$OPT_SECONDARY" && -n "$inival" ]]; then
@@ -304,7 +304,7 @@ for k in "${order[@]}"; do
         fi
     fi
 
-    if [[ "$THEME_NAME" = "overlay" ]]; then
+    if [[ "$THEME_NAME" = *"overlay"* ]]; then
         (( ++ ov_counter ))
         print -r -- ': ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}'"$k"']::='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
         FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
@@ -316,12 +316,12 @@ done
 
 # This can overwrite some of *_STYLES fields
 # Re-apply overlay on top of the theme we switched to
-[[ "$THEME_NAME" != "overlay" ]] && [[ -r "$FAST_WORK_DIR"/theme_overlay.zsh ]] && source "$FAST_WORK_DIR"/theme_overlay.zsh
+[[ "$THEME_NAME" != *"overlay"* ]] && [[ -r "$FAST_WORK_DIR"/theme_overlay.zsh ]] && source "$FAST_WORK_DIR"/theme_overlay.zsh
 
-zcompile $FAST_WORK_DIR/$outfile
+zcompile $FAST_WORK_DIR/$outfile 2>/dev/null
 
 [[ -z "$OPT_QUIET" ]] && {
-    if [[ "$THEME_NAME" != "overlay" ]]; then
+    if [[ "$THEME_NAME" != *"overlay"* ]]; then
         print "Switched to theme \`$THEME_NAME' (current session, and future sessions)" || \
     else
         print "Processed the overlay ($ov_counter keys found), it is now active (for current session, and future sessions)"
