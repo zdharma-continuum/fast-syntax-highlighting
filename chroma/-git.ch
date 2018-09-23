@@ -53,7 +53,11 @@ else
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
             if (( __start_pos >= 0 )); then
                 # if subcommand exists
-                if git help -a | grep "^  [a-z]" | tr ' ' '\n' | grep -x "$__wrd" > /dev/null || git config "alias.$__wrd" > /dev/null; then
+                -fast-run-command "git help -a" chroma-git-subcmd-list "" 10
+                # (s: :) will split on every space, but because the expression
+                # isn't double-quoted, the empty elements will be eradicated
+                __lines_list=( ${(M)${(s: :)${(M)__lines_list:#  [a-z]*}}:#$__wrd} )
+                if (( ${#__lines_list} > 0 )) || git config "alias.$__wrd" > /dev/null; then
                     __style=${FAST_THEME_NAME}subcommand
                 else
                     __style=${FAST_THEME_NAME}incorrect-subtle
