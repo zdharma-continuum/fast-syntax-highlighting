@@ -221,6 +221,7 @@ FAST_HIGHLIGHT+=(
   chroma-systemctl  chroma/-subcommand.ch
   chroma-asciinema  chroma/-subcommand.ch
   chroma-ipfs       chroma/-subcommand.ch
+  chroma-zplugin    chroma/-subcommand.ch
 
   #chroma-which   chroma/-which.ch
   #chroma-vim     chroma/-vim.ch
