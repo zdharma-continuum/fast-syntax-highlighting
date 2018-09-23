@@ -56,6 +56,12 @@ else
                 -fast-run-command "git help -a" chroma-git-subcmd-list "" 10
                 # (s: :) will split on every space, but because the expression
                 # isn't double-quoted, the empty elements will be eradicated
+                # Some further knowledge-base: s-flag is special, it skips
+                # empty elements and creates an array (not a concatenated
+                # string) even when double-quoted. The normally needed @-flag
+                # that breaks the concaetnated string back into array in case
+                # of double-quoting has additional effect for s-flag: it
+                # finally blocks empty-elements eradication.
                 __lines_list=( ${(M)${(s: :)${(M)__lines_list:#  [a-z]*}}:#$__wrd} )
                 if (( ${#__lines_list} > 0 )) || git config "alias.$__wrd" > /dev/null; then
                     __style=${FAST_THEME_NAME}subcommand
