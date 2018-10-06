@@ -2,19 +2,19 @@
 
 ## Motivation
 
-Someone might want to create a detailed highlighting for a specific program
+Someone might want to create a detailed highlighting for a **specific program**
 and this document helps achieving this. It explains how chroma functions – the
 code behind such detailed highlighting – are constructed and used.
 
 ## Keywords
 
-- `chroma` - a shorthand for `chroma function`,
+- `chroma` - a shorthand for `chroma function` – the thing that literally colorizes selected commands, like `git`, `grep`, etc. invocations, see `chroma function` below,
 - `big loop` - main highlighting code, a loop over tokens and at least 2 large structular constructs (big `if` and `case`);
-  it is advanced, e.g. parses `case` statements, here-string,
+  it is advanced, e.g. parses `case` statements, here-string, it basically constitutes 90% of the F-Sy-H project,
 - `chroma function` - a plugin-function that is called when a specific command occurs (e.g. when user enters `git` at
-  command line) suppressing activity of `big loop` (i.e. no standard highlighting),
+  command line) suppressing activity of `big loop` (i.e. no standard highlighting unless requested),
 - `token` - result of splitting whole command line (i.e. `$BUFFER`, the Zle variable) into bits called tokens, which are
-  words in general separated by spaces on the command line.
+  words in general, separated by spaces on the command line.
 
 ## Overview Of Functioning
 
@@ -27,9 +27,9 @@ code behind such detailed highlighting – are constructed and used.
 
 4. Chroma takes care of "chroma" state, ensures it will be set also for next token.
 
-5. "chroma" state is active, so all following tokens are routed to the chroma.
+5. "chroma" state is active, so all following tokens are routed to the chroma (in general skipping big-loop, see next items),
 
-6. When processing of single token is complete, the associated chroma returs 0
+6. When processing of a single token is complete, the associated chroma returns 0
    (shell-truth) to request no further processing by the big loop.
 
 7. It can also return 1 so that single, current token will be passed into big-loop
@@ -47,7 +47,7 @@ code behind such detailed highlighting – are constructed and used.
        because Zsh colorizes by *ranges* applied onto command line buffer (e.g.
        `from-10 to-13 fg=red`),
 
-- `$4` - a private copy of `$_end_pos` from the upper scope; denotes where token
+- `$4` - a private copy of `$_end_pos` from the upper scope; denotes where current token
        ends (at which index in the string being the command line).
 
 So example invocation could look like this:
@@ -56,7 +56,7 @@ So example invocation could look like this:
 chroma/-example.ch 1 "grep" "$_start_pos" "$_end_pos"
 ----
 
-Such call is in fact very simple, big-loop will be doing them for the user.
+Big-loop will be doing such calls for the user, after occurring a specific chroma-enabled command (like e.g. `awk`), and then until chroma will detect end of this chroma-enabled command (end of whole invocation, with arguments, etc.; in other words, when e.g. new line or `;`-character occurs, etc.).
 
 ## Example Chroma-Function
 
