@@ -23,10 +23,11 @@ map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
 FAST_WORK_DIR=${${FAST_WORK_DIR/(#m)(#s)(XDG|LOCAL|HOME|OPT):(#c0,1)/${map[${MATCH%:}:]}}%/}
 
 local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY OPT_SHOW OPT_COPY OPT_OV_RESET
-local OPT_PALETTE OPT_CDWD
+local OPT_PALETTE OPT_CDWD OPT_XCHG OPT_OV_XCHG
 local -A opthash
 zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test -secondary \
-            s -show -copy-shipped-theme: R -ov-reset p -palette w -workdir || \
+            s -show -copy-shipped-theme: R -ov-reset p -palette w -workdir \
+            x -xchg y -ov-xchg || \
                 { echo "Improper options given, see help (-h/--help)"; return 1; }
 
 (( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
@@ -41,6 +42,8 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test
 (( ${+opthash[-R]} + ${+opthash[--ov-reset]} )) && OPT_OV_RESET="-R"
 (( ${+opthash[-p]} + ${+opthash[--palette]} )) && OPT_PALETTE="-p"
 (( ${+opthash[-w]} + ${+opthash[--workdir]} )) && OPT_CDWD="-w"
+(( ${+opthash[-x]} + ${+opthash[--xchg]} ))    && OPT_XCHG="-x"
+(( ${+opthash[-y]} + ${+opthash[--ov-xchg]} )) && OPT_OV_XCHG="-y"
 
 local -a match mbegin mend
 local MATCH; integer MBEGIN MEND
@@ -207,7 +210,7 @@ color=( red green blue yellow cyan magenta black white default )
 #
 
 local -A out
-local THEME_NAME
+local THEME_NAME THEME_PATH="$1"
 if [[ "$1" = */* || "$1" = (XDG|LOCAL|HOME|OPT):* ]]; then
     1="${${1/(#s)XDG:/${${XDG_CONFIG_HOME:-$HOME/.config}%/}/fsh/}%.ini}.ini"
     1="${${1/(#s)LOCAL://usr/local/share/fsh/}%.ini}.ini"
@@ -228,20 +231,23 @@ else
     fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
 fi
 
-[[ -z "$OPT_SECONDARY" ]] && { [[ "$THEME_NAME" = "overlay" ]] && local outfile="theme_overlay.zsh" || local outfile="current_theme.zsh"; } || local outfile="secondary_theme.zsh"
-command rm -f "$FAST_WORK_DIR"/"$outfile"
+[[ -z "$OPT_SECONDARY" ]] && { [[ "$THEME_NAME" = *"overlay"* ]] && local outfile="theme_overlay.zsh" || local outfile="current_theme.zsh"; } || local outfile="secondary_theme.zsh"
+[[ -z "$OPT_XCHG" && -z "$OPT_OV_XCHG" ]] && command rm -f "$FAST_WORK_DIR"/"$outfile"
 
 # Set a zstyle and a parameter to carry theme name
-if [[ -z "$OPT_SECONDARY" ]]; then
+if [[ -z "$OPT_SECONDARY" && -z "$OPT_XCHG" && -z "$OPT_OV_XCHG" ]]; then
     [[ "$THEME_NAME" != *"overlay"* ]] && {
         print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
         print -r -- 'typeset -g FAST_THEME_NAME="'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
         zstyle :plugin:fast-syntax-highlighting theme "$THEME_NAME"
         typeset -g FAST_THEME_NAME="$THEME_NAME"
     }
-else
+elif [[ -z "$OPT_XCHG" && -z "$OPT_OV_XCHG" ]]; then
     local FAST_THEME_NAME="$THEME_NAME"
 fi
+
+# Store from which file the theme or overlay is being loaded
+[[ "$THEME_NAME" != *"overlay" && -z "$OPT_OV_XCHG" ]] && FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}-path]="$THEME_PATH" || FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}-ov-path]="$THEME_PATH"
 
 # Generate current_theme.zsh or secondary_theme.zsh, traversing ini-file associative array
 local k kk
@@ -264,6 +270,12 @@ for k in "${order[@]}"; do
         first=0
         [[ "$THEME_NAME" = *"overlay"* ]] && break
     done
+
+    # ORIG: Clear orig-style when loading a new theme, not overlay
+    [[ -z "$OPT_OV_XCHG" ]] && unset "FAST_HIGHLIGHT_STYLES[orig-style-$k]"
+    # ORIG: Restore orig-style when loading a new overlay
+    [[ -n "$OPT_OV_XCHG" && -n "${FAST_HIGHLIGHT_STYLES[orig-style-$k]}" ]] && { FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="${FAST_HIGHLIGHT_STYLES[orig-style-$k]}"; unset "FAST_HIGHLIGHT_STYLES[orig-style-$k]"; }
+    # Set only the keys provided in theme
     [[ -z "$inikey" ]] && { [[ -z "$OPT_QUIET" && "$THEME_NAME" != *"overlay"* ]] && print "Missing style $first_val"; continue; }
 
     inival="${out[$inikey]}"
@@ -304,12 +316,15 @@ for k in "${order[@]}"; do
         fi
     fi
 
-    if [[ "$THEME_NAME" = *"overlay"* ]]; then
+    if [[ "$THEME_NAME" = *"overlay"* || -n "$OPT_OV_XCHG" ]]; then
         (( ++ ov_counter ))
-        print -r -- ': ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}'"$k"']::='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
+        [[ -z "$OPT_XCHG$OPT_OV_XCHG" ]] && print -r -- ': ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}'"$k"']::='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
+        # ORIG: Save original value of the overwritten style
+        FAST_HIGHLIGHT_STYLES[orig-style-$k]=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]}
+        # Overwrite theme's style
         FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
     else
-        print -r -- ': ${FAST_HIGHLIGHT_STYLES['"${FAST_THEME_NAME}$k"']:='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
+        [[ -z "$OPT_XCHG$OPT_OV_XCHG" ]] && print -r -- ': ${FAST_HIGHLIGHT_STYLES['"${FAST_THEME_NAME}$k"']:='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
         FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
     fi
 done
