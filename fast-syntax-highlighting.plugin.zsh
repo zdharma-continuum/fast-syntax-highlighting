@@ -269,9 +269,18 @@ _zsh_highlight_bind_widgets()
 # -------------------------------------------------------------------------------------------------
 
 # Try binding widgets.
-_zsh_highlight_bind_widgets || {
-  print -r -- >&2 'zsh-syntax-highlighting: failed binding ZLE widgets, exiting.'
-  return 1
+autoload is-at-least
+is-at-least 5.4 && {
+    integer addhook_retval=0
+    autoload -Uz add-zle-hook-widget
+    add-zle-hook-widget zle-line-pre-redraw _zsh_highlight; (( addhook_retval += $? ))
+    add-zle-hook-widget zle-line-finish _zsh_highlight; (( addhook_retval += $? ))
+    (( addhook_retval == 0 ))
+} || {
+    _zsh_highlight_bind_widgets || {
+      print -r -- >&2 'zsh-syntax-highlighting: failed binding ZLE widgets, exiting.'
+      return 1
+    }
 }
 
 # Reset scratch variables when commandline is done.
@@ -294,7 +303,7 @@ ZSH_HIGHLIGHT_MAXLENGTH=10000
 zmodload zsh/parameter 2>/dev/null
 zmodload zsh/system 2>/dev/null
 
-autoload -Uz -- is-at-least fast-theme fast-read-ini-file -fast-run-git-command -fast-make-targets \
+autoload -Uz -- fast-theme fast-read-ini-file -fast-run-git-command -fast-make-targets \
                 -fast-run-command
 autoload -Uz -- chroma/-git.ch chroma/-example.ch chroma/-grep.ch chroma/-perl.ch chroma/-make.ch \
                 chroma/-awk.ch chroma/-vim.ch chroma/-source.ch chroma/-sh.ch chroma/-docker.ch \
@@ -314,5 +323,4 @@ zstyle -s :plugin:fast-syntax-highlighting theme __fsyh_theme
 unset __fsyh_theme
 
 alias fsh-alias=fast-theme
-
 -fast-highlight-fill-option-variables
