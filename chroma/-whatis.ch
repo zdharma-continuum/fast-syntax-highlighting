@@ -40,7 +40,7 @@ else
     fi
     if (( check )) then
         __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}
-    elif [[ -e ${~__wrd} ]] then
+    elif [[ ${~__wrd} = */* && -e ${~__wrd} ]] then
         __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}
     else
         __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}
