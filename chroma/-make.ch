@@ -38,8 +38,12 @@ local -a __lines_list reply2
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
 
-    if [[ "$__wrd" = -* ]]; then
-        __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
+    if [[ "$__wrd" = -* || "$__wrd" = *=* ]]; then
+        [[ "$__wrd" = *=* ]] && {
+            __style=${FAST_THEME_NAME}variable
+        } || {
+            __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
+        }
 
         if [[ "$__wrd" = (-I|-o|-W) ]]; then
             FAST_HIGHLIGHT[chroma-make-skip-two]=1
