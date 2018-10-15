@@ -57,7 +57,7 @@ local -a __results __deserialized __noshsplit
             [[ "${#__results}" -gt 0 ]] && {
                 __style=${FAST_THEME_NAME}correct-subtle
                 __deserialized=( "${(Q@)${(z@)FAST_HIGHLIGHT[chroma-autoload-elements]}}" )
-                [[ -z "${__deserialized[1]}" && ${#__deserialized} -eq 1 ]] && deserialized=()
+                [[ -z "${__deserialized[1]}" && ${#__deserialized} -eq 1 ]] && __deserialized=()
                 # Cannot use ${abc:+"$abc"} trick with ${~...}, so handle most
                 # cases of the possible shwordsplit through an additional array
                 __noshsplit=( ${~__wrd} )
