@@ -21,7 +21,7 @@
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 local __style __chars
 integer __idx1 __idx2
-local -a __results
+local -a __results __deserialized
 
 # First call, i.e. command starts, i.e. "grep" token etc.
 (( __first_call )) && {
@@ -51,6 +51,8 @@ local -a __results
 
         if [[ $__wrd != (\$|\"\$)* && $__wrd != (/|\"/|\'/)* && $__wrd != \`* ]]; then
             __results=( ${^fpath}/$__wrd(N) )
+            __deserialized=( "${(Q@)${(z@)FAST_HIGHLIGHT[chroma-fpath_peq-elements]}}" )
+            __results+=( ${^__deserialized}/$__wrd(N) )
             [[ "${#__results}" -gt 0 ]] && __style=${FAST_THEME_NAME}correct-subtle || __style=${FAST_THEME_NAME}incorrect-subtle
         fi
 
