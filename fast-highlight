@@ -222,6 +222,22 @@ FAST_HIGHLIGHT+=(
   chroma-asciinema  chroma/-subcommand.ch
   chroma-ipfs       chroma/-subcommand.ch
   chroma-zplugin    chroma/-subcommand.ch
+  chroma-aspell     chroma/-subcommand.ch
+  chroma-bspc       chroma/-subcommand.ch
+  chroma-cryptsetup chroma/-subcommand.ch
+  chroma-diskutil   chroma/-subcommand.ch
+  chroma-exercism   chroma/-subcommand.ch
+  chroma-gulp       chroma/-subcommand.ch
+  chroma-i3-msg     chroma/-subcommand.ch
+  chroma-openssl    chroma/-subcommand.ch
+  chroma-solargraph chroma/-subcommand.ch
+  chroma-subliminal chroma/-subcommand.ch
+  chroma-svnadmin   chroma/-subcommand.ch
+  chroma-travis     chroma/-subcommand.ch
+  chroma-xdotool    chroma/-subcommand.ch
+  chroma-zmanage    chroma/-subcommand.ch
+  chroma-zsystem    chroma/-subcommand.ch
+  chroma-zypper     chroma/-subcommand.ch
 
   #chroma-which   chroma/-which.ch
   #chroma-vim     chroma/-vim.ch
