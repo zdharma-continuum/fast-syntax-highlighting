@@ -29,12 +29,11 @@ local -a deserialized noshsplit
     [[ "$__wrd" != ")" ]] && {
         deserialized=( "${(Q@)${(z@)FAST_HIGHLIGHT[chroma-fpath_peq-elements]}}" )
         [[ -z "${deserialized[1]}" && ${#deserialized} -eq 1 ]] && deserialized=()
-        # Cannot use ${abc:="$abc"} trick with ${~...}, handle most
-        # cases of the possible shwordsplit through additional array
+        # Cannot use ${abc:+"$abc"} trick with ${~...}, so handle most
+        # cases of the possible shwordsplit through an additional array
         noshsplit=( ${~__wrd} )
-        deserialized+=( ${(j: :)noshsplit} )
+        deserialized+=( "${(j: :)noshsplit}" )
         FAST_HIGHLIGHT[chroma-fpath_peq-elements]="${(j: :)${(q@)deserialized}}"
-        print -rl "Added <$__wrd>, the holding string is now: ${FAST_HIGHLIGHT[chroma-fpath_peq-elements]}" >> /tmp/reply
     }
 
     return 1

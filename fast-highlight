@@ -270,6 +270,8 @@ typeset -ga ZLAST_COMMANDS
       REPLY="global alias"
     elif (( $+functions[(e)$1] )); then
       REPLY=function
+    elif (( ${${(Q@)${(z@)FAST_HIGHLIGHT[chroma-autoload-elements]}}[(Ie)$1]} )); then
+      REPLY=function
     elif (( $+builtins[(e)$1] )); then
       REPLY=builtin
     elif (( $+commands[(e)$1] )); then
