@@ -410,6 +410,8 @@ typeset -ga ZLAST_COMMANDS
   ZLAST_COMMANDS=()
   # Restart observing of assigns
   FAST_ASSIGNS_SEEN=()
+  # Restart function's gathering
+  FAST_HIGHLIGHT[chroma-autoload-elements]="dummy-1337-function"
 
   [[ -n $ZCALC_ACTIVE ]] && {
     _start_pos=0; _end_pos=__len; __arg=$__buf
@@ -802,6 +804,11 @@ typeset -ga ZLAST_COMMANDS
                  _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN + 1 )) )
                  # Remove possible annoying unknown-token __style, or misleading function __style
                  reply[-1]=()
+                 unset "__fast_highlight_main__command_type_cache[$active_command]"
+
+                 __inputs=( ${(Q@)${(z@)FAST_HIGHLIGHT[chroma-autoload-elements]}} )
+                 __inputs+=( "$active_command" )
+                 FAST_HIGHLIGHT[chroma-autoload-elements]="${(j: :)${(q@)__inputs}}"
                  ;;
         '--'*)   [[ $__arg == "--" ]] && { _was_double_hyphen=1; __style=${FAST_THEME_NAME}double-hyphen-option; } || { (( !_was_double_hyphen )) && __style=${FAST_THEME_NAME}double-hyphen-option || __style=${FAST_THEME_NAME}default; };;
         '-'*)    (( !_was_double_hyphen )) && __style=${FAST_THEME_NAME}single-hyphen-option || __style=${FAST_THEME_NAME}default;;
