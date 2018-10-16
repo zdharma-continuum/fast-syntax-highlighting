@@ -63,6 +63,8 @@ local -a __results __deserialized __noshsplit
                 __noshsplit=( ${~__wrd} )
                 __deserialized+=( "${(j: :)__noshsplit}" )
                 FAST_HIGHLIGHT[chroma-autoload-elements]="${(j: :)${(q@)__deserialized}}"
+                # Make the function defined for big-loop's *main-type mechanism
+                __fast_highlight_main__command_type_cache[${(j: :)__noshsplit}]="function"
             } || __style=${FAST_THEME_NAME}incorrect-subtle
         fi
 
