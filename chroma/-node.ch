@@ -10,7 +10,7 @@ if (( __first_call )); then
 elif [[ "$__wrd" = -- ]]; then
     FAST_HIGHLIGHT[chroma-node-file]=2
 elif (( FAST_HIGHLIGHT[chroma-node-file] != 2 )) && [[ "$__wrd" = -* ]]; then
-    if [[ "$__wrd" = -e || "$__wrd" = --eval ]]; then
+    if [[ "$__wrd" = -*e* || "$__wrd" = --eval ]]; then
         FAST_HIGHLIGHT[chroma-node-file]=0
     fi
 elif (( FAST_HIGHLIGHT[chroma-node-file] )); then
