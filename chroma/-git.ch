@@ -58,7 +58,11 @@ else
         fi
         return 1
     else
-        if (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] > 0 && \
+        # If at e.g. '>' or destination/source spec (of the redirection)
+        if (( in_redirection > 0 )); then
+            return 1
+        # If at main git option taking argument in a separate word (-C and -c)
+        elif (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] > 0 && \
             0 == FAST_HIGHLIGHT[chroma-git-got-subcommand] ))
         then
             # Remember the value
@@ -194,6 +198,8 @@ else
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] \
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "reset" ]] \
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "rebase" ]]; then
+
+                # if doing `git checkout -b ...'
                 if [[ "$__wrd" = "-b" && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
                     FAST_HIGHLIGHT[chroma-git-checkout-new]=1
                     __style=${FAST_THEME_NAME}single-hyphen-option
