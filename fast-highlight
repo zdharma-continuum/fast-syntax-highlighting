@@ -458,14 +458,15 @@ typeset -ga ZLAST_COMMANDS
       # Prepare next loop cycle
       (( this_word & BIT_case_item )) || { (( in_array_assignment )) && (( this_word = 2 | (this_word & BIT_case_code) )) || { (( this_word = 1 | (this_word & BIT_case_code) )); highlight_glob=1; }; }
       in_redirection=0
-      proc_buf=${proc_buf[offset + __asize + 1,__len]}
 
       # Chance to highlight ';'
-      [[ ${proc_buf[offset+1]} != $'\n' ]] && \
+      [[ ${proc_buf[offset+1]} != $'\n' ]] && {
         [[ ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}commandseparator]} != "none" ]] && \
           (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && \
             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}commandseparator]}")
+      }
 
+      proc_buf=${proc_buf[offset + __asize + 1,__len]}
       _start_pos=$_end_pos
       continue
     else
