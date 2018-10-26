@@ -14,7 +14,7 @@
 (( next_word = 2 | 8192 ))
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-local -a deserialized noshsplit
+local -a deserialized
 
 (( __first_call )) && {
     return 1
@@ -28,10 +28,9 @@ local -a deserialized noshsplit
     [[ "$__wrd" != ")" ]] && {
         deserialized=( "${(Q@)${(z@)FAST_HIGHLIGHT[chroma-fpath_peq-elements]}}" )
         [[ -z "${deserialized[1]}" && ${#deserialized} -eq 1 ]] && deserialized=()
-        # Cannot use ${abc:+"$abc"} trick with ${~...}, so handle most
-        # cases of the possible shwordsplit through an additional array
-        noshsplit=( ${~__wrd} )
-        deserialized+=( "${(j: :)noshsplit}" )
+        # Support ~ and $VAR, for [a-ZA-Z_] characters in "VAR",
+        # this probably misses 1 or 2 possible characters
+        deserialized+=( "${(Q)${${(j: :)__wrd}//(#b)((\$[a-zA-Z_]##)|(#s)~)/${(P)${${${match[1]#\$}:#\~}:-HOME}}}}" )
         FAST_HIGHLIGHT[chroma-fpath_peq-elements]="${(j: :)${(q@)deserialized}}"
     }
 
