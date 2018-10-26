@@ -17,6 +17,23 @@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 local -a deserialized
 
 (( __first_call )) && {
+    case $__wrd in
+        (fpath=\()
+            FAST_HIGHLIGHT[fpath_peq_mode]=1
+            ;;
+        (fpath+=\()
+            FAST_HIGHLIGHT[fpath_peq_mode]=2
+            ;;
+        (FPATH=)
+            FAST_HIGHLIGHT[fpath_peq_mode]=4
+            ;;
+        (FPATH+=)
+            FAST_HIGHLIGHT[fpath_peq_mode]=8
+            ;;
+    esac
+    if (( FAST_HIGHLIGHT[fpath_peq_mode] & 5 )); then
+        FAST_HIGHLIGHT[chroma-fpath_peq-elements]="! ${FAST_HIGHLIGHT[chroma-fpath_peq-elements]}"
+    fi
     return 1
 } || {
     # Following call, i.e. not the first one

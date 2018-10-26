@@ -240,6 +240,7 @@ FAST_HIGHLIGHT+=(
   chroma-zypper     chroma/-subcommand.ch
 
   chroma-fpath+=\( chroma/-fpath_peq.ch
+  chroma-fpath=\( chroma/-fpath_peq.ch
   #chroma-which   chroma/-which.ch
   #chroma-vim     chroma/-vim.ch
 )
