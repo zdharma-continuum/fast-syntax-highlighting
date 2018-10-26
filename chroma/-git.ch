@@ -34,6 +34,7 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-git-checkout-new]=0
     FAST_HIGHLIGHT[chroma-git-fetch-multiple]=0
     FAST_HIGHLIGHT[chroma-git-branch-change]=0
+    FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
     return 1
 else
     # Following call, i.e. not the first one
@@ -46,9 +47,29 @@ else
         FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
         __style=${FAST_THEME_NAME}double-hyphen-option
     elif [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-git-got-subcommand]} -eq 0 ]]; then
+        if (( FAST_HIGHLIGHT[chroma-git-got-subcommand] )); then
+            # TODO, per subcommand options-with-arguments handling
+        elif (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] == 0 )); then
+            if [[ "$__wrd" = "-C" ]]; then
+                FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
+            elif [[ "$__wrd" = "-c" ]]; then
+                FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=1
+            fi
+        fi
         return 1
     else
-        if (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
+        if (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] > 0 && \
+            0 == FAST_HIGHLIGHT[chroma-git-got-subcommand] ))
+        then
+            # Remember the value
+            __idx2=${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}
+            # Reset the is-argument mark-field
+            FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
+
+            (( __idx2 == 2 )) && return 1
+            # Other options' args (i.e. arg of -c) aren't routed to big-loop,
+            # they aren't paths and aren't handled there
+        elif (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
             FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
             if (( __start_pos >= 0 )); then
