@@ -241,6 +241,8 @@ FAST_HIGHLIGHT+=(
 
   chroma-fpath+=\( chroma/-fpath_peq.ch
   chroma-fpath=\( chroma/-fpath_peq.ch
+  chroma-FPATH+=   chroma/-fpath_peq.ch
+  chroma-FPATH=   chroma/-fpath_peq.ch
   #chroma-which   chroma/-which.ch
   #chroma-vim     chroma/-vim.ch
 )
@@ -538,6 +540,7 @@ typeset -ga ZLAST_COMMANDS
      # !in_redirection needed particularly for exec {A}>b {C}>d
      (( !in_redirection )) && active_command=$__arg
      _mybuf=${${aliases[$active_command]:-$active_command}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#}
+     [[ "$_mybuf" = (#b)(FPATH+(#c0,1)=)* ]] && _mybuf="${match[1]} ${(j: :)${(s,:,)${_mybuf#FPATH+(#c0,1)=}}}"
      [[ -n ${FAST_HIGHLIGHT[chroma-${_mybuf%% *}]} ]] && {
        __list=( ${(z@)_mybuf} )
        if (( ${#__list} > 1 )) || [[ $active_command != $_mybuf ]]; then
