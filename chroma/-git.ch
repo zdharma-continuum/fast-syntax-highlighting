@@ -276,6 +276,29 @@ else
                 else
                     return 1
                 fi
+            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "tag" ]]; then
+                if [[ "${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}" -eq 0 ]]; then
+                    if [[ "$__wrd" = (-u|-m) ]]; then
+                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=1
+                    elif [[ "$__wrd" = "-F" ]]; then
+                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
+                    elif [[ "$__wrd" = "-d" ]]; then
+                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=3
+                    elif [[ "$__wrd" = (-u|-m|-F|--contains|--nocontains|--points-at|--merged|--no-merged) ]]; then
+                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=4
+                    elif [[ "$__wrd" != -* ]]; then
+                        (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
+                        if [[ ${FAST_HIGHLIGHT[chroma-git-counter]} -eq 2 ]]; then
+                            -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
+                            -fast-run-git-command "+git tag" "chroma-git-tags" ""
+                            [[ -n ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}incorrect-subtle
+                        elif [[ ${FAST_HIGHLIGHT[chroma-git-counter]} -eq 3 ]]; then
+                        fi
+                    else
+                        return 1
+                    fi
+                else
+                fi
             else
                 return 1
             fi
