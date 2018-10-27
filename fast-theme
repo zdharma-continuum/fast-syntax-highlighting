@@ -182,6 +182,8 @@ map=(
     single-sq-bracket           "-"
     double-sq-bracket           "-"
     double-paren                "-"
+    optarg-string               "- double-quoted-argument"
+    optarg-number               "- mathnum"
 )
 
 # In which order to generate entries
@@ -197,6 +199,7 @@ order=(
     case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-bg
     path-to-dir paired-bracket bracket-level-1 bracket-level-2 bracket-level-3
     global-alias subcommand single-sq-bracket double-sq-bracket double-paren
+    optarg-string optarg-number
 )
 
 [[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
