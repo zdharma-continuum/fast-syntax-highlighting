@@ -47,9 +47,8 @@ else
         FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
         __style=${FAST_THEME_NAME}double-hyphen-option
     elif [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-git-got-subcommand]} -eq 0 ]]; then
-        if (( FAST_HIGHLIGHT[chroma-git-got-subcommand] )); then
-            # TODO, per subcommand options-with-arguments handling
-        elif (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] == 0 )); then
+        # Options occuring before a subcommand
+        if (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] == 0 )); then
             if [[ "$__wrd" = "-C" ]]; then
                 FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
             elif [[ "$__wrd" = "-c" ]]; then
@@ -71,8 +70,8 @@ else
             FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
 
             (( __idx2 == 2 )) && return 1
-            # Other options' args (i.e. arg of -c) aren't routed to big-loop,
-            # they aren't paths and aren't handled there
+            # Other options' args (i.e. arg of -c) aren't routed to the big-loop
+            # as they aren't paths and aren't handled in any special way there
         elif (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
             FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
             FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
@@ -88,10 +87,16 @@ else
                 # of double-quoting has additional effect for s-flag: it
                 # finally blocks empty-elements eradication.
                 __lines_list=( ${(M)${(s: :)${(M)__lines_list:#  [a-z]*}}:#$__wrd} )
-                if (( ${#__lines_list} > 0 )) || git config "alias.$__wrd" > /dev/null; then
+                if (( ${#__lines_list} > 0 )); then
                     __style=${FAST_THEME_NAME}subcommand
                 else
-                    __style=${FAST_THEME_NAME}incorrect-subtle
+                    -fast-run-command "git alias" chroma-git-alias-list "" 10
+                    __lines_list=( ${(M)__lines_list:#${__wrd}[[:space:]]#=*} )
+                    if (( ${#__lines_list} > 0 )); then
+                        __style=${FAST_THEME_NAME}subcommand
+                    else
+                        __style=${FAST_THEME_NAME}incorrect-subtle
+                    fi
                 fi
             fi
             # The counter includes the subcommand itself
