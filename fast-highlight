@@ -811,7 +811,18 @@ typeset -ga ZLAST_COMMANDS
                  reply[-1]=()
                  __fast_highlight_main__command_type_cache[$active_command]="function"
                  ;;
-        '--'*)   [[ $__arg == "--" ]] && { _was_double_hyphen=1; __style=${FAST_THEME_NAME}double-hyphen-option; } || { (( !_was_double_hyphen )) && __style=${FAST_THEME_NAME}double-hyphen-option || __style=${FAST_THEME_NAME}default; };;
+        '--'*)   [[ $__arg == "--" ]] && { _was_double_hyphen=1; __style=${FAST_THEME_NAME}double-hyphen-option; } || {
+                   (( !_was_double_hyphen )) && {
+                     [[ "$__arg" = (#b)(--[a-zA-Z0-9_]##)=* ]] && {
+                       (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && \
+                         reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
+                       (( __start=_start_pos-__PBUFLEN+1+mend[1], __end=_end_pos-__PBUFLEN, __start >= 0 )) && \
+                        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-string]}")
+                       already_added=1
+                     } || __style=${FAST_THEME_NAME}double-hyphen-option
+                   } || __style=${FAST_THEME_NAME}default
+                 }
+                 ;;
         '-'*)    (( !_was_double_hyphen )) && __style=${FAST_THEME_NAME}single-hyphen-option || __style=${FAST_THEME_NAME}default;;
         \$\'*)
                  (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}dollar-quoted-argument]}")
