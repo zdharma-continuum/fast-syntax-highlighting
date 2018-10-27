@@ -277,16 +277,17 @@ else
                     return 1
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "tag" ]]; then
-                if [[ "${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}" -eq 0 ]]; then
+                if [[ "${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}" -le 0 ]]; then
                     if [[ "$__wrd" = (-u|-m) ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=1
                     elif [[ "$__wrd" = "-F" ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
                     elif [[ "$__wrd" = "-d" ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=3
-                    elif [[ "$__wrd" = (-u|-m|-F|--contains|--nocontains|--points-at|--merged|--no-merged) ]]; then
+                    elif [[ "$__wrd" = (--contains|--no-contains|--points-at|--merged|--no-merged) ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=4
-                    elif [[ "$__wrd" != -* ]]; then
+                    fi
+                    if [[ "$__wrd" != -* ]]; then
                         (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                         if [[ ${FAST_HIGHLIGHT[chroma-git-counter]} -eq 2 ]]; then
                             -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
@@ -298,6 +299,29 @@ else
                         return 1
                     fi
                 else
+                    case "${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}" in
+                        (1) 
+                            __style=${FAST_THEME_NAME}optarg-string
+                            ;;
+                        (2)
+                            FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
+                            return 1;
+                            ;;
+                        (3)
+                            -fast-run-git-command "git tag" "chroma-git-tags" ""
+                            [[ -n ${__lines_list[(r)$__wrd]} ]] && \
+                                __style=${FAST_THEME_NAME}correct-subtle || \
+                                __style=${FAST_THEME_NAME}incorrect-subtle
+                            ;;
+                        (4)
+                            if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
+                                __style=${FAST_THEME_NAME}correct-subtle
+                            else
+                                __style=${FAST_THEME_NAME}incorrect-subtle
+                            fi
+                            ;;
+                    esac
+                    FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
                 fi
             else
                 return 1
