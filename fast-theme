@@ -291,14 +291,14 @@ for k in "${order[@]}"; do
     if [[ "$inival" = bg:* ]]; then
         result="bg=${inival#bg:}"
     elif [[ "$inival" = (#b)(*),(*),(*) || "$inival" = (#b)(*),(*) ]]; then
-        if [[ "${match[1]}" = (${(~j:|:)color})* || "${match[1]}" = [0-9]##* ]]; then
+        if [[ "${match[1]}" = (${(~j:|:)color})* || "${match[1]}" = [0-9]##* || "${match[1]}" = \#[0-9a-fA-F](#c6,6) ]]; then
             result="fg=${match[1]}"
         else
             result="${match[1]}"
         fi
 
         # This is not used, maybe one day it will become needed
-        if [[ "${match[3]}" = custom:(${(~j:|:)color})* || "${match[3]}" = custom:[0-9]##* ]]; then
+        if [[ "${match[3]}" = custom:(${(~j:|:)color})* || "${match[3]}" = custom:[0-9]##* || "${match[3]}" = custom:\#[0-9a-fA-F](#c6,6) ]]; then
             result2="fg=${match[3]#custom:}"
         else
             result2="${match[3]}"
@@ -312,7 +312,7 @@ for k in "${order[@]}"; do
             [[ -n "$result2" ]] && result2+=",${match[2]}" # unused
         fi
     else
-        if [[ "$inival" = (${(~j:|:)color})* || "$inival" = [0-9]##* ]]; then
+        if [[ "$inival" = (${(~j:|:)color})* || "$inival" = [0-9]##* || "$inival" = \#[0-9a-fA-F](#c6,6) ]]; then
             result="fg=$inival"
         else
             result="$inival"
