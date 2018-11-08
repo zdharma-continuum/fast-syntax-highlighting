@@ -54,7 +54,7 @@ integer __idx1 __idx2
                 if [[ -n "${match[3]}" ]]; then
                     __idx1+=${mbegin[3]}-1
                     __idx2=__idx1+${mend[3]}-${mbegin[3]}+1
-                    (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]}")
+                    (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}for-loop-operator]}")
                     __idx1=__idx2
                 else
                     __idx1+=${mbegin[5]}-1

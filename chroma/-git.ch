@@ -165,8 +165,8 @@ else
                         (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
                             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
                     fi
-                    if (( ${#__wrd} > 72 )); then
-                        for (( __idx1 = 1, __idx2 = 1; __idx1 <= 72; ++ __idx1, ++ __idx2 )); do
+                    if (( ${#__wrd} > 50 )); then
+                        for (( __idx1 = 1, __idx2 = 1; __idx1 <= 50; ++ __idx1, ++ __idx2 )); do
                             while [[ "${__arg[__idx2]}" != "${__wrd[__idx1]}" ]]; do
                                 (( ++ __idx2 ))
                                 (( __idx2 > __asize )) && { __idx2=-1; break; }
