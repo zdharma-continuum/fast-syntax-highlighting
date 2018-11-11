@@ -29,9 +29,13 @@
 # -------------------------------------------------------------------------------------------------
 
 
-# Set $ZERO to the expected value, regardless of functionargzero.
-typeset -g ZERO=${(%):-%N}
-typeset -g FAST_BASE_DIR="${ZERO:h}"
+# Standarized way of handling finding plugin dir,
+# regardless of functionargzero and posixargzero,
+# and with an option for a plugin manager to alter
+# the plugin directory (i.e. set ZERO parameter)
+# http://zdharma.org/Zsh-100-Commits-Club/Zsh-Plugin-Standard.html
+0="${${ZERO:-${0:#$ZSH_ARGZERO}}:-${(%):-%N}}"
+typeset -g FAST_BASE_DIR="${0:h}"
 typeset -ga _FAST_MAIN_CACHE
 # Holds list of indices pointing at brackets that
 # are complex, i.e. e.g. part of "[[" in [[ ... ]]
@@ -303,8 +307,8 @@ autoload -Uz -- chroma/-git.ch chroma/-example.ch chroma/-grep.ch chroma/-perl.c
                 chroma/-autorandr.ch chroma/-nmcli.ch chroma/-fast-theme.ch chroma/-node.ch \
                 chroma/-fpath_peq.ch
 
-source "${ZERO:h}/fast-highlight"
-source "${ZERO:h}/fast-string-highlight"
+source "${0:h}/fast-highlight"
+source "${0:h}/fast-string-highlight"
 
 local __fsyh_theme
 zstyle -s :plugin:fast-syntax-highlighting theme __fsyh_theme
