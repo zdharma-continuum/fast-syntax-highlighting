@@ -41,8 +41,17 @@ typeset -ga _FAST_MAIN_CACHE
 # are complex, i.e. e.g. part of "[[" in [[ ... ]]
 typeset -ga _FAST_COMPLEX_BRACKETS
 
+typeset -g FAST_WORK_DIR
+: ${FAST_WORK_DIR:=$FAST_BASE_DIR}
+FAST_WORK_DIR=${~FAST_WORK_DIR}
+
 if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$FAST_BASE_DIR]}" != $FAST_BASE_DIR ]]; then
     fpath+=( "$FAST_BASE_DIR" )
+fi
+
+if [[ "$FAST_WORK_DIR" = /usr/* || ( "$FAST_WORK_DIR" = /opt/* && ! -w "$FAST_WORK_DIR" ) ]]; then
+    FAST_WORK_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/fsh"
+    command mkdir -p "$FAST_WORK_DIR"
 fi
 
 # Invokes each highlighter that needs updating.
