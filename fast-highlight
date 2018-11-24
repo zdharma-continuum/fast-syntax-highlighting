@@ -580,7 +580,7 @@ typeset -ga ZLAST_COMMANDS
      # try-always construct
      __style=${FAST_THEME_NAME}reserved-word # de facto a reserved word, although not de jure
      (( next_word = 1 | (this_word & BIT_case_code) ))
-   elif (( (this_word & 1) && (in_redirection == 0) )) || [[ $braces_stack = T* ]]; then
+   elif (( (this_word & 1) && (in_redirection == 0) )) || [[ $braces_stack = T* ]]; then # T - typedef, etc.
      if (( __arg_type == 1 )); then
       __style=${FAST_THEME_NAME}precommand
       [[ $__arg = "command" || $__arg = "exec" ]] && (( next_word = next_word | 64 ))
@@ -603,14 +603,14 @@ typeset -ga ZLAST_COMMANDS
       case $REPLY in
         reserved)       # reserved word
                         [[ $__arg = "[[" ]] && __style=${FAST_THEME_NAME}double-sq-bracket || __style=${FAST_THEME_NAME}reserved-word
-                        if [[ $__arg == $'\x7b' ]]; then # '{'
+                        if [[ $__arg == $'\x7b' ]]; then # Y - '{'
                           braces_stack='Y'$braces_stack
-                        elif [[ $__arg == $'\x7d' && $braces_stack = Y* ]]; then # '}'
+                        elif [[ $__arg == $'\x7d' && $braces_stack = Y* ]]; then # Y - '}'
                           # We're at command word, so no need to check right_brace_is_recognised_everywhere
                           braces_stack=${braces_stack#Y}
                           __style=${FAST_THEME_NAME}reserved-word
                           (( next_word = next_word | 16 ))
-                        elif [[ $__arg == "[[" ]]; then
+                        elif [[ $__arg == "[[" ]]; then  # A - [[
                           braces_stack='A'$braces_stack
 
                           # Counting complex brackets (for brackets-highlighter): 1. [[ as command
@@ -831,6 +831,8 @@ typeset -ga ZLAST_COMMANDS
                  ;;
         [\"\']*|[^\"\\]##([\\][\\])#\"*|[^\'\\]##([\\][\\])#\'*)
                  if (( this_word & 256 )) && [[ $__arg = [\'\"]* ]]; then
+                   (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && \
+                     reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}recursive-base]}")
                    if [[ -n ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]} ]]; then
                      __idx=1
                      _mybuf=$FAST_THEME_NAME
@@ -1147,6 +1149,8 @@ typeset -ga ZLAST_COMMANDS
       __idx=0
     fi
     for _mybuf in $__inputs; do
+      (( __start=${_mybuf%%;*}-__PBUFLEN, __end=${_mybuf##*;}-__PBUFLEN, __start >= 0 )) && \
+        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${__tmp}recursive-base]}")
       # Pass authentic buffer for recursive analysis
       -fast-highlight-process "$PREBUFFER" ${__buf[${_mybuf%%;*},${_mybuf##*;}]} $(( ${_mybuf%%;*} - 1 ))
     done
