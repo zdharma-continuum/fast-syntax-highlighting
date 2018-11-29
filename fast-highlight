@@ -1152,7 +1152,7 @@ typeset -ga ZLAST_COMMANDS
       (( __start=${_mybuf%%;*}-__PBUFLEN, __end=${_mybuf##*;}-__PBUFLEN, __start >= 0 )) && \
         reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${__tmp}recursive-base]}")
       # Pass authentic buffer for recursive analysis
-      -fast-highlight-process "$PREBUFFER" ${__buf[${_mybuf%%;*},${_mybuf##*;}]} $(( ${_mybuf%%;*} - 1 ))
+      -fast-highlight-process "$PREBUFFER" "${__buf[${_mybuf%%;*},${_mybuf##*;}]}" $(( ${_mybuf%%;*} - 1 ))
     done
     # Restore theme
     (( __idx )) && FAST_THEME_NAME=$__tmp
