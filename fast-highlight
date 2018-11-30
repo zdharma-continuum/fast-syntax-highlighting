@@ -68,7 +68,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[path-to-dir]:=fg=magenta,underline}
 : ${FAST_HIGHLIGHT_STYLES[path_pathseparator]:=}
 : ${FAST_HIGHLIGHT_STYLES[globbing]:=fg=blue,bold}
-: ${FAST_HIGHLIGHT_STYLES[globbing-ext]:=fg=blue,bold}
+: ${FAST_HIGHLIGHT_STYLES[globbing-ext]:=fg=13}
 : ${FAST_HIGHLIGHT_STYLES[history-expansion]:=fg=blue,bold}
 : ${FAST_HIGHLIGHT_STYLES[single-hyphen-option]:=fg=cyan}
 : ${FAST_HIGHLIGHT_STYLES[double-hyphen-option]:=fg=cyan}
@@ -91,8 +91,8 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[for-loop-number]:=fg=magenta}
 : ${FAST_HIGHLIGHT_STYLES[for-loop-separator]:=fg=yellow,bold}
 : ${FAST_HIGHLIGHT_STYLES[here-string-tri]:=fg=yellow}
-: ${FAST_HIGHLIGHT_STYLES[here-string-text]:=bg=blue}
-: ${FAST_HIGHLIGHT_STYLES[here-string-var]:=fg=cyan,bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[here-string-text]:=bg=18}
+: ${FAST_HIGHLIGHT_STYLES[here-string-var]:=fg=cyan,bg=18}
 : ${FAST_HIGHLIGHT_STYLES[case-input]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[case-parentheses]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[case-condition]:=bg=blue}
@@ -103,9 +103,10 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[single-sq-bracket]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[double-sq-bracket]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[double-paren]:=fg=yellow}
-: ${FAST_HIGHLIGHT_STYLES[correct-subtle]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[correct-subtle]:=fg=12}
 : ${FAST_HIGHLIGHT_STYLES[incorrect-subtle]:=fg=red}
-: ${FAST_HIGHLIGHT_STYLES[subtle-bg]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[subtle-bg]:=bg=18}
+: ${FAST_HIGHLIGHT_STYLES[secondary]:=}
 fi
 
 # This can overwrite some of *_STYLES fields
