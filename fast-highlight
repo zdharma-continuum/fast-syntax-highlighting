@@ -103,6 +103,9 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[single-sq-bracket]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[double-sq-bracket]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[double-paren]:=fg=yellow}
+: ${FAST_HIGHLIGHT_STYLES[correct-subtle]:=bg=blue}
+: ${FAST_HIGHLIGHT_STYLES[incorrect-subtle]:=fg=red}
+: ${FAST_HIGHLIGHT_STYLES[subtle-bg]:=bg=blue}
 fi
 
 # This can overwrite some of *_STYLES fields
