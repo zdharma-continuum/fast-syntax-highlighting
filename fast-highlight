@@ -703,7 +703,7 @@ typeset -ga ZLAST_COMMANDS
                         elif (( __arg_type == 3 )); then
                           # This highlights empty commands (semicolon follows nothing) as an error.
                           # Zsh accepts them, though.
-                          (( this_word & 2 )) && __style=${FAST_THEME_NAME}commandseparator
+                          (( this_word & 3 )) && __style=${FAST_THEME_NAME}commandseparator
                         elif [[ $__arg[1,2] == '((' ]]; then
                           # Arithmetic evaluation.
                           #
