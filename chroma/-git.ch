@@ -74,7 +74,17 @@ else
             # as they aren't paths and aren't handled in any special way there
         elif (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
             FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
-            FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
+
+            # Check if the command is an alias - we want to highlight the
+            # aliased command just like the target command of the alias
+            -fast-run-command "git alias $__wrd" chroma-git-alias-list-"$__wrd" "" 10
+            __lines_list=( ${(M)__lines_list[@]:#${__wrd}[[:space:]]#=*} )
+
+            if (( ${#__lines_list} > 0 )); then
+                FAST_HIGHLIGHT[chroma-git-subcommand]="${${${__lines_list[1]#*=}##[[:space:]]##}%%[[:space:]]##*}"
+            else
+                FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
+            fi
             if (( __start_pos >= 0 )); then
                 # if subcommand exists
                 -fast-run-command "git help -a" chroma-git-subcmd-list "" 10
