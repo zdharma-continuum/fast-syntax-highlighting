@@ -90,7 +90,7 @@ else
                 if (( ${#__lines_list} > 0 )); then
                     __style=${FAST_THEME_NAME}subcommand
                 else
-                    -fast-run-command "git alias" chroma-git-alias-list "" 10
+                    -fast-run-command "git alias $__wrd" chroma-git-alias-list-"$__wrd" "" 10
                     __lines_list=( ${(M)__lines_list[@]:#${__wrd}[[:space:]]#=*} )
                     if (( ${#__lines_list} > 0 )); then
                         __style=${FAST_THEME_NAME}subcommand
