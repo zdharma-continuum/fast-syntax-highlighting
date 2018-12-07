@@ -115,7 +115,7 @@ _zsh_highlight()
         local needle=$'\n'
         integer min max
         if (( MARK > CURSOR )) ; then
-          min=$CURSOR max=$MARK
+          min=$CURSOR max=$(( MARK + 1 ))
         else
           min=$MARK max=$CURSOR
         fi
