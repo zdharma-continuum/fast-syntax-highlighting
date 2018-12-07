@@ -77,7 +77,7 @@ else
 
             # Check if the command is an alias - we want to highlight the
             # aliased command just like the target command of the alias
-            -fast-run-command "git alias $__wrd" chroma-git-alias-list-"$__wrd" "" 10
+            -fast-run-command "git alias" chroma-git-alias-list "" 10
             __lines_list=( ${(M)__lines_list[@]:#${__wrd}[[:space:]]#=*} )
 
             if (( ${#__lines_list} > 0 )); then
@@ -100,7 +100,7 @@ else
                 if (( ${#__lines_list} > 0 )); then
                     __style=${FAST_THEME_NAME}subcommand
                 else
-                    -fast-run-command "git alias $__wrd" chroma-git-alias-list-"$__wrd" "" 10
+                    -fast-run-command "git alias" chroma-git-alias-list "" 10
                     __lines_list=( ${(M)__lines_list[@]:#${__wrd}[[:space:]]#=*} )
                     if (( ${#__lines_list} > 0 )); then
                         __style=${FAST_THEME_NAME}subcommand
