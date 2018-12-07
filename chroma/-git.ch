@@ -226,7 +226,7 @@ else
                         if (( __idx1 == 2 )) || \
                             [[ "$__idx1" = 3 && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]]; then
                             # if is ref
-                            if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
+                            if command git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
                                 __style=${FAST_THEME_NAME}correct-subtle
                             # if is file and subcommand is checkout or diff
                             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" \

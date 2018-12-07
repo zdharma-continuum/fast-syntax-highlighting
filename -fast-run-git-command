@@ -28,8 +28,8 @@ local -a __response
 
 if [[ -z "${FAST_HIGHLIGHT[$2-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[$2-cache-born-at] )) -gt ${4:-5} ]]; then
     FAST_HIGHLIGHT[$2-cache-born-at]="$EPOCHSECONDS"
-    if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
-        __response=( ${${(f)"$(${(Qz)${1#+}} 2>/dev/null)"}#$3} )
+    if [[ "$(command git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
+        __response=( ${${(f)"$(command ${(Qz)${1#+}} 2>/dev/null)"}#$3} )
         [[ "$1" = "+"* ]] && __lines_list+=( "${__response[@]}" ) || __lines_list=( "${__response[@]}" )
     else
         __lines_list=()

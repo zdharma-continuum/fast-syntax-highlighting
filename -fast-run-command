@@ -21,7 +21,7 @@ typeset -ga __lines_list
 
 if [[ -z "${FAST_HIGHLIGHT[$2-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[$2-cache-born-at] )) -gt ${4:-5} ]]; then
     FAST_HIGHLIGHT[$2-cache-born-at]="$EPOCHSECONDS"
-    __lines_list=( ${${(f)"$(${(Qz)1} 2>/dev/null)"}#$3} )
+    __lines_list=( ${${(f)"$(command ${(Qz)1} 2>/dev/null)"}#$3} )
     FAST_HIGHLIGHT[$2-cache]="${(j:;:)__lines_list};"
 else
     __lines_list=( "${(s:;:)FAST_HIGHLIGHT[$2-cache]}" )
