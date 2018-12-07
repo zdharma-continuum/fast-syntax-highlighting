@@ -86,12 +86,12 @@ else
                 # that breaks the concaetnated string back into array in case
                 # of double-quoting has additional effect for s-flag: it
                 # finally blocks empty-elements eradication.
-                __lines_list=( ${(M)${(s: :)${(M)__lines_list:#  [a-z]*}}:#$__wrd} )
+                __lines_list=( ${(M)${(s: :)${(M)__lines_list[@]:#  [a-z]*}}:#$__wrd} )
                 if (( ${#__lines_list} > 0 )); then
                     __style=${FAST_THEME_NAME}subcommand
                 else
                     -fast-run-command "git alias" chroma-git-alias-list "" 10
-                    __lines_list=( ${(M)__lines_list:#${__wrd}[[:space:]]#=*} )
+                    __lines_list=( ${(M)__lines_list[@]:#${__wrd}[[:space:]]#=*} )
                     if (( ${#__lines_list} > 0 )); then
                         __style=${FAST_THEME_NAME}subcommand
                     else
