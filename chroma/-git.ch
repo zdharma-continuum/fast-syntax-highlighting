@@ -77,11 +77,16 @@ else
 
             # Check if the command is an alias - we want to highlight the
             # aliased command just like the target command of the alias
-            -fast-run-command "git alias" chroma-git-alias-list "" 10
-            __lines_list=( ${(M)__lines_list[@]:#${__wrd}[[:space:]]#=*} )
+            -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" 10
+            # Grep for line: alias.{user-entered-subcmd}[[:space:]], and remove alias. prefix
+            __lines_list=( ${${(M)__lines_list[@]:#alias.${__wrd}[[:space:]]##*}#alias.} )
 
             if (( ${#__lines_list} > 0 )); then
-                FAST_HIGHLIGHT[chroma-git-subcommand]="${${${__lines_list[1]#*=}##[[:space:]]##}%%[[:space:]]##*}"
+                # First remove alias name (#*[[:space:]]) and the space after it, then
+                # remove any leading spaces from what's left (##[[:space:]]##), then
+                # remove everything except the first word that's in the left line
+                # (%%[[:space:]]##*, i.e.: "everything from right side up to any space")
+                FAST_HIGHLIGHT[chroma-git-subcommand]="${${${__lines_list[1]#*[[:space:]]}##[[:space:]]##}%%[[:space:]]##*}"
             else
                 FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
             fi
@@ -100,8 +105,9 @@ else
                 if (( ${#__lines_list} > 0 )); then
                     __style=${FAST_THEME_NAME}subcommand
                 else
-                    -fast-run-command "git alias" chroma-git-alias-list "" 10
-                    __lines_list=( ${(M)__lines_list[@]:#${__wrd}[[:space:]]#=*} )
+                    -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" 10
+                    # Does a line match alias.{user-entered-subcmd}[[:space:]] ?
+                    __lines_list=( ${(M)__lines_list[@]:#alias.${__wrd}[[:space:]]##*} )
                     if (( ${#__lines_list} > 0 )); then
                         __style=${FAST_THEME_NAME}subcommand
                     else
