@@ -54,7 +54,11 @@ local -a __results
             if [[ "${FAST_HIGHLIGHT[chroma-scp-counter]}" -eq 1 ]]; then
                 if [[ "$__arg" = [^:]##:[0-9]## ]]; then
                     FAST_HIGHLIGHT[chroma-scp-message]+="Format of hostname incorrect, use -P to pass port number"
+                else
+                    return 1
                 fi
+            else
+                return 1
             fi
         fi
     fi
