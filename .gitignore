@@ -1,5 +1,6 @@
 current_theme.zsh
 secondary_theme.zsh
+theme_overlay.zsh
 *.txt
 test/out.parse
 test/res
