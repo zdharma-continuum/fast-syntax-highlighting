@@ -93,7 +93,7 @@ else
             fi
             if (( __start_pos >= 0 )); then
                 # if subcommand exists
-                -fast-run-command "git help -a" chroma-git-subcmd-list "" $(( 5 * 60 ))
+                LANG=C -fast-run-command "git help -a" chroma-git-subcmd-list "" $(( 5 * 60 ))
                 # (s: :) will split on every space, but because the expression
                 # isn't double-quoted, the empty elements will be eradicated
                 # Some further knowledge-base: s-flag is special, it skips
