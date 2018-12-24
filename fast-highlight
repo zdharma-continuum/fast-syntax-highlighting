@@ -180,8 +180,8 @@ FAST_HIGHLIGHT+=(
   chroma-ssh        chroma/-ssh.ch
 
   chroma-git        chroma/-git.ch
-  chroma-hub        chroma/-git.ch
-  chroma-lab        chroma/-git.ch
+  chroma-hub        chroma/-hub.ch
+  chroma-lab        chroma/-lab.ch
 
   chroma-egrep      chroma/-grep.ch
   chroma-fgrep      chroma/-grep.ch
