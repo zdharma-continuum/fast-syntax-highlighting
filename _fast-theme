@@ -20,7 +20,7 @@ arguments=(
 )
 
 typeset -a themes
-themes=( "$FAST_BASE_DIR"/themes/*.ini(:t:r) )
+themes=( "$FAST_WORK_DIR"/themes/*.ini(:t:r) )
 
 _wanted themes expl "Themes" \
     compadd "$@" -a - themes && ret=0

@@ -45,9 +45,8 @@ local -a deserialized
     [[ "$__wrd" != ")" ]] && {
         deserialized=( "${(Q@)${(z@)FAST_HIGHLIGHT[chroma-fpath_peq-elements]}}" )
         [[ -z "${deserialized[1]}" && ${#deserialized} -eq 1 ]] && deserialized=()
-        # Support ~ and $VAR, for [a-ZA-Z_] characters in "VAR",
-        # this probably misses 1 or 2 possible characters
-        deserialized+=( "${(Q)${${(j: :)__wrd}//(#b)((\$[a-zA-Z_]##)|(#s)~)/${(P)${${${match[1]#\$}:#\~}:-HOME}}}}" )
+        # Support ~ and $VAR, for [a-zA-Z_][a-ZA-Z0-9_]# characters in "VAR"
+        deserialized+=( "${(Q)${${(j: :)__wrd}//(#b)((\$([0-9]##|[a-zA-Z_][a-zA-Z0-9_]#))|(\$\{([0-9]##|[a-zA-Z_][a-zA-Z0-9_]#)\})|(#s)~)/${(P)${${${${match[1]##\$\{(#c0,1)}%\}}:#\~}:-HOME}}}}" )
         FAST_HIGHLIGHT[chroma-fpath_peq-elements]="${(j: :)${(q@)deserialized}}"
     }
 
