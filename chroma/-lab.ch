@@ -1,4 +1,8 @@
 # vim:ft=zsh:et:sw=4
+#
+# The `lab' tool after which this chroma is modeled after:
+# https://github.com/zaquestion/lab
+#
 (( next_word = 2 | 8192 ))
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 
