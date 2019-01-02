@@ -214,7 +214,7 @@ else
                     fi
                 # if before --
                 elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
-                    if [[ "$__wrd" = "-m" ]]; then
+                    if [[ "$__wrd" = -[^-]#m ]]; then
                         FAST_HIGHLIGHT[chrome-git-got-msg1]=1
                         __style=${FAST_THEME_NAME}single-hyphen-option
                     else
