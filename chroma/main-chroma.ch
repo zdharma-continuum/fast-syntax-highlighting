@@ -182,6 +182,8 @@ chroma/main-create-OPTION-hash.ch() {
         print -l -- "[F2 option-hash] Got split of an ||-part:" "${${__sp[@]}[@]/(#s)/\\t}" "^^^^^^^^^^^^" >> /tmp/reply
         __e="${__sp[1]}"
         __s=( "${(@s:|:)${${__e#\(}%\)}}" )
+        [[ ${#__s} -eq 1 && -z "${__s[1]}" ]] && __s=()
+        __s=( "${__s[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
         shift __sp
 
         for __ in $__s; do
