@@ -32,7 +32,7 @@ chroma_def=(
                     <<>> NO-OP // NO-OP"
 
 
-    "subcommands" "::-chroma-git-get-subcommands" # run a function (the :: causes this) and use `reply'
+    "subcommands" "::chroma/-git-get-subcommands.ch" # run a function (the :: causes this) and use `reply'
 
     # `fetch'
     "subcmd:fetch" "G_0_opt^ // D_0_opt // D_1_arg // D_2_arg"
@@ -152,12 +152,40 @@ chroma_def=(
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 print -rl -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@ >> /tmp/reply
 print -r -- @@@@@@@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4" @@@@@@@ >> /tmp/reply
-local __style __entry __value __action __handler __tmp __hspaces=$'\t ' __nl=$'\n'
+local __style __entry __value __action __handler __tmp __svalue __hspaces=$'\t ' __nl=$'\n'
 integer __idx1 __idx2 __ivalue __have_value=0
 local -a __lines_list chroma_git_remote_subcommands __avalue
 local -A map
 map=( "#" "H" "^" "D" )
 chroma_git_remote_subcommands=(add rename remove set-head set-branches get-url set-url set-url set-url show prune update)
+
+chroma/-git-get-subcommands.ch() {
+    LANG=C -fast-run-command "git help -a" chroma-${FAST_HIGHLIGHT[chroma-current]}-subcmd-list "" $(( 15 * 60 ))
+    if [[ "${__lines_list[1]}" = See* ]]; then
+        # (**)
+        # git >= v2.20, the aliases in the `git help -a' command
+        __lines_list=( ${${${${(M)__lines_list[@]:#([[:space:]][[:space:]]#[a-z]*|Command aliases)}##[[:space:]]##}//Command\ aliases/Command_aliases}} )
+        __svalue="+${__lines_list[(I)Command_aliases]}"
+        __lines_list[1,__svalue-1]=( ${(@)__lines_list[1,__svalue-1]%%[[:space:]]##*} )
+    else
+        # (**)
+        # git < v2.20, add aliases through extra code
+        __lines_list=( ${(s: :)${(M)__lines_list[@]:#  [a-z]*}} )
+
+        __svalue=${#__lines_list}
+        # This allows to check if the command is an alias - we want to
+        # highlight the aliased command just like the target command of
+        # the alias
+        -fast-run-command "+git config --get-regexp 'alias.*'" chroma-${FAST_HIGHLIGHT[chroma-current]}-alias-list "[[:space:]]#alias." $(( 15 * 60 ))
+    fi
+
+    __tmp=${#__lines_list}
+    typeset -ga chroma__git__aliases
+    chroma__git__aliases=( ${__lines_list[__svalue+1,__tmp]} )
+    [[ ${__lines_list[__svalue]} != "Command_aliases" ]] && (( ++ __svalue, __ivalue=0, 1 )) || (( __ivalue=1 ))
+    __lines_list[__svalue,__tmp]=( ${(@)__lines_list[__svalue+__ivalue,__tmp]%%[[:space:]]##*} )
+    reply=( "${__lines_list[@]}" )
+}
 
 chroma/main-create-OPTION-hash.ch() {
     local __subcmd="$1" __option_set_id="$2" __the_hash_name="$3" __ __e __el __the_hash_name __var_name
@@ -350,11 +378,21 @@ chroma/-pre_process_chroma_def.ch() {
 
     print -rl -- "Starting PRE-PROCESS for __the_hash_name:$__the_hash_name" >> /tmp/reply
 
+    local __subcmds="${chroma_def[subcommands]}"
+    if [[ "$__subcmds" = "::"* ]]; then
+        ${__subcmds#::}
+        __var_name="${__the_hash_name}[subcommands]"
+        : ${(P)__var_name::=(${(j:|:)reply})}
+    else
+        __var_name="${__the_hash_name}[subcommands]"
+        : ${(P)__var_name::=$__subcmds}
+    fi
+    print "Got the SUBCOMMANDS: ${(P)__var_name}" >> /tmp/reply
+
     for __key in "${(@)chroma_def[(I)subcmd:*]}"; do
         __split=( "${(@s:|:)${${__key##subcmd:\((#c0,1)}%\)}}" )
         [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
         __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
-        typeset -gA "$__the_hash_name"
         for __ke in "${__split[@]}"; do
             __var_name="${__the_hash_name}[subcmd:$__ke]"
             : ${(P)__var_name::=${chroma_def[$__key]}}
@@ -375,7 +413,8 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]=""
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]=""
     __the_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
-    (( 0 == ${(P)+__the_hash_name} )) && chroma/-pre_process_chroma_def.ch "$__the_hash_name" || print "...No..." >> /tmp/reply
+    (( 0 == ${(P)+__the_hash_name} )) && { typeset -gA "$__the_hash_name"; chroma/-pre_process_chroma_def.ch "$__the_hash_name" } || print "...No... [\$+var: ${(P)+__the_hash_name}]" >> /tmp/reply
+    FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-aliases-start-at]="-1"
     return 1
 else
     (( ++ FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr] ))
@@ -399,66 +438,13 @@ else
         if (( in_redirection > 0 )); then
             return 1
         elif (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand] == 0 )); then
-            FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]=1
-            print "Here 16, got-subcommand := 1, subcmd verification" >> /tmp/reply
-
-            # Check if the command is an alias - we want to highlight the
-            # aliased command just like the target command of the alias
-            -fast-run-command "git config --get-regexp 'alias.*'" chroma-${FAST_HIGHLIGHT[chroma-current]}-alias-list "" $(( 5 * 60 ))
-            # Grep for line: alias.{user-entered-subcmd}[[:space:]], and remove alias. prefix
-            __lines_list=( ${${(M)__lines_list[@]:#alias.${__wrd}[[:space:]]##*}#alias.} )
-
-            if (( ${#__lines_list} > 0 )); then
-                # (*)
-                # First remove alias name (#*[[:space:]]) and the space after it, then
-                # remove any leading spaces from what's left (##[[:space:]]##), then
-                # remove everything except the first word that's in the left line
-                # (%%[[:space:]]##*, i.e.: "everything from right side up to any space")
-                FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="${${${__lines_list[1]#*[[:space:]]}##[[:space:]]##}%%[[:space:]]##*}"
-            else
+            __the_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
+            __var_name="${__the_hash_name}[subcommands]"
+            if [[ "$__wrd" = ${(P)~__var_name} ]]; then
+                print "Here 16, got-subcommand :=, subcmd verification / OK" >> /tmp/reply
+                FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]=1
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="$__wrd"
             fi
-
-            if (( __start_pos >= 0 )); then
-                # if subcommand exists
-                LANG=C -fast-run-command "git help -a" chroma-${FAST_HIGHLIGHT[chroma-current]}-subcmd-list "" $(( 5 * 60 ))
-                # (s: :) will split on every space, but because the expression
-                # isn't double-quoted, the empty elements will be eradicated
-                # Some further knowledge-base: s-flag is special, it skips
-                # empty elements and creates an array (not a concatenated
-                # string) even when double-quoted. The normally needed @-flag
-                # that logically breaks the concaetnated string back into array
-                # in case of double-quoting has additional effect for s-flag:
-                # it finally blocks empty-elements eradication.
-                if [[ "${__lines_list[1]}" = See* ]]; then
-                    # (**)
-                    # git >= v2.20
-                    __lines_list=( ${(M)${${${(M)__lines_list[@]:# [[:space:]]#[a-z]*}##[[:space:]]##}%%[[:space:]]##*}:#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}} )
-                else
-                    # (**)
-                    # git < v2.20
-                    __lines_list=( ${(M)${(s: :)${(M)__lines_list[@]:#  [a-z]*}}:#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}} )
-                fi
-
-                # Above we've checked:
-                # 1) If given subcommand is an alias (*)
-                # 2) If the command, or command pointed by the alias, exists (**)
-                # 3) There's little problem, git v2.20 outputs aliases in git help -a,
-                #    which means that alias will be recognized as correct if it will
-                #    point at another alias or on itself. That's a minor problem, a
-                #    TODO for future planned optimization for v2.20 Git
-                # 4) Notice that the above situation is better than the previous - the
-                #    alias is being verified to point to a valid git subcommand
-                # That's all that's needed to decide on the correctnes:
-                if (( ${#__lines_list} > 0 )); then
-                    __style=${FAST_THEME_NAME}subcommand
-
-                else
-                    __style=${FAST_THEME_NAME}incorrect-subtle
-                fi
-            fi
-            # The counter includes the subcommand itself
-            (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter] += 1 ))
         else
             __wrd="${__wrd//\`/x}"
             __arg="${__arg//\`/x}"
