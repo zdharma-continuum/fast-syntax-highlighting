@@ -164,7 +164,7 @@ chroma/main-create-OPTION-hash.ch() {
     print -rl "======================" "  **## STARTING ##** chroma/main-##CREATE##-option-HASH.ch // subcmd:$__subcmd // option_set_id:$__option_set_id // h-nam:$__the_hash_name" >> /tmp/reply
     print "[D] Got option-set: ${(j:,:)__option_set_id}" >> /tmp/reply
     typeset -gA "$__the_hash_name"
-    print "[E] __the_hash_name [$__the_hash_name]/[$__option_set_id]" >> /tmp/reply
+    print "[E] __the_hash_name ${__the_hash_name}:[$__option_set_id]" >> /tmp/reply
 
     # Split on ||
     __split=( "${(@s:||:)chroma_def[${__option_set_id}]}" )
@@ -198,11 +198,15 @@ chroma/main-create-OPTION-hash.ch() {
 }
 
 chroma/main-process-token.ch() {
-    local __subcmd="$1" __wrd="$2" __val __var_name __the_hash_name __i __size
+    local __subcmd="$1" __wrd="$2" __val __var_name __main_hash_name __the_hash_name __i __size
     local -a __splitted __split __added
+    local -A map
+    map=( "#" "H" "^" "D" )
 
     print "\n*Starting* chroma/main-process-token // subcmd:${(qq)__subcmd}" >> /tmp/reply
-    __splitted=( "${(@s://:)my_chroma_def[subcmd:$__subcmd]}" )
+    __main_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
+    __var_name="${__main_hash_name}[subcmd:$__subcmd]"
+    __splitted=( "${(@s://:P)__var_name}" )
     [[ ${#__splitted} -eq 1 && -z "${__splitted[1]}" ]] && __splitted=()
     __splitted=( "${__splitted[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
 
@@ -318,8 +322,6 @@ chroma/main-process-token.ch() {
         __var_name="${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}"
         FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]=""
         __split=( "${(@s://:P)__var_name}" )
-        [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
-
         [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && { print -rl "NULL at __tmp[$__tmp]" >> /tmp/reply; __split=(); }
         __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
 
@@ -338,19 +340,24 @@ chroma/main-process-token.ch() {
             [[ "$__have_value" -eq 2 && -n "$__value" && "$__value" != "NO-OP" ]] && { print -rl "Running action (of 1, at 2): $__value" >> /tmp/reply; eval "$__value"; }
         fi
     fi
-    print -- "################## Exiting chroma/main-process-token.ch $__subcmd ##################" >> /tmp/reply
+    print -- "############### Exiting chroma/main-process-token.ch $__subcmd / $__wrd ###############" >> /tmp/reply
 }
 
 chroma/-pre_process_chroma_def.ch() {
-    local __key __value __ke _val
+    local __key __value __ke _val __the_hash_name __var_name
     local -a __split
+    local -A map
+    map=( "#" "H" "^" "D" )
+    __the_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
     for __key in "${(@)chroma_def[(I)subcmd:*]}"; do
         __split=( "${(@s:|:)${${__key##subcmd:\((#c0,1)}%\)}}" )
         [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
         __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
+        typeset -gA "$__the_hash_name"
         for __ke in "${__split[@]}"; do
-            my_chroma_def[subcmd:$__ke]=${chroma_def[$__key]}
-            print -rl -- "Storred my_chroma_def[subcmd:$__ke]=chroma_def[$__key], i.e. = ${chroma_def[$__key]}" >> /tmp/reply
+            __var_name="${__the_hash_name}[subcmd:$__ke]"
+            : ${(P)__var_name::=${chroma_def[$__key]}}
+            print -rl -- "Storred ${__var_name}=chroma_def[$__key], i.e. = ${chroma_def[$__key]}" >> /tmp/reply
         done
     done
 }
@@ -366,7 +373,6 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]=1
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]=""
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]=""
-    typeset -gA my_chroma_def
     chroma/-pre_process_chroma_def.ch
     return 1
 else
@@ -377,7 +383,7 @@ else
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
 
-    echo "== @@ Starting @@ #${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]} Main-Chroma-call == // __wrd:$__wrd ## GOT-SUBCOMMAND:${(qq)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]} //@@// -n option-with-arg-active:${(q-)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" >> /tmp/reply
+    echo "== @@ Starting @@ #${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]} Main-Chroma-call == // << __WORD :$__wrd >> ## GOT-SUBCOMMAND:${(qq)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]} //@@// -n option-with-arg-active:${(q-)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" >> /tmp/reply
     if [[ "$__wrd" = -*  || -n "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}"
     ]]; then
         echo "Here A ## The \`if -*' branch" >> /tmp/reply
