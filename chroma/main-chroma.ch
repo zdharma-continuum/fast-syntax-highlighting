@@ -346,11 +346,11 @@ chroma/main-process-token.ch() {
 }
 
 chroma/-pre_process_chroma_def.ch() {
-    local __key __value __ke _val __the_hash_name __var_name
+    local __key __value __ke _val __the_hash_name="$1" __var_name
     local -a __split
-    local -A map
-    map=( "#" "H" "^" "D" )
-    __the_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
+
+    print -rl -- "Starting PRE-PROCESS for __the_hash_name:$__the_hash_name" >> /tmp/reply
+
     for __key in "${(@)chroma_def[(I)subcmd:*]}"; do
         __split=( "${(@s:|:)${${__key##subcmd:\((#c0,1)}%\)}}" )
         [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
@@ -375,7 +375,8 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]=1
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]=""
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]=""
-    chroma/-pre_process_chroma_def.ch
+    __the_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
+    (( 0 == ${(P)+__the_hash_name} )) && chroma/-pre_process_chroma_def.ch "$__the_hash_name" || print "...No..." >> /tmp/reply
     return 1
 else
     (( ++ FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr] ))
