@@ -22,13 +22,13 @@ chroma_def=(
     "F_0_opt" "(-C|--exec-path=|--git-dir=|--work-tree=)
                    <<>> return 1 // ::-some-chroma-handler
                    <<>> print 'Im here' >> /tmp/reply // ::-std-ch-+x-dir-path-verify
-            || -c 
+            || -c
                     <<>> NO-OP // ::-chroma-git-a-handler
                     <<>> echo ABCD =========== >> /tmp/reply // ::-chroma-git-verify-config-assign
-            || --namespace= 
-                    <<>> return 1 // NO-OP 
+            || --namespace=
+                    <<>> return 1 // NO-OP
                     <<>> echo Hello ============ >> /tmp/reply // NO-OP
-            || (--version|--help|--html-path|--man-path|--info-path|-p|--paginate|--no-pager|--no-replace-objects|--bare) 
+            || (--version|--help|--html-path|--man-path|--info-path|-p|--paginate|--no-pager|--no-replace-objects|--bare)
                     <<>> NO-OP // NO-OP"
 
 
@@ -112,7 +112,7 @@ chroma_def=(
     "R-*1-opt:-b" "return 1 // ::-chroma-got--b" # mandatory (the *) -b option, occuring at 1st position
     "R_1_arg" "// ::-chroma-git-rev-averify"     # *-averify -> opposite functioning - exists -> incorrect, !exists -> correct
 
-    
+
     # OR (main form of the checkout command)
     "S_1_arg" "// ::(-chroma-git-rev-verify||-chroma-git-remote-rev-verify||-std-ch-path-verify)"
 
@@ -226,7 +226,6 @@ chroma/main-process-token.ch() {
         if [[ "$__wrd" = -* ]]; then
             print "1st-PATH (-z opt-with-arg-active, non-opt-arg branch, i.e. OPTION BRANCH) [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]" >> /tmp/reply
             for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
-                            
                 [[ "${__val}" != "${__val[1]}"_${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}_opt(\*|\^|) && "${__val}" != "${__val[1]}"_"#"_opt(\*|\^|) ]] && { print "DIDN'T MATCH $__val / arg counter:${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply;  continue; } || print "Got candidate: $__val" >> /tmp/reply
                 # Create the hash cache-parameter if needed
                 __the_hash_name="chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//\#/H}//[^a-zA-Z0-9_]/_}"
@@ -670,7 +669,7 @@ else
                         fi
                     else
                         case "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" in
-                            (-u|-m) 
+                            (-u|-m)
                                 __style=${FAST_THEME_NAME}optarg-string
                                 ;;
                             (-F)
