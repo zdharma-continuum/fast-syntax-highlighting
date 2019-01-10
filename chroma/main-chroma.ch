@@ -159,6 +159,15 @@ local -A map
 map=( "#" "H" "^" "D" )
 chroma_git_remote_subcommands=(add rename remove set-head set-branches get-url set-url set-url set-url show prune update)
 
+chroma/-git-check-if-alias.ch() {
+    local __wrd="$1" __subcmd="$2"
+    local -a __result
+
+    typeset -ga chroma__git__aliases
+    __result=( ${(M)chroma__git__aliases[@]:#${__wrd}[[:space:]]##*} )
+    print "Got __result: $__result" >> /tmp/reply
+}
+
 chroma/-git-get-subcommands.ch() {
     LANG=C -fast-run-command "git help -a" chroma-${FAST_HIGHLIGHT[chroma-current]}-subcmd-list "" $(( 15 * 60 ))
     if [[ "${__lines_list[1]}" = See* ]]; then
