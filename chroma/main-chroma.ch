@@ -341,7 +341,7 @@ chroma/main-process-token.ch() {
                 __action="${__split[1]}"
                 print -rl -- "Got action record for $__val, i.e. the split:" "${__split[@]}" "^^^^^^^^^^^^^^^^^^^^^" >> /tmp/reply
                 [[ "${__split[2]}" = ::[^[:space:]]* ]] && __handler="${__split[2]#::}" || { [[ "$__handler" != "NO-OP" && -n "$__handler" ]] && print "Error in chroma definition: a handler entry ${(q)__split[2]} without leading \`::'"; }
-                [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(3): $__handler" >> /tmp/reply; "$__handler"; }
+                [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(3): $__handler" >> /tmp/reply; "$__handler" "$__wrd" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}"; }
                 [[ -n "$__action" && "$__action" != "NO-OP" ]] && { print -rl -- "Running action(3): $__action" >> /tmp/reply; eval "$__action"; }
                 [[ "$__val" != *\* ]] && break
             done
@@ -436,13 +436,9 @@ else
     echo "== @@ Starting @@ #${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]} Main-Chroma-call == // << __WORD:$__wrd >> ## GOT-SUBCOMMAND:${(qq)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]} //@@// -n option-with-arg-active:${(q-)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" >> /tmp/reply
     if [[ "$__wrd" = -*  || -n "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}"
     ]]; then
-        echo "Here A ## The \`if -*' branch" >> /tmp/reply
+        echo "Here A ## The \`if -*' MAIN branch" >> /tmp/reply
         chroma/main-process-token.ch "${${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}:-NULL}" "$__wrd"
     else
-        print -n "Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply
-        (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand] == 1 )) && (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] += 1 ))
-        print -r -- " -> ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply
-        echo "Here 14, ARGUMENT ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply
         # If at e.g. '>' or destination/source spec (of the redirection)
         if (( in_redirection > 0 )); then
             return 1
@@ -450,14 +446,23 @@ else
             __the_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
             __var_name="${__the_hash_name}[subcommands]"
             if [[ "$__wrd" = ${(P)~__var_name} ]]; then
-                print "Here 16, got-subcommand :=, subcmd verification / OK" >> /tmp/reply
+                print "Here 16, got-subcommand := $__wrd, subcmd verification / OK" >> /tmp/reply
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]=1
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="$__wrd"
+            else
+                print "Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]} -> $(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] + 1 ))" >> /tmp/reply
+                (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] += 1 ))
+                echo "Here 14-A, ARGUMENT ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply
             fi
+            chroma/main-process-token.ch "${${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}:-NULL}" "$__wrd"
         else
             __wrd="${__wrd//\`/x}"
             __arg="${__arg//\`/x}"
             __wrd="${(Q)__wrd}"
+
+            print "Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]} -> $(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] + 1 ))" >> /tmp/reply
+            (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] += 1 ))
+            echo "Here 14-B, ARGUMENT ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply
 
             print "Here 15: ELSE *-got-subcommand == 1" >>/tmp/reply
             chroma/main-process-token.ch "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}" "$__wrd"
