@@ -6,24 +6,32 @@
 #
 function -fast-highlight-string-process {
     local -A pos_to_level level_to_pos pair_map final_pairs
-    local input=$1$2 _mybuf=$1$2 __style __quoting
-    integer __idx=0 __pair_idx __level=0 __start __end
+    local input=$1$2 _mybuf=$1$2 __style __quoting __contents __hl_pattern
+    integer __idx=0 __pair_idx __level=0 __start __end __contents_begin
     local -a match mbegin mend
 
+    local -a FAST_HIGHLIGHT_PATTERNS
+    FAST_HIGHLIGHT_PATTERNS=( "sudo" "mv \\* /tmp" )
+    local -a FAST_HIGHLIGHT_PATTERNS_Q
+    FAST_HIGHLIGHT_PATTERNS_Q=( "this" "other *" )
+
     pair_map=( "(" ")" "{" "}" "[" "]" )
+    __contents_begin=0
+    while [[ $_mybuf = (#b)([^"{}()[]\\\"'"]#)((["({[]})\"'"])|[\\](*))(*) ]]; do
+        [[ -n ${match[4]} ]] && {
+            __idx+=${mbegin[2]}
+            __contents+=${match[1]}'\'
 
-    while [[ $_mybuf = (#b)[^"{}()[]\\\"'"]#((["({[]})\"'"])|[\\](*))(*) ]]; do
-        [[ -n ${match[3]} ]] && {
-            __idx+=${mbegin[1]}
-
-            [[ $__quoting = \' ]] && _mybuf=${match[3]} || { _mybuf=${match[3]:1}; (( ++ __idx )); }
+            [[ $__quoting = \' ]] && _mybuf=${match[4]} || { _mybuf=${match[4]:1}; (( ++ __idx )); __contents+=${match[4][1]}; }
         } || {
-            __idx+=${mbegin[1]}
+            __contents+=${match[1]}${match[2]}
+            __idx+=${mbegin[2]}
+            _mybuf=${match[5]}
             [[ -z $__quoting && -z ${_FAST_COMPLEX_BRACKETS[(r)$((__idx-${#PREBUFFER}-1))]} ]] && {
-                if [[ ${match[1]} = ["({["] ]]; then
+                if [[ ${match[2]} = ["({["] ]]; then
                     pos_to_level[$__idx]=$(( ++__level ))
                     level_to_pos[$__level]=$__idx
-                elif [[ ${match[1]} = ["]})"] ]]; then
+                elif [[ ${match[2]} = ["]})"] ]]; then
                     if (( __level > 0 )); then
                         __pair_idx=${level_to_pos[$__level]}
                         pos_to_level[$__idx]=$(( __level -- ))
@@ -37,10 +45,30 @@ function -fast-highlight-string-process {
                 fi
             }
 
-            [[ ${match[1]} = \" && $__quoting != \' ]] && { [[ $__quoting = '"' ]] && __quoting="" || __quoting='"'; }
-            [[ ${match[1]} = \' && $__quoting != \" ]] && { [[ $__quoting = "'" ]] && __quoting="" || __quoting="'"; }
-
-            _mybuf=${match[4]}
+            [[ ${match[2]} = \" && $__quoting != \' ]] && {
+                if [[ $__quoting = '"' ]]; then
+                    for __hl_pattern in ${FAST_HIGHLIGHT_PATTERNS_Q[@]}; do
+                        [[ $__contents = (#b)*(${~__hl_pattern})* ]] && {
+                            (( __start=__contents_begin-${#PREBUFFER}+${mbegin[1]}, __end=__contents_begin-${#PREBUFFER}+${mend[1]}, __start >= 0 )) && \
+                                reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}")
+                        }
+                    done
+                    __quoting=""
+                else
+                    __quoting='"'
+                fi
+                __contents=""
+                __contents_begin=${mbegin[5]}
+            }
+            [[ ${match[2]} = \' && $__quoting != \" ]] && {
+                if [[ $__quoting = "'" ]]; then
+                    __quoting=""
+                else
+                    __quoting="'"
+                fi
+                __contents=""
+                __contents_begin=${mbegin[5]}
+            }
         }
     done
 
