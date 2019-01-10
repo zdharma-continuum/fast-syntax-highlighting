@@ -16,6 +16,7 @@
 (( next_word = 2 | 8192 ))
 
 typeset -gA chroma_def
+#typeset -ga chroma_def_arr
 chroma_def=(
     "subcmd:NULL" "F_0_opt"
     "F_0_opt" "(-C|--exec-path=|--git-dir=|--work-tree=)
@@ -30,56 +31,62 @@ chroma_def=(
             || (--version|--help|--html-path|--man-path|--info-path|-p|--paginate|--no-pager|--no-replace-objects|--bare) 
                     <<>> NO-OP // NO-OP"
 
-    # `push', the one in D_1_opt means: after first argument,
-    # i.e. after subcommand
-    "subcmd:push" "G_0_opt^ // D_0_opt // D_1_arg // D_1_opt // D_#_opt* // D_2_arg*"
-    "D_0_opt" "(-all|--mirror|--tags|--follow-tags|--atomic|-n|--dry-run)
-                   <<>> NO-OP // ::chroma-opt-action
-            || --receive-pack=
-                   <<>> return 1 // ::chroma-opt-action
-                   <<>> return 1 // ::chroma-opt-ARG-action"
 
+    "subcommands" "::-chroma-git-get-subcommands" # run a function (the :: causes this) and use `reply'
+
+    # `fetch'
+    "subcmd:fetch" "G_0_opt^ // D_0_opt // D_1_arg // D_2_arg"
+
+    # Special options (^ - has directives, currently - an :add-directive)
     "G_0_opt^" "
-                --multiple^
-                    <<>> echo I will add option-set D_\\#_arg>> /tmp/reply // ::chroma-occured-multiple
+                --multiple
+                    <<>> echo This is action, it is ran after the handler that follows >> /tmp/reply // ::chroma-occured-multiple-handler-function
                 || --multiple:add
-                    <<>> D_#_arg"
+                    <<>> D_#_arg
+                || --multiple:del
+                    <<>> D_1_arg // D_2_arg" # when --multiple is passed, then there is no
+                                             # refspec argument, only remotes-ids follow
+                                             # unlimited # of them, hence the # in D_#_arg
 
-    "D_#_arg" "NO-OP // ::chroma-git-handle argument"
+    # D_0_opt. D-options (D is an identifier) at position 0 -> before any argument
+    "D_0_opt" "(--all|-a|--mirror|--tags|--follow-tags|--atomic|-n|--dry-run|--unshallow|
+                --update-shallow|--dry-run|-f|--force|-k|--keep|-p|--prune|-n|--no-tags|
+                -t|--tags|--no-recurse-submodules|-u|--update-head-ok|-q|--quiet|-v|--verbose|
+                --progress|-4|--ipv4|-6|--ipv6|--help)
+                   <<>> return 1 // ::chroma-git-opt-action
+           || (--depth=|--deepen=|--shallow-exclude=|--shallow-since=|--receive-pack=|
+               --refmap=|--recurse-submodules=|-j|--jobs=|--submodule-prefix=|--upload-pack|
+               --recurse-submodules-default=)
+                   <<>> return 1 // ::chroma-git-aopt-action
+                   <<>> return 1 // ::chroma-git-aopt-ARG-action"
+                   # Above: note the two //-separated blocks for options that have
+                   # some arguments – the second pair of action/handler is being
+                   # run when an option argument is occurred (first one: the option
+                   # itself)
 
     "D_1_arg" "NO-OP // ::-chroma-remote-verify"
-    "D_2_arg*" "NO-OP // ::-chroma-ref-verify"
-    "D_1_opt" "--signed=
-                   <<>> return 1 >> /tmp/reply // ::chroma-opt-action
-                   <<>> echo 2 >> /tmp/reply // ::chroma-opt-arg-action"
+    "D_2_arg" "NO-OP // ::-chroma-ref-verify"
+    "D_#_arg" "NO-OP // ::-chroma-repo-verify"  # The hash `#' denotes: an argument at any position
+                                               # It will nicely match any following (above the first 2)
+                                               # arguments passed when using --multiple
 
-    "D_#_opt*" "* 
-                <<>> NO-OP // ::chroma-git-pus-pul-fet-option
-            || --force 
-                <<>> print -- --force >> /tmp/reply // non-callback
-                <<>> print -- the option (--force) argument >> /tmp/reply // ::chroma-opt-arg-action
-            || --help
-                <<>> print -- --help >> /tmp/reply // non-callback
-    "
+    # `push'|`pull''
+    "subcmd:(push|pull)" "C_0_opt // C_1_arg // C_2_arg"
 
-    "D_3_arg" "return 1 // NO-OP"
-
-    "subcommands" "::-chroma-git-get-subcommands" # run a function (because of the ::)
-
-    # `push'|`pull'|`fetch'
-    "subcmd:fetch" "X-*1-opt // X-1+-2+-arg || C_0_opt // C_1_arg // C_2_arg"
-    "X-*1-opt:--multiple" "return 1 // ::-chroma-got-multiple" # if --multiple occurs, call -chroma-got-multiple
-    "X-1+-2+-arg" "// ::-chroma-remote-verify"                 # follows an object verified by the function
-
-    # OR
-    "C_0_opt" "return 1 // ::chroma-git-pus-pul-fet-option"
-    "C_1_arg" "// ::-chroma-remote-verify"
-    "C_2_arg" "// ::-chroma-ref-verify"
+    "C_0_opt" "*
+            <<>> return 1 // ::chroma-git-push|pull-option" # a catch-all option entry; it thus doesn't
+                                                            # verify if the option is valid (but the
+                                                            # handler could be still doing this)
+    "C_1_arg" "NO-OP // ::-chroma-remote-verify"
+    "C_2_arg" "NO-OP // ::-chroma-ref-verify"
 
     # `COMMIT'
-    "subcmd:commit" "Y_#_opt_with_arg // Y_#_opt_arg"
-    "Y_#_opt_with_arg:(-m|--message=)" "return 1 // NO-OP"
-    "Y_#_opt_arg" "// ::-chroma-verify-commit-msg"        # after -m's/etc. argument is detected, call the callback
+    "subcmd:commit" "Y_#_opt"
+    "Y_#_opt" "(-m|--message=)
+                        <<>> return 1 // ::chroma-git-aopt-action
+                        <<>> return 1 // ::chroma-git-aopt-ARG-action" # The second <<>>-block enables
+                                                     # the action/handler pair for an option argument
+                                                     # and also in general denotes options with arguments
 
     # `MERGE'
     "subcmd:merge" "E_0_opt_with_arg // E_0_opt_arg // E_1_arg"
@@ -139,6 +146,9 @@ chroma_def=(
                                                   # existence in all refs and all tags
 )
 
+#print -rl "chroma_def_arr element count: ${#chroma_def_arr}" >> /tmp/reply
+#chroma_def=( "${chroma_def_arr[@]}" )
+
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 print -rl -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@ >> /tmp/reply
 print -r -- @@@@@@@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4" @@@@@@@ >> /tmp/reply
@@ -173,8 +183,8 @@ chroma/main-create-OPTION-hash.ch() {
         shift __sp
 
         for __ in $__s; do
-            __=${__%^}
-            [[ "$__" = --*:add ]] && __var_name="${__the_hash_name}[${__}-directive]" || __var_name="${__the_hash_name}[${__}-opt-action]"
+            __=${__%\^}
+            [[ "$__" = --*:(add|del) ]] && __var_name="${__the_hash_name}[${__}-directive]" || __var_name="${__the_hash_name}[${__}-opt-action]"
             print "${(r:55:: :):-${__var_name}} := >>${__sp[1]}${${${#__sp}:#(0|1)}:+ +}<<" >> /tmp/reply
             : ${(P)__var_name::=${__sp[1]}${${${#__sp}:#(0|1)}:+ +}}
 
@@ -192,28 +202,26 @@ chroma/main-process-token.ch() {
     local -a __splitted __split __added
 
     print "\n*Starting* chroma/main-process-token // subcmd:${(qq)__subcmd}" >> /tmp/reply
-    __splitted=( "${(@s://:)chroma_def[subcmd:$__subcmd]}" )
+    __splitted=( "${(@s://:)my_chroma_def[subcmd:$__subcmd]}" )
     [[ ${#__splitted} -eq 1 && -z "${__splitted[1]}" ]] && __splitted=()
     __splitted=( "${__splitted[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
 
-    print "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${(j:, :)__splitted}" >> /tmp/reply
+    print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "//" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})}}:-EMPTY-SET!} ${${(j:, :)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}}:-EMPTY-SET!} >> /tmp/reply
 
     (( ! ${#__splitted} )) && return 1
 
     print -rl -- "------------------------" >> /tmp/reply
     print -rl -- "---NO-HASH-CREATE-NOW---" >> /tmp/reply
     print -rl -- "------------------------" >> /tmp/reply
-    print -rl -- "-z OPT-WITH-ORG-ACTIVE" >> /tmp/reply
+    print -rl -- "-z OPT-WITH-ARG-ACTIVE" >> /tmp/reply
 
     # Options occuring before a subcommand
     if [[ -z "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" ]]; then
         if [[ "$__wrd" = -* ]]; then
             print "1st-PATH (-z opt-with-arg-active, non-opt-arg branch, i.e. OPTION BRANCH) [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]" >> /tmp/reply
-            #for __val in $__splitted; do
-            __size=${#__splitted}
-            for (( __i = 1; __i <= __size; __i ++ )); do
-                __val="${__splitted[__i]}"
-                [[ "${__val}" != "${__val[1]}"_${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}_opt(\*|\^|) && "${__val}" != "${__val[1]}"_"#"_opt(\*|\^|) ]] && { print "DIDN'T MATCH $__val / "arg counter:"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply;  continue; } || print "Got candidate: $__val" >> /tmp/reply
+            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
+                            
+                [[ "${__val}" != "${__val[1]}"_${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}_opt(\*|\^|) && "${__val}" != "${__val[1]}"_"#"_opt(\*|\^|) ]] && { print "DIDN'T MATCH $__val / arg counter:${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply;  continue; } || print "Got candidate: $__val" >> /tmp/reply
                 # Create the hash cache-parameter if needed
                 __the_hash_name="chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//\#/H}//[^a-zA-Z0-9_]/_}"
                 [[ "$__val" = *_opt(\*|\^|) && "${(P)+__the_hash_name}" -eq 0 ]] && chroma/main-create-OPTION-hash.ch "$__subcmd" "$__val" "$__the_hash_name" || echo "[C] No..." >> /tmp/reply
@@ -223,7 +231,7 @@ chroma/main-process-token.ch() {
                 [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
                 # If no result, then try with catch-all entry
                 (( ! ${#__split} )) && {
-                    print "% no ${(q-)${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}-opt-action, retrying with *-opt-action" >> /tmp/reply
+                    print "% no ${(q-)${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}-opt-action, retrying with *-opt-action" "|__var_name|:$__var_name">> /tmp/reply
                     __var_name="${__the_hash_name}[*-opt-action]"
                     __split=( "${(@s://:P)__var_name}" )
                     [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
@@ -251,24 +259,24 @@ chroma/main-process-token.ch() {
                     __handler="${__split[2]%[[:blank:]]+}"
 
                     # Check for directives (like :add)
-                    cat >>/tmp/reply <<END
-if [[ "$__val" = *opt\^ && "$__wrd" = *\^ ]]; then
-END
-                    if [[ "$__val" = *opt\^ && "$__wrd" = *\^ ]]; then
-                        __var_name="${__the_hash_name}[${${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}-add-directive]"
-                        __split=( "${(@s://:P)__var_name}" )
-                        [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
-                        # If no result, then try with catch-all entry
-                        (( ! ${#__split} )) && {
-                            print "% no ${(q-)${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}-opt-action, retrying with *-opt-action" >> /tmp/reply
-                            __var_name="${__the_hash_name}[*-add-directive]"
-                            __split=( "${(@s://:P)__var_name}" )
-                            [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
-                        }
+                    if [[ "$__val" = *opt\^ ]]; then
+                        __var_name="${__the_hash_name}[${${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}:add-directive]"
+                        (( ${(P)+__var_name} )) && __split=( "${(@s://:P)__var_name}" )
+                        [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split[1]=()
+                        __ivalue=${#__split}
+                        __var_name="${__var_name%:add-*}:del-directive]"
+                        (( ${(P)+__var_name} )) && __split+=( "${(@s://:P)__var_name}" )
+                        [[ ${#__split} -eq $(( __ivalue + 1 )) && -z "${__split[__ivalue+1]}" ]] && __split[__ivalue+1]=()
                         __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
-                        if (( ${#__split} )); then
-                            print -rl -- "GOT ADD-DIRECTIVE:" "${__split[#]}"
-                        fi
+                        __tmp=${#__split}
+
+                        # First: del-directive
+                        FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]+="${(j: :)__split[__ivalue+1,__tmp]} "
+
+                        print -rl "__ivalue:$__ivalue, THE __SPLIT[#$__tmp]: " "${__split[@]}" "//" "The FAST_HIGHLIGHT[chroma-*deleted-option-sets]: " ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]} >> /tmp/reply
+
+                        # Second: add-directive
+                        FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]+="${(j: :)__split[1,__ivalue]} "
                     fi
                     [[ "$__handler" = ::[^[:space:]]* ]] && __handler="${__handler#::}" || __handler=""
                     [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(1): $__handler" >> /tmp/reply;  "$__handler"; }
@@ -280,10 +288,7 @@ END
             done
         else
             print "1st-PATH-B (-z opt-with-arg-active, non-opt-arg branch, ARGUMENT BRANCH [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}])" >> /tmp/reply
-            #for __val in $__splitted; do
-            __size=${#__splitted}
-            for (( __i = 1; __i <= __size; __i ++ )); do
-                __val="${__splitted[__i]}"
+            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
                 [[ "${__val}" != "${__val[1]}"_"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}"_arg(\*|\^|) && "${__val}" != "${__val[1]}"_"#"_arg(\*|\^|) ]] && { print "Continuing for $__val" >> /tmp/reply; continue }
                 # Create the hash cache-parameter if needed
                 __the_hash_name="chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//\#/H}//[^a-zA-Z0-9_]/_}"
@@ -293,7 +298,7 @@ END
                 __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
                 __action="${__split[1]}"
                 print -rl -- "Got action record for $__val, i.e. the split:" "${__split[@]}" "^^^^^^^^^^^^^^^^^^^^^" >> /tmp/reply
-                [[ "${__split[2]}" = ::[^[:space:]]* ]] && __handler="${__split[2]#::}" || { [[ "$__handler" != "NO-OP" && -n "$__handler" ]] && print "Error in chroma definition: a handler entry ${(q)split[2]} without leading \`::'"; }
+                [[ "${__split[2]}" = ::[^[:space:]]* ]] && __handler="${__split[2]#::}" || { [[ "$__handler" != "NO-OP" && -n "$__handler" ]] && print "Error in chroma definition: a handler entry ${(q)__split[2]} without leading \`::'"; }
                 [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(3): $__handler" >> /tmp/reply; "$__handler"; }
                 [[ -n "$__action" && "$__action" != "NO-OP" ]] && { print -rl -- "Running action(3): $__action" >> /tmp/reply; eval "$__action"; }
                 [[ "$__val" != *\* ]] && break
@@ -333,7 +338,21 @@ END
             [[ "$__have_value" -eq 2 && -n "$__value" && "$__value" != "NO-OP" ]] && { print -rl "Running action (of 1, at 2): $__value" >> /tmp/reply; eval "$__value"; }
         fi
     fi
-    print -- "######################################################### Exiting chroma/main-process-token.ch $__subcmd" >> /tmp/reply
+    print -- "################## Exiting chroma/main-process-token.ch $__subcmd ##################" >> /tmp/reply
+}
+
+chroma/-pre_process_chroma_def.ch() {
+    local __key __value __ke _val
+    local -a __split
+    for __key in "${(@)chroma_def[(I)subcmd:*]}"; do
+        __split=( "${(@s:|:)${${__key##subcmd:\((#c0,1)}%\)}}" )
+        [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
+        __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
+        for __ke in "${__split[@]}"; do
+            my_chroma_def[subcmd:$__ke]=${chroma_def[$__key]}
+            print -rl -- "Storred my_chroma_def[subcmd:$__ke]=chroma_def[$__key], i.e. = ${chroma_def[$__key]}" >> /tmp/reply
+        done
+    done
 }
 
 if (( __first_call )); then
@@ -345,6 +364,10 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]=""
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-arg]=""
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]=1
+    FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]=""
+    FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]=""
+    typeset -gA my_chroma_def
+    chroma/-pre_process_chroma_def.ch
     return 1
 else
     (( ++ FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr] ))

@@ -179,7 +179,7 @@ FAST_HIGHLIGHT+=(
   chroma-scp        chroma/-scp.ch
   chroma-ssh        chroma/-ssh.ch
 
-  chroma-git        chroma/-git.ch
+  chroma-git        chroma/main-chroma.ch
   chroma-hub        chroma/-hub.ch
   chroma-lab        chroma/-lab.ch
 
@@ -345,7 +345,7 @@ typeset -ga ZLAST_COMMANDS
 -fast-highlight-process()
 {
   emulate -L zsh
-  setopt extendedglob bareglobqual nonomatch noksharrays
+  setopt extendedglob bareglobqual nonomatch noksharrays typesetsilent
 
   [[ $CONTEXT == "select" ]] && return 0
 
