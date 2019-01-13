@@ -18,7 +18,7 @@
 typeset -gA chroma_def
 #typeset -ga chroma_def_arr
 chroma_def=(
-    "subcmd:NULL" "F_0_opt"
+    "subcmd:NULL" "F_0_opt // D_1_arg // D_2_arg // D_#_arg"
     "F_0_opt" "(-C|--exec-path=|--git-dir=|--work-tree=)
                    <<>> return 1 // ::-some-chroma-handler
                    <<>> print 'Im here' >> /tmp/reply // ::-std-ch-+x-dir-path-verify
@@ -33,6 +33,9 @@ chroma_def=(
 
 
     "subcommands" "::chroma/-git-get-subcommands.ch" # run a function (the :: causes this) and use `reply'
+    #"subcommands" "(fetch|pull)" # run a function (the :: causes this) and use `reply'
+
+    "X_0_arg" "NO-OP // ::chroma/-git-check-if-alias.ch"
 
     # `fetch'
     "subcmd:fetch" "G_0_opt^ // D_0_opt // D_1_arg // D_2_arg"
@@ -71,12 +74,16 @@ chroma_def=(
                                                # arguments passed when using --multiple
 
     # `push'|`pull''
-    "subcmd:(push|pull)" "C_0_opt // C_1_arg // C_2_arg"
+    "subcmd:(push|pull|lp)" "C_0_opt // X_0_arg // C_1_arg // C_2_arg"
 
     "C_0_opt" "*
-            <<>> return 1 // ::chroma-git-push|pull-option" # a catch-all option entry; it thus doesn't
-                                                            # verify if the option is valid (but the
-                                                            # handler could be still doing this)
+            <<>> return 1 // ::chroma-git-push|pull-option
+                                                            
+                                                            
+            <<>> echo 'C_0_opt *-catch-all **with argument**' >> /tmp/reply
+            // ::chroma-git-push|pull-option"  # a catch-all option entry; it thus doesn't
+                                                             # verify if the option is valid (but the
+                                                             # handler could be still doing this)
     "C_1_arg" "NO-OP // ::-chroma-remote-verify"
     "C_2_arg" "NO-OP // ::-chroma-ref-verify"
 
@@ -150,7 +157,7 @@ chroma_def=(
 #chroma_def=( "${chroma_def_arr[@]}" )
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-print -rl -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@ >> /tmp/reply
+print -r -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@ "               " @@@@@@@@@@@@ >> /tmp/reply
 print -r -- @@@@@@@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4" @@@@@@@ >> /tmp/reply
 local __style __entry __value __action __handler __tmp __svalue __hspaces=$'\t ' __nl=$'\n'
 integer __idx1 __idx2 __ivalue __have_value=0
@@ -165,10 +172,12 @@ chroma/-git-check-if-alias.ch() {
 
     typeset -ga chroma__git__aliases
     __result=( ${(M)chroma__git__aliases[@]:#${__wrd}[[:space:]]##*} )
-    print "Got __result: $__result" >> /tmp/reply
+    print "Got is-alias-__result: $__result" >> /tmp/reply
 }
 
 chroma/-git-get-subcommands.ch() {
+    local __svalue
+    integer __ivalue
     LANG=C -fast-run-command "git help -a" chroma-${FAST_HIGHLIGHT[chroma-current]}-subcmd-list "" $(( 15 * 60 ))
     if [[ "${__lines_list[1]}" = See* ]]; then
         # (**)
@@ -278,6 +287,7 @@ chroma/main-process-token.ch() {
                     __split=( "${(@s://:P)__var_name}" )
                     [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split=()
                 }
+                __svalue="$__var_name"
                 # Remove whitespace
                 __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
                 print -l -- "\`$__val': (ch.run #${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]}), deref. of \`$__var_name'" >> /tmp/reply
@@ -287,13 +297,14 @@ chroma/main-process-token.ch() {
                         echo "YES handling the value (the OPT.ARGUMENT)! [${__split[2]}]" >> /tmp/reply
                         if [[ "$__wrd" = *=* ]]; then
                             echo "Here 5 (the-immediate Arg-Acquiring, of option)" >> /tmp/reply
-                            FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]="${__the_hash_name}[${${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}-opt-arg-action]"
+                            FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]="${__svalue%-opt-action\]}-opt-arg-action]"
                             FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-arg]="${__wrd#*=}"
                             __have_value=2
                         else
                             echo "Here 6 (enable Arg-Awaiting, of option)" >> /tmp/reply
+                            print "FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]=\"${__svalue%-opt-action\]}-opt-arg-action]\"" >> /tmp/reply
                             __have_value=0
-                            FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]="${__the_hash_name}[${${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}-opt-arg-action]"
+                            FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]="${__svalue%-opt-action\]}-opt-arg-action]"
                         fi
                     fi
 
@@ -347,7 +358,7 @@ chroma/main-process-token.ch() {
             done
         fi
     else
-        print -- "2nd-PATH (-n opt-with-arg-active):\nHere 7X the actual opt-val store (after the \`Here 6 Arg-Awaiting' in the chroma-run: #$(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]-1 )) [current: #$(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr] ))])" >> /tmp/reply
+        print -- "2nd-PATH (-n opt-with-arg-active) NON-EMPTY arg-active:\nHere 7X the actual opt-val <<< \$__wrd:$__wrd >>> store (after the \`Here 6 Arg-Awaiting' in the chroma-run: #$(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]-1 )) [current: #$(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr] ))])" >> /tmp/reply
         FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-arg]="$__wrd"
         __have_value=1
     fi
@@ -360,7 +371,7 @@ chroma/main-process-token.ch() {
         __var_name="${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}"
         FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]=""
         __split=( "${(@s://:P)__var_name}" )
-        [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && { print -rl "NULL at __tmp[$__tmp]" >> /tmp/reply; __split=(); }
+        [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && { print -rl "NULL at __var_name:$__var_name" >> /tmp/reply; __split=(); }
         __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
 
         # Remember 1st level action
@@ -450,7 +461,7 @@ else
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]=1
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="$__wrd"
             else
-                print "Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]} -> $(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] + 1 ))" >> /tmp/reply
+                print "subcmd verif / NOT OK; Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]} -> $(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] + 1 ))" >> /tmp/reply
                 (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] += 1 ))
                 echo "Here 14-A, ARGUMENT ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply
             fi
@@ -464,7 +475,7 @@ else
             (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] += 1 ))
             echo "Here 14-B, ARGUMENT ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/reply
 
-            print "Here 15: ELSE *-got-subcommand == 1" >>/tmp/reply
+            print "Here 15: ELSE *-got-subcommand == 1 is TRUE" >>/tmp/reply
             chroma/main-process-token.ch "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}" "$__wrd"
 
             if [[ -n "" ]]; then
