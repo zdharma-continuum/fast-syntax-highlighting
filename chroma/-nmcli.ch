@@ -7,7 +7,7 @@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4" subcommand
 subcommands=(
     help "_"
     general "help status hostname permissions logging _"
-    networking "help on off connectivit _"
+    networking "help on off connectivity _"
     radio "help all wifi wwan _"
     connection "help show up down add modify clone edit delete monitor reload load import export _"
     device "help status show set connect reapply modify disconnect delete monitor wifi lldp _"
