@@ -203,6 +203,9 @@ FAST_HIGHLIGHT+=(
   chroma-whatis     chroma/-whatis.ch
   chroma-man        chroma/-whatis.ch
 
+  chroma-xargs      chroma/-precommand.ch
+  chroma-nohup      chroma/-precommand.ch
+
   chroma-hg         chroma/-subcommand.ch
   chroma-cvs        chroma/-subcommand.ch
   chroma-pip        chroma/-subcommand.ch
