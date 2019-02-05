@@ -49,9 +49,9 @@ else
     elif [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-git-got-subcommand]} -eq 0 ]]; then
         # Options occuring before a subcommand
         if (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] == 0 )); then
-            if [[ "$__wrd" = -[^-]#C[^-]# ]]; then
+            if [[ "$__wrd" = -[^[:space:]-]#C ]]; then
                 FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
-            elif [[ "$__wrd" = -[^-]#c[^-]# ]]; then
+            elif [[ "$__wrd" = -[^[:space:]-]#c ]]; then
                 FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=1
             fi
         fi
@@ -214,7 +214,7 @@ else
                     fi
                 # if before --
                 elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
-                    if [[ "$__wrd" = -[^-]#m[^-]# ]]; then
+                    if [[ "$__wrd" = -[^[:space:]-]#m ]]; then
                         FAST_HIGHLIGHT[chrome-git-got-msg1]=1
                         __style=${FAST_THEME_NAME}single-hyphen-option
                     else
@@ -234,7 +234,7 @@ else
                 || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "rebase" ]]; then
 
                 # if doing `git checkout -b ...'
-                if [[ "$__wrd" = -[^-]#b[^-]# && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
+                if [[ "$__wrd" = -[^[:space:]-]#b && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
                     FAST_HIGHLIGHT[chroma-git-checkout-new]=1
                     __style=${FAST_THEME_NAME}single-hyphen-option
                 # if command is not checkout -b something
@@ -296,8 +296,8 @@ else
                     ||  "$__wrd" = --edit-description \
                     ||  "$__wrd" = --set-upstream-to=* \
                     ||  "$__wrd" = --unset-upstream \
-                    ||  "$__wrd" = -[^-]#d[^-]# \
-                    ||  "$__wrd" = -[^-]#D[^-]# ]]; then
+                    ||  "$__wrd" = -[^[:space:]-]#d \
+                    ||  "$__wrd" = -[^[:space:]-]#D ]]; then
                     FAST_HIGHLIGHT[chroma-git-branch-change]=1
                     return 1
                 elif [[ "$__wrd" != -* ]]; then
@@ -312,11 +312,11 @@ else
                 fi
             elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "tag" ]]; then
                 if [[ "${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}" -le 0 ]]; then
-                    if [[ "$__wrd" =  -[^-]#(u|m)[^-]# ]]; then
+                    if [[ "$__wrd" =  -[^[:space:]-]#(u|m) ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=1
-                    elif [[ "$__wrd" = -[^-]#F[^-]# ]]; then
+                    elif [[ "$__wrd" = -[^[:space:]-]#F ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
-                    elif [[ "$__wrd" = -[^-]#d[^-]# ]]; then
+                    elif [[ "$__wrd" = -[^[:space:]-]#d ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=3
                     elif [[ "$__wrd" = (--contains|--no-contains|--points-at|--merged|--no-merged) ]]; then
                         FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=4
