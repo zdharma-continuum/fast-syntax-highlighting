@@ -5,6 +5,8 @@
 # $2 - BUFFER
 #
 function -fast-highlight-string-process {
+    emulate -LR zsh -o extendedglob -o warncreateglobal -o typesetsilent
+
     local -A pos_to_level level_to_pos pair_map final_pairs
     local input=$1$2 _mybuf=$1$2 __style __quoting
     integer __idx=0 __pair_idx __level=0 __start __end
