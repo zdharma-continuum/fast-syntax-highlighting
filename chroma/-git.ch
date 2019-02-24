@@ -30,6 +30,7 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-git-got-subcommand]=0
     FAST_HIGHLIGHT[chroma-git-subcommand]=""
     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
+    FAST_HIGHLIGHT[chrome-git-got-anymsg]=0
     FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=0
     FAST_HIGHLIGHT[chroma-git-checkout-new]=0
     FAST_HIGHLIGHT[chroma-git-fetch-multiple]=0
@@ -179,9 +180,10 @@ else
                 match[1]=""
                 match[2]=""
                 # if previous argument is -m or current argument is --message=something
-                if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 )) \
+                if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 && ! FAST_HIGHLIGHT[chrome-git-got-anymsg] )) \
                     || [[ "$__wrd" = (#b)(--message=)(*) && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
                     FAST_HIGHLIGHT[chrome-git-got-msg1]=0
+                    FAST_HIGHLIGHT[chrome-git-got-anymsg]=1
                     if [[ -n "${match[1]}" ]]; then
                         __wrd="${(Q)${match[2]//\`/x}}"
                         # highlight (--message=)something
@@ -194,9 +196,10 @@ else
                         (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
                             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
                     fi
-                    if (( ${#__wrd} > 50 )); then
+                    local __firstline=${__wrd%%$'\n'*}
+                    if (( ${#__firstline} > 50 )); then
                         for (( __idx1 = 1, __idx2 = 1; __idx1 <= 50; ++ __idx1, ++ __idx2 )); do
-                            while [[ "${__arg[__idx2]}" != "${__wrd[__idx1]}" ]]; do
+                            while [[ "${__arg[__idx2]}" != "${__firstline[__idx1]}" ]]; do
                                 (( ++ __idx2 ))
                                 (( __idx2 > __asize )) && { __idx2=-1; break; }
                             done
@@ -204,10 +207,10 @@ else
                         done
                         if (( __idx2 != -1 )); then
                             if [[ -n "${match[1]}" ]]; then
-                                (( __start=__start_pos-${#PREBUFFER}+__idx2, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
+                                (( __start=__start_pos-${#PREBUFFER}+__idx2, __end=__end_pos-${#PREBUFFER}-$#__wrd+$#__firstline-1, __start >= 0 )) && \
                                     reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
                             else
-                                (( __start=__start_pos-${#PREBUFFER}+__idx2-1, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
+                                (( __start=__start_pos-${#PREBUFFER}+__idx2-1, __end=__end_pos-${#PREBUFFER}-$#__wrd+$#__firstline-1, __start >= 0 )) && \
                                     reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
                             fi
                         fi
