@@ -1,5 +1,6 @@
 # -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
 # Copyright (c) 2018 Sebastian Gniazdowski
+# Copyright (c) 2018, 2019 Philippe Troin (F-i-f on GitHub)
 #
 # Theme support using ini-files.
 #
@@ -257,7 +258,7 @@ fi
 
 # Generate current_theme.zsh or secondary_theme.zsh, traversing ini-file associative array
 local k kk
-local inikey inival result result2 first_val
+local inikey inival result result2 first_val isbg
 integer ov_counter=0 first
 for k in "${order[@]}"; do
     first=1
@@ -289,37 +290,29 @@ for k in "${order[@]}"; do
         fast-theme -q --secondary "$inival"
     fi
 
-    result="" result2=""
-
-    if [[ "$inival" = bg:* ]]; then
-        result="bg=${inival#bg:}"
-    elif [[ "$inival" = (#b)(*),(*),(*) || "$inival" = (#b)(*),(*) ]]; then
-        if [[ "${match[1]}" = (${(~j:|:)color})* || "${match[1]}" = [0-9]##* || "${match[1]}" = \#[0-9a-fA-F](#c6,6) ]]; then
-            result="fg=${match[1]}"
-        else
-            result="${match[1]}"
-        fi
-
-        # This is not used, maybe one day it will become needed
-        if [[ "${match[3]}" = custom:(${(~j:|:)color})* || "${match[3]}" = custom:[0-9]##* || "${match[3]}" = custom:\#[0-9a-fA-F](#c6,6) ]]; then
-            result2="fg=${match[3]#custom:}"
-        else
-            result2="${match[3]}"
-        fi
-
-        if [[ "${match[2]}" = bg:(${(~j:|:)color})* || "${match[2]}" = bg:[0-9]##* ]]; then
-            result+=",bg=${match[2]#bg:}"
-            [[ -n "$result2" ]] && result2+=",bg=${match[2]#bg:}" # unused
-        else
-            result+=",${match[2]}"
-            [[ -n "$result2" ]] && result2+=",${match[2]}" # unused
-        fi
+    result=""
+    if [[ $k = secondary ]]; then
+        result="$inival"
     else
-        if [[ "$inival" = (${(~j:|:)color})* || "$inival" = [0-9]##* || "$inival" = \#[0-9a-fA-F](#c6,6) ]]; then
-            result="fg=$inival"
-        else
-            result="$inival"
-        fi
+        for kk in ${(s:,:)inival}
+        do
+            if [[ $kk = (none|(no-|)(bold|blink|conceal|reverse|standout|underline)) ]]; then
+                result+="${result:+,}$kk"
+            else
+                isbg=0
+                if [[ $kk = bg:* ]]; then
+                    isbg=1
+                    kk=${kk#bg:}
+                fi
+                if [[ $kk = (${(~j:|:)color}) || $kk = [0-9]## || $kk = \#[0-9a-fA-F](#c6,6) ]]; then
+                    result+="${result:+,}"
+                    (( isbg )) && result+="bg=" || result+="fg="
+                    result+="$kk"
+                else
+                    print "cannot parse style $k: unknown color or style element $kk"
+                fi
+            fi
+        done
     fi
 
     if [[ "$THEME_NAME" = *"overlay"* || -n "$OPT_OV_XCHG" ]]; then
