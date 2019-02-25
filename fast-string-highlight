@@ -5,7 +5,8 @@
 # $2 - BUFFER
 #
 function -fast-highlight-string-process {
-    emulate -LR zsh -o extendedglob -o warncreateglobal -o typesetsilent
+    emulate -LR zsh
+    setopt extendedglob warncreateglobal typesetsilent
 
     local -A pos_to_level level_to_pos pair_map final_pairs
     local input=$1$2 _mybuf=$1$2 __style __quoting
