@@ -32,7 +32,7 @@ chroma/-subversion.ch/parse-revision() {
     setopt local_options extendedglob warn_create_global typeset_silent
     local __wrd="$1" __start_pos="$2" __end_pos="$3" __style __start __end
     case $__wrd in
-        [0-9]##)                   __style=${FAST_THEME_NAME}mathnum          ;;
+        (r|)[0-9]##)               __style=${FAST_THEME_NAME}mathnum          ;;
         (HEAD|BASE|COMITTED|PREV)) __style=${FAST_THEME_NAME}correct-subtle   ;;
         '{'[^}]##'}')              __style=${FAST_THEME_NAME}subtle-bg        ;;
         *)                         __style=${FAST_THEME_NAME}incorrect-subtle ;;
