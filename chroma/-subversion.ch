@@ -43,10 +43,10 @@ chroma/-subversion.ch/parse-revision() {
 chroma/-subversion.ch/parse-target() {
     setopt local_options extendedglob warn_create_global typeset_silent
     local __wrd="$1" __start_pos="$2" __end_pos="$3" __style __start __end
-    if [[ $__wrd == *@* ]]
+    if [[ $__wrd == *@[^/]# ]]
     then
-        local place=${__wrd%@*}
-        local rev=${__wrd##*@}
+        local place=${__wrd%@[^/]#}
+        local rev=$__wrd[$(($#place+2)),$#__wrd]
         if [[ -e $place ]]; then
             local __style
             [[ -d $place ]] && __style="${FAST_THEME_NAME}path-to-dir"  ||  __style="${FAST_THEME_NAME}path"
