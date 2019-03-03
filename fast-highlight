@@ -550,7 +550,7 @@ typeset -ga ZLAST_COMMANDS
    (( this_word & 1 )) && {
      # !in_redirection needed particularly for exec {A}>b {C}>d
      (( !in_redirection )) && active_command=$__arg
-     _mybuf=${${aliases[$active_command]:-$active_command}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#}
+     _mybuf=${${aliases[$active_command]:-${active_command##*/}}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#}
      [[ "$_mybuf" = (#b)(FPATH+(#c0,1)=)* ]] && _mybuf="${match[1]} ${(j: :)${(s,:,)${_mybuf#FPATH+(#c0,1)=}}}"
      [[ -n ${FAST_HIGHLIGHT[chroma-${_mybuf%% *}]} ]] && {
        __list=( ${(z@)_mybuf} )
@@ -578,7 +578,7 @@ typeset -ga ZLAST_COMMANDS
      } || (( 1 ))
    } || {
      (( this_word & 8192 )) && {
-       __list=( ${(z@)${aliases[$active_command]:-$active_command}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#} )
+       __list=( ${(z@)${aliases[$active_command]:-${active_command##*/}}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#} )
        ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 0 "$__arg" $_start_pos $_end_pos 2>/dev/null && continue
      }
    }
