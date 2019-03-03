@@ -77,7 +77,7 @@ else
 
             # Check if the command is an alias - we want to highlight the
             # aliased command just like the target command of the alias
-            -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 5 * 60 ))
+            -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 10 * 60 ))
             # Grep for line: alias.{user-entered-subcmd}[[:space:]], and remove alias. prefix
             __lines_list=( ${${(M)__lines_list[@]:#alias.${__wrd}[[:space:]]##*}#alias.} )
 
@@ -93,7 +93,7 @@ else
             fi
             if (( __start_pos >= 0 )); then
                 # if subcommand exists
-                LANG=C -fast-run-command "git help -a" chroma-git-subcmd-list "" $(( 5 * 60 ))
+                LANG=C -fast-run-command "git help -a" chroma-git-subcmd-list "" $(( 10 * 60 ))
                 # (s: :) will split on every space, but because the expression
                 # isn't double-quoted, the empty elements will be eradicated
                 # Some further knowledge-base: s-flag is special, it skips
