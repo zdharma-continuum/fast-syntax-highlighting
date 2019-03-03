@@ -549,6 +549,11 @@ typeset -ga ZLAST_COMMANDS
       fi
    fi
 
+   (( this_word & 8192 )) && {
+     __list=( ${(z@)${aliases[$active_command]:-${active_command##*/}}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#} )
+     ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 0 "$__arg" $_start_pos $_end_pos 2>/dev/null && continue
+   }
+
    (( this_word & 1 )) && {
      # !in_redirection needed particularly for exec {A}>b {C}>d
      (( !in_redirection )) && active_command=$__arg
@@ -578,11 +583,6 @@ typeset -ga ZLAST_COMMANDS
          ${FAST_HIGHLIGHT[chroma-$active_command]} 1 "$__arg" $_start_pos $_end_pos 2>/dev/null && continue
        fi
      } || (( 1 ))
-   } || {
-     (( this_word & 8192 )) && {
-       __list=( ${(z@)${aliases[$active_command]:-${active_command##*/}}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#} )
-       ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 0 "$__arg" $_start_pos $_end_pos 2>/dev/null && continue
-     }
    }
 
    expanded_path=""
