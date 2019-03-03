@@ -42,7 +42,7 @@ local -a __results __deserialized __noshsplit
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
 
-    if [[ "$__wrd" = -* ]]; then
+    if [[ "$__wrd" = [-+]* ]]; then
         # Detected option, add style for it.
         [[ "$__wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \
                                 __style=${FAST_THEME_NAME}single-hyphen-option
