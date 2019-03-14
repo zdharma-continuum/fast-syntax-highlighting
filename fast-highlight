@@ -1160,7 +1160,7 @@ typeset -ga ZLAST_COMMANDS
       __idx=0
     fi
     for _mybuf in $__inputs; do
-      (( __start=${_mybuf%%;*}-__PBUFLEN, __end=${_mybuf##*;}-__PBUFLEN, __start >= 0 )) && \
+      (( __start=${_mybuf%%;*}-__PBUFLEN-1, __end=${_mybuf##*;}-__PBUFLEN, __start >= 0 )) && \
         reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${__tmp}recursive-base]}")
       # Pass authentic buffer for recursive analysis
       -fast-highlight-process "$PREBUFFER" "${__buf[${_mybuf%%;*},${_mybuf##*;}]}" $(( ${_mybuf%%;*} - 1 ))
