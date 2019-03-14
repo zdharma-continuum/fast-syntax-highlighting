@@ -170,6 +170,7 @@ FAST_HIGHLIGHT+=(
   chroma-autorandr     chroma/-autorandr.ch
   chroma-docker        chroma/-docker.ch
   chroma-example       chroma/-example.ch
+  chroma-ionice        chroma/-ionice.ch
   chroma-make          chroma/-make.ch
   chroma-nmcli         chroma/-nmcli.ch
   chroma-node          chroma/-node.ch
