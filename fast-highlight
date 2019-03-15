@@ -245,6 +245,7 @@ FAST_HIGHLIGHT+=(
   chroma-subliminal    chroma/-subcommand.ch
   chroma-svnadmin      chroma/-subcommand.ch
   chroma-travis        chroma/-subcommand.ch
+  chroma-udisksctl     chroma/-subcommand.ch
   chroma-xdotool       chroma/-subcommand.ch
   chroma-zmanage       chroma/-subcommand.ch
   chroma-zsystem       chroma/-subcommand.ch
