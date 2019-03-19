@@ -201,7 +201,6 @@ FAST_HIGHLIGHT+=(
   chroma-bash          chroma/-sh.ch
   chroma-fish          chroma/-sh.ch
   chroma-sh            chroma/-sh.ch
-  chroma-tmux          chroma/-sh.ch
   chroma-zsh           chroma/-sh.ch
 
   chroma-whatis        chroma/-whatis.ch
@@ -217,6 +216,7 @@ FAST_HIGHLIGHT+=(
   chroma-pip2          chroma/-subcommand.ch
   chroma-pip3          chroma/-subcommand.ch
   chroma-gem           chroma/-subcommand.ch
+  chroma-bundle        chroma/-subcommand.ch
   chroma-yard          chroma/-subcommand.ch
   chroma-cabal         chroma/-subcommand.ch
   chroma-npm           chroma/-subcommand.ch
@@ -226,6 +226,10 @@ FAST_HIGHLIGHT+=(
   chroma-port          chroma/-subcommand.ch
   chroma-yum           chroma/-subcommand.ch
   chroma-dnf           chroma/-subcommand.ch
+  chroma-tmux          chroma/-subcommand.ch
+  chroma-pass          chroma/-subcommand.ch
+  chroma-aws           chroma/-subcommand.ch
+  chroma-apt           chroma/-subcommand.ch
   chroma-apt-get       chroma/-subcommand.ch
   chroma-apt-cache     chroma/-subcommand.ch
   chroma-aptitude      chroma/-subcommand.ch
