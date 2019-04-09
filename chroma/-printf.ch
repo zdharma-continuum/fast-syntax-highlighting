@@ -37,19 +37,22 @@ integer __idx1 __idx2
     [[ "$__arg_type" = 3 ]] && return 2
 
     if [[ "$__wrd" = -* ]]; then
-        # Detected option, add style for it.
-        [[ "$__wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \
-                                __style=${FAST_THEME_NAME}single-hyphen-option
         if [[ "$__wrd" = "-v" ]]; then
             FAST_HIGHLIGHT[chroma-printf-skip-two]=1
         fi
+        return 1
     else
         # Count non-option tokens.
         if (( FAST_HIGHLIGHT[chroma-printf-skip-two] )); then
             FAST_HIGHLIGHT[chroma-printf-skip-two]=0
+            return 1
         else
             (( FAST_HIGHLIGHT[chroma-printf-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-printf-counter] ))
             if [[ "$__idx1" -eq 1 ]]; then
+                [[ "$__wrd" = \"* ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
+                    && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
+                [[ "$__wrd" = \'* ]] && (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
+                    && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}single-quoted-argument]}")
                 FSH_LIST=() # use fsh_sy_h_append function to write to FSH_LIST
                 : "${__wrd//(#m)\%[\#\+\ 0-]#[0-9]#([.][0-9]#)(#c0,1)[diouxXfFeEgGaAcsb]/$(( fsh_sy_h_append($MBEGIN, $MEND) ))}";
                 for __val in "${FSH_LIST[@]}" ; do
@@ -58,6 +61,8 @@ integer __idx1 __idx2
                     (( __start=__idx1-${#PREBUFFER}, __end=__idx2-${#PREBUFFER}-1, __start >= 0 )) && \
                         reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]}")
                 done
+            else
+                return 1
             fi
         fi
     fi
