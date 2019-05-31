@@ -42,7 +42,6 @@ typeset -gA FAST_WHATIS_CACHE
         local -a start_end
         start_end=( ${(s:/:)${${(M)${${input#type?$'\n'}}#*$'\n'}%$'\n'}} )
         (( start_end[1] >= 0 )) && region_highlight+=("$start_end[1] $start_end[2] $__style")
-        LANG=C sleep 0.3
         zle .redisplay
     fi
 
