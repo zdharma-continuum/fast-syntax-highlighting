@@ -6,6 +6,11 @@ typeset -gA FAST_WHATIS_CACHE
 (( ! ${+FAST_HIGHLIGHT[whatis_chroma_callback_was_ran]} )) && \
         FAST_HIGHLIGHT[whatis_chroma_callback_was_ran]=0
 
+(( ! ${+FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]} )) && {
+        is-at-least 5.0.6 && local __res=1 || local __res=0
+        FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]="$__res"
+}
+
 -fast-whatis-chroma-callback() {
     local THEFD="$1" input check=2
 
@@ -59,7 +64,7 @@ if (( __first_call )) && [[ -z "${FAST_HIGHLIGHT[whatis_chroma_type]}" ]] ;then
 
     exec {THEFD}< <( echo "test"; whatis "osx whatis fallback check"; echo "$?"; )
     command true # a workaround of Zsh bug
-    zle -F -w "$THEFD" -fast-whatis-chroma-callback
+    zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
 fi
 
 [[ "$__arg_type" = 3 ]] && return 2
@@ -75,11 +80,11 @@ else
         if (( FAST_HIGHLIGHT[whatis_chroma_type] == 2 )); then
             exec {THEFD}< <( echo "type2"; (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} )); echo "$__start/$__end"; whatis "$__wrd"; )
             command true # see above
-            zle -F -w "$THEFD" -fast-whatis-chroma-callback
+            zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
         else
             exec {THEFD}< <( echo "type1"; (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} )); echo "$__start/$__end"; whatis "$__wrd" > /dev/null; echo "$?"; )
             command true
-            zle -F -w "$THEFD" -fast-whatis-chroma-callback
+            zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
         fi
     else
         check=${FAST_WHATIS_CACHE[$__wrd]}
