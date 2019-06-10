@@ -38,9 +38,9 @@ chroma_def=(
     "X_0_arg" "NO-OP // ::chroma/-git-check-if-alias.ch"
 
     # `fetch'
-    "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_0_opt // REMOTE_1_arg // REF_#_arg"
+    "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_1_arg // REF_#_arg // FETCH_NO_MATCH_0_opt"
 
-    # Special options (^ - has directives, currently - an :add-directive)
+    # Special options (^ - has directives, currently - an :add and :del directive)
     "FETCH_MULTIPLE_0_opt^" "
                 --multiple
                     <<>> __style=\${FAST_THEME_NAME}correct-subtle // ::chroma-occured-multiple-handler-function
@@ -51,15 +51,26 @@ chroma_def=(
                                              # refspec argument, only remotes-ids follow
                                              # unlimited # of them, hence the # in D_#_arg
 
+    # Special options (^ - has directives - an :del-directive)
+    "FETCH_ALL_0_opt^" "
+                --all
+                    <<>> __style=\${FAST_THEME_NAME}double-hyphen-option // NO-OP 
+                || --all:del
+                    <<>> REMOTE_1_arg // REF_#_arg"
+
     # FETCH_0_opt. FETCH-options (FETCH is an identifier) at position 0 ->
     #   -> before any argument
-    "FETCH_0_opt" "--help
-                    <<>> __style=\${FAST_THEME_NAME}correct-subtle // ::chroma-occured-help-handler-function
-           || (--depth=|--deepen=|--shallow-exclude=|--shallow-since=|--receive-pack=|
-               --refmap=|--recurse-submodules=|-j|--jobs=|--submodule-prefix=|--upload-pack|
+    "FETCH_0_opt" "
+              (--depth=|--deepen=|--shallow-exclude=|--shallow-since=|--receive-pack=|
+               --refmap=|--recurse-submodules=|-j|--jobs=|--submodule-prefix=|
                --recurse-submodules-default=)
-                   <<>> __style=\${FAST_THEME_NAME}correct-subtle // ::chroma-git-fetch-aopt-action
-                   <<>> __style=\${FAST_THEME_NAME}correct-subtle // ::chroma-git-fetch-aopt-ARG-action"
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+           || (--help|--all|-a|--append|--unshallow|--update-shallow|--dry-run|-f|--force|
+               -k|--multiple|-p|--prune|-n|--no-tags|-t|--tags|--no-recurse-submodules|
+               -u|--update-head-ok|--upload-pack|-q|--quiet|-v|--verbose|--progress|
+               -4|--ipv4|-6|--ipv6)
+                   <<>> __style=\${FAST_THEME_NAME}correct-subtle // ::chroma-git-fetch-opt-action"
                    # Above: note the two //-separated blocks for options that have
                    # some arguments – the second pair of action/handler is being
                    # run when an option argument is occurred (first one: the option
@@ -70,6 +81,7 @@ chroma_def=(
     "REPO_#_arg" "NO-OP // ::-chroma-git-repo-verify"  # The hash `#' denotes: an argument at any position
                                                     # It will nicely match any following (above the first 2)
                                                     # arguments passed when using --multiple
+    "FETCH_NO_MATCH_0_opt" "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
     # `push'|`pull''
     "subcmd:(push|pull|lp)" "C_0_opt // X_0_arg // C_1_arg // C_2_arg"
@@ -158,11 +170,12 @@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 print -r -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@ "               " @@@@@@@@@@@@ >> /tmp/reply
 print -r -- @@@@@@@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4" @@@@@@@ >> /tmp/reply
 local __style __entry __value __action __handler __tmp __svalue __hspaces=$'\t ' __nl=$'\n'
-integer __idx1 __idx2 __ivalue __have_value=0
-local -a __lines_list chroma_git_remote_subcommands __avalue
+integer __idx1 __idx2 __start __end __ivalue __have_value=0
+local -a __lines_list __avalue
 local -A map
 map=( "#" "H" "^" "D" )
-chroma_git_remote_subcommands=(add rename remove set-head set-branches get-url set-url set-url set-url show prune update)
+
+(( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN ))
 
 chroma/-git-check-if-alias.ch() {
     local __wrd="$1" __subcmd="$2"
@@ -330,15 +343,15 @@ chroma/main-process-token.ch() {
                         FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]+="${(j: :)__split[1,__ivalue]} "
                     fi
                     [[ "$__handler" = ::[^[:space:]]* ]] && __handler="${__handler#::}" || __handler=""
-                    [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(1): $__handler" >> /tmp/reply;  "$__handler"; }
-                    [[ "$__have_value" -ne 2 && -n "$__action" && "$__action" != "NO-OP" ]] && { print -rl "Running action (1): $__action" >> /tmp/reply; eval "$__action"; }
+                    [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(1): $__handler" >> /tmp/reply; "$__handler" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}" "$__start" "$__end" "$__wrd"; }
+                    [[ "$__have_value" -ne 2 && -n "$__action" && "$__action" != "NO-OP" ]] && { print -rl "Running action (1): $__action" >> /tmp/reply; eval "() { $__action; }"; }
                     [[ "$__val" != *\* ]] && break
                 else
-                    __style=${FAST_THEME_NAME}incorrect-subtle
+                    print -rl -- "NO-MATCH ROUTE TAKEN" >> /tmp/reply
                 fi
             done
         else
-            print "1st-PATH-B (-z opt-with-arg-active, non-opt-arg branch, ARGUMENT BRANCH [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}])" >> /tmp/reply
+            print "1st-PATH-B (-z opt-with-arg-active, non-opt-arg branch, ARGUMENT BRANCH [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]) //// added-option-sets: ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}" >> /tmp/reply
             for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
                 [[ "${__val}" != "${__val%%_([0-9]##|\#)*}"_"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}"_arg(\*|\^|) && "${__val}" != "${__val%%_([0-9]##|\#)*}"_"#"_arg(\*|\^|) ]] && { print "Continuing for $__val" >> /tmp/reply; continue }
                 # Create the hash cache-parameter if needed
@@ -350,7 +363,7 @@ chroma/main-process-token.ch() {
                 __action="${__split[1]}"
                 print -rl -- "Got action record for $__val, i.e. the split:" "${__split[@]}" "^^^^^^^^^^^^^^^^^^^^^" >> /tmp/reply
                 [[ "${__split[2]}" = ::[^[:space:]]* ]] && __handler="${__split[2]#::}" || { [[ "$__handler" != "NO-OP" && -n "$__handler" ]] && print "Error in chroma definition: a handler entry ${(q)__split[2]} without leading \`::'"; }
-                [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(3): $__handler" >> /tmp/reply; "$__handler" "$__wrd" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}"; }
+                [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(3): $__handler" >> /tmp/reply; "$__handler" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}" "$__start" "$__end" "$__wrd"; }
                 [[ -n "$__action" && "$__action" != "NO-OP" ]] && { print -rl -- "Running action(3): $__action" >> /tmp/reply; eval "$__action"; }
                 [[ "$__val" != *\* ]] && break
             done
@@ -381,7 +394,7 @@ chroma/main-process-token.ch() {
             __handler="${__split[2]}"
             [[ "$__handler" = ::[^[:space:]]* ]] && __handler="${__handler#::}"
 
-            [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(2): $__handler" >> /tmp/reply;  "$__handler"; }
+            [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { print -rl -- "Running handler(2): $__handler" >> /tmp/reply; "$__handler" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}" "$__start" "$__end" "$__wrd"; }
             [[ -n "$__action" && "$__action" != "NO-OP" ]] && { print -rl -- "Running action(2): $__action" >> /tmp/reply; eval "$__action"; }
             print -rl -- "The __action value: [$__value]" >> /tmp/reply
             [[ "$__have_value" -eq 2 && -n "$__value" && "$__value" != "NO-OP" ]] && { print -rl "Running action (of 1, at 2): $__value" >> /tmp/reply; eval "$__value"; }
@@ -445,7 +458,7 @@ else
     echo "== @@ Starting @@ #${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]} Main-Chroma-call == // << __WORD:$__wrd >> ## GOT-SUBCOMMAND:${(qq)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]} //@@// -n option-with-arg-active:${(q-)FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" >> /tmp/reply
     if [[ "$__wrd" = -*  || -n "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}"
     ]]; then
-        echo "Here A ## The \`if -*' MAIN branch" >> /tmp/reply
+        echo "Here A ## The \`if -*' i.e. \`IF OPTION' MAIN branch" >> /tmp/reply
         chroma/main-process-token.ch "${${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}:-NULL}" "$__wrd"
     else
         # If at e.g. '>' or destination/source spec (of the redirection)
@@ -458,6 +471,7 @@ else
                 print "Here 16, got-subcommand := $__wrd, subcmd verification / OK" >> /tmp/reply
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]=1
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="$__wrd"
+                __style="${FAST_THEME_NAME}subcommand"
             else
                 print "subcmd verif / NOT OK; Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]} -> $(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] + 1 ))" >> /tmp/reply
                 (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] += 1 ))
