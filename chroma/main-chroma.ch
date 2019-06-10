@@ -176,7 +176,7 @@ local __style __entry __value __action __handler __tmp __svalue __hspaces=$'\t '
 integer __idx1 __idx2 __start __end __ivalue __have_value=0
 local -a __lines_list __avalue
 local -A map
-map=( "#" "H" "^" "D" )
+map=( "#" "_H" "^" "_D" "*" "_S" )
 
 (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN ))
 
@@ -289,8 +289,8 @@ chroma/main-process-token.ch() {
     local __subcmd="$1" __wrd="$2" __val __var_name __main_hash_name __the_hash_name __i __size
     local -a __splitted __split __added
 
-    __main_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
     chroma/main-chroma-print "\n******************* Starting chroma/main-process-token // subcmd:${(qq)__subcmd}" >> /tmp/fsh-dbg
+    __main_hash_name="chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^\*])/${map[${match[1]}]}}"
     __var_name="${__main_hash_name}[subcmd:$__subcmd]"
     __splitted=( "${(@s://:P)__var_name}" )
     [[ ${#__splitted} -eq 1 && -z "${__splitted[1]}" ]] && __splitted=()
@@ -312,7 +312,7 @@ chroma/main-process-token.ch() {
             for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
                 [[ "${__val}" != "${__val%%_([0-9]##|\#)##*}"_${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}_opt(\*|\^|) && "${__val}" != "${__val%%_([0-9]##|\#)*}"_"#"_opt(\*|\^|) ]] && { chroma/main-chroma-print "DIDN'T MATCH $__val / arg counter:${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/fsh-dbg;  continue; } || chroma/main-chroma-print "Got candidate: $__val" >> /tmp/fsh-dbg
                 # Create the hash cache-parameter if needed
-                __the_hash_name="chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//\#/H}//[^a-zA-Z0-9_]/_}"
+                __the_hash_name="chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//(#b)([\#\^\*])/${map[${match[1]}]}}//[^a-zA-Z0-9_]/_}"
                 [[ "$__val" = *_opt(\*|\^|) && "${(P)+__the_hash_name}" -eq 0 ]] && chroma/main-create-OPTION-hash.ch "$__subcmd" "$__val" "$__the_hash_name" || chroma/main-chroma-print "Not creating, the hash already exists..." >> /tmp/fsh-dbg
                 # Try dedicated-entry for the option
                 __var_name="${__the_hash_name}[${${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}-opt-action]"
