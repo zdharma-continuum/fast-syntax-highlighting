@@ -216,6 +216,28 @@ chroma/-git-get-subcommands.ch() {
     reply=( "${__lines_list[@]}" )
 }
 
+chroma/main-chroma-std-aopt-action() {
+    integer _start="$2" _end="$3"
+    local _scmd="$1" _wrd="$4"
+
+    [[ "$_wrd" = (#b)(--[a-zA-Z0-9_-]##)=(*) ]] && {
+        reply+=("$_start $(( _end - mend[2] + mbegin[2] - 1 )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
+        reply+=("$(( _start + 1 + mend[1] )) $_end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-${${${(M)match[2]:#<->}:+number}:-string}]}")
+    } || {
+	[[ "$_wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \
+	    __style=${FAST_THEME_NAME}single-hyphen-option
+    }
+}
+
+chroma/main-chroma-std-aopt-ARG-action() {
+    integer _start="$2" _end="$3"
+    local _scmd="$1" _wrd="$4"
+
+    [[ "$_wrd" = (#b)(--[a-zA-Z0-9_-]##)=(*) ]] && {
+        reply+=("$(( _start + 1 + mend[1] )) $_end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-${${${(M)match[2]:#<->}:+number}:-string}]}")
+    } || __style=${FAST_THEME_NAME}optarg-${${${(M)_wrd:#(-|)<->}:+number}:-string}
+}
+
 chroma/main-create-OPTION-hash.ch() {
     local __subcmd="$1" __option_set_id="$2" __the_hash_name="$3" __ __e __el __the_hash_name __var_name
     local -a __split __sp __s
@@ -325,7 +347,7 @@ chroma/main-process-token.ch() {
                     # Check for directives (like :add)
                     if [[ "$__val" = *opt\^ ]]; then
                         __var_name="${__the_hash_name}[${${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}:add-directive]"
-                        (( ${(P)+__var_name} )) && __split=( "${(@s://:P)__var_name}" )
+                        (( ${(P)+__var_name} )) && __split=( "${(@s://:P)__var_name}" ) || __split=()
                         [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split[1]=()
                         __ivalue=${#__split}
                         __var_name="${__var_name%:add-*}:del-directive]"
