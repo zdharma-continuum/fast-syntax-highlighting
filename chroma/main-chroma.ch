@@ -35,7 +35,7 @@ chroma_def=(
     "subcommands" "::chroma/-git-get-subcommands.ch" # run a function (the :: causes this) and use `reply'
     #"subcommands" "(fetch|pull)" # run a function (the :: causes this) and use `reply'
 
-    "X_0_arg" "NO-OP // ::chroma/-git-check-if-alias.ch"
+    "subcmd-hook" "chroma/-git-check-if-alias.ch"
 
     # `fetch'
     "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_1_arg // REF_#_arg // FETCH_NO_MATCH_0_opt"
@@ -178,12 +178,14 @@ map=( "#" "H" "^" "D" )
 (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN ))
 
 chroma/-git-check-if-alias.ch() {
-    local __wrd="$1" __subcmd="$2"
+    local __wrd="$1"
     local -a __result
 
     typeset -ga chroma__git__aliases
     __result=( ${(M)chroma__git__aliases[@]:#${__wrd}[[:space:]]##*} )
-    print "Got is-alias-__result: $__result" >> /tmp/reply
+    chroma/main-chroma-print "Got is-alias-__result: $__result" >> /tmp/fsh-dbg
+    [[ -n "$__result" ]] && \
+	FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="${${${__result#* }## ##}%% *}"
 }
 
 chroma/-git-get-subcommands.ch() {
@@ -440,7 +442,13 @@ chroma/-pre_process_chroma_def.ch() {
         __var_name="${__the_hash_name}[subcommands]"
         : ${(P)__var_name::=$__subcmds}
     fi
-    print "Got the SUBCOMMANDS: ${(P)__var_name}" >> /tmp/reply
+    print "Got SUBCOMMANDS: ${(P)__var_name}" >> /tmp/fsh-dbg
+
+    local __subcmd_hook="${chroma_def[subcmd-hook]}"
+    if [[ -n "$__subcmd_hook" ]]; then
+        __var_name="${__the_hash_name}[subcmd-hook]"
+        : ${(P)__var_name::=$__subcmd_hook}
+    fi
 
     for __key in "${(@)chroma_def[(I)subcmd:*]}"; do
         __split=( "${(@s:|:)${${__key##subcmd:\((#c0,1)}%\)}}" )
@@ -493,6 +501,8 @@ else
                 print "Here 16, got-subcommand := $__wrd, subcmd verification / OK" >> /tmp/reply
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand]=1
                 FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="$__wrd"
+		__var_name="${__the_hash_name}[subcmd-hook]"
+		(( ${(P)+__var_name} )) && { print -r -- "Running subcmd-hook: ${(P)__var_name}" >> /tmp/fsh-dbg; "${(P)__var_name}" "$__wrd"; }
                 __style="${FAST_THEME_NAME}subcommand"
             else
                 print "subcmd verif / NOT OK; Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]} -> $(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] + 1 ))" >> /tmp/reply
