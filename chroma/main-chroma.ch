@@ -18,18 +18,16 @@
 typeset -gA chroma_def
 #typeset -ga chroma_def_arr
 chroma_def=(
-    "subcmd:NULL" "F_0_opt // D_1_arg // D_2_arg // D_#_arg"
-    "F_0_opt" "(-C|--exec-path=|--git-dir=|--work-tree=)
-                   <<>> return 1 // ::-some-chroma-handler
-                   <<>> print 'Im here' >> /tmp/reply // ::-std-ch-+x-dir-path-verify
+    "subcmd:NULL" "NULL_0_opt"
+    "NULL_0_opt" "(-C|--exec-path=|--git-dir=|--work-tree=|--namespace=|--super-prefix=)
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
             || -c
-                    <<>> NO-OP // ::-chroma-git-a-handler
-                    <<>> echo ABCD =========== >> /tmp/reply // ::-chroma-git-verify-config-assign
-            || --namespace=
-                    <<>> return 1 // NO-OP
-                    <<>> echo Hello ============ >> /tmp/reply // NO-OP
-            || (--version|--help|--html-path|--man-path|--info-path|-p|--paginate|--no-pager|--no-replace-objects|--bare)
-                    <<>> NO-OP // NO-OP"
+                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP
+                    <<>> __style=\${FAST_THEME_NAME}optarg-string // NO-OP
+            || (--version|--help|--html-path|--man-path|--info-path|-p|--paginate|
+		-P|--no-pager|--no-replace-objects|--bare)
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
 
 
     "subcommands" "::chroma/-git-get-subcommands.ch" # run a function (the :: causes this) and use `reply'
@@ -37,7 +35,10 @@ chroma_def=(
 
     "subcmd-hook" "chroma/-git-check-if-alias.ch"
 
-    # `fetch'
+    ##
+    ## `FETCH'
+    ##
+
     "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_1_arg // REF_#_arg // FETCH_NO_MATCH_0_opt"
 
     # Special options (^ - has directives, currently - an :add and :del directive)
