@@ -179,7 +179,7 @@ FAST_HIGHLIGHT+=(
   chroma-scp        chroma/-scp.ch
   chroma-ssh        chroma/-ssh.ch
 
-  chroma-git        chroma/main-chroma.ch
+  chroma-git        chroma/main-chroma.ch%git
   chroma-hub        chroma/-hub.ch
   chroma-lab        chroma/-lab.ch
 
@@ -552,12 +552,12 @@ typeset -ga ZLAST_COMMANDS
          __style=${FAST_THEME_NAME}alias
          (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
 
-         ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 1 "${__list[1]}" "-100000" $_end_pos 2>/dev/null || \
+         ${${FAST_HIGHLIGHT[chroma-${__list[1]}]}%\%*} ${(M)FAST_HIGHLIGHT[chroma-${__list[1]}]%\%*} 1 "${__list[1]}" "-100000" $_end_pos 2>/dev/null || \
            (( this_word = next_word, next_word = 2 ))
 
          for _mybuf in "${(@)__list[2,-1]}"; do
            (( next_word = next_word | (this_word & (BIT_case_code|8192)) ))
-           ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 0 "$_mybuf" "-100000" $_end_pos 2>/dev/null || \
+           ${${FAST_HIGHLIGHT[chroma-${__list[1]}]}%\%*} ${(M)FAST_HIGHLIGHT[chroma-${__list[1]}]%\%*} 0 "$_mybuf" "-100000" $_end_pos 2>/dev/null || \
              (( this_word = next_word, next_word = 2 ))
          done
 
@@ -567,13 +567,13 @@ typeset -ga ZLAST_COMMANDS
 
          continue
        else
-         ${FAST_HIGHLIGHT[chroma-$active_command]} 1 "$__arg" $_start_pos $_end_pos 2>/dev/null && continue
+         ${${FAST_HIGHLIGHT[chroma-${__list[1]}]}%\%*} ${(M)FAST_HIGHLIGHT[chroma-${__list[1]}]%\%*} 1 "$__arg" $_start_pos $_end_pos && continue
        fi
      } || (( 1 ))
    } || {
      (( this_word & 8192 )) && {
        __list=( ${(z@)${aliases[$active_command]:-$active_command}##[[:space:]]#(command|builtin|exec|noglob|nocorrect|pkexec)[[:space:]]#} )
-       ${FAST_HIGHLIGHT[chroma-${__list[1]}]} 0 "$__arg" $_start_pos $_end_pos 2>/dev/null && continue
+       ${${FAST_HIGHLIGHT[chroma-${__list[1]}]}%\%*} ${(M)FAST_HIGHLIGHT[chroma-${__list[1]}]%\%*} 0 "$__arg" $_start_pos $_end_pos && continue
      }
    }
 
