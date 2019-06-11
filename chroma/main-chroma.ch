@@ -37,6 +37,7 @@ map=( "#" "_H" "^" "_D" "*" "_S" )
 
 (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN ))
 
+# Action that highlights the options
 chroma/main-chroma-std-aopt-action() {
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
@@ -50,6 +51,7 @@ chroma/main-chroma-std-aopt-action() {
     }
 }
 
+# Action that highlights the options' arguments
 chroma/main-chroma-std-aopt-ARG-action() {
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
@@ -114,17 +116,15 @@ chroma/main-process-token.ch() {
     [[ ${#__splitted} -eq 1 && -z "${__splitted[1]}" ]] && __splitted=()
     __splitted=( "${__splitted[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
 
-    chroma/main-chroma-print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "//" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})}}:-EMPTY-SET!} ${${(j:, :)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}}:-EMPTY-SET!} >> /tmp/fsh-dbg
+    chroma/main-chroma-print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "-----" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})}}:-EMPTY-SET!} ${${(j:, :)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}}:-EMPTY-SET!} >> /tmp/fsh-dbg
 
     (( ! ${#__splitted} )) && return 1
 
-    chroma/main-chroma-print -rl -- "------------------------" >> /tmp/fsh-dbg
-    chroma/main-chroma-print -rl -- "---NO-HASH-CREATE-NOW---" >> /tmp/fsh-dbg
-    chroma/main-chroma-print -rl -- "------------------------" >> /tmp/fsh-dbg
-    chroma/main-chroma-print -rl -- "-z OPT-WITH-ARG-ACTIVE" >> /tmp/fsh-dbg
+    chroma/main-chroma-print -rl -- "---NO-HASH-CREATE-FROM-NOW-ON---" >> /tmp/fsh-dbg
 
     # Options occuring before a subcommand
     if [[ -z "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" ]]; then
+        chroma/main-chroma-print -rl -- "-z OPT-WITH-ARG-ACTIVE == true" >> /tmp/fsh-dbg
         if [[ "$__wrd" = -* ]]; then
             chroma/main-chroma-print "1st-PATH (-z opt-with-arg-active, non-opt-arg branch, i.e. OPTION BRANCH) [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]" >> /tmp/fsh-dbg
             for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
