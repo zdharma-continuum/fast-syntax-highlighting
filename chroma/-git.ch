@@ -103,16 +103,33 @@ fsh__git__chroma__def=(
     "REMOTE_1_arg" "NO-OP // ::chroma/-git-remote-verify" # This definition is generic, reused later
 
     ##
+    ## `COMMIT'
+    ##
+
+    "subcmd:commit" "COMMIT_#_opt // FILE_#_arg"
+
+    "COMMIT_#_opt" "
+              (-m|--message=)
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+           || (--help|-a|--all|-p|--patch|--reset-author|--short|--branch|
+               --porcelain|--long|-z|--null|-s|--signoff|-n|--no-verify|
+               --allow-empty|--allow-empty-message|-e|--edit|--no-edit|
+               --amend|--no-post-rewrite|-i|--include|-o|--only|--untracked-files|
+               -v|--verbose|-q|--quiet|--dry-run|--status|--no-status|--no-gpg-sign)
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+           || (-C|--reuse-message=|-c|--reedit-message=|--fixup=|--squash=|
+               -F|--file=|--author=|--date=|-t|--template=|--cleanup=|
+               -u|--untracked-files=|-S|--gpg-sign=)
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action"
+
+    "FILE_#_arg" "NO-OP // chroma/-git-file-verify"
+
+    ##
     ## Unfinished / old follow
     ##
 
-    # `COMMIT'
-    "subcmd:commit" "Y_#_opt"
-    "Y_#_opt" "(-m|--message=)
-                        <<>> return 1 // ::chroma-git-aopt-action
-                        <<>> return 1 // ::chroma-git-aopt-ARG-action" # The second <<>>-block enables
-                                                     # the action/handler pair for an option argument
-                                                     # and also in general denotes options with arguments
 
     # `MERGE'
     "subcmd:merge" "E_0_opt_with_arg // E_0_opt_arg // E_1_arg"
@@ -170,6 +187,7 @@ fsh__git__chroma__def=(
     "A_0_opt_arg" "::-chroma-handle-tag-option-argument"
     "A_1_arg" "::-chroma-git-averify-ref-and-tag" # opposite (exists -> incorrect-subtle) verification of
                                                   # existence in all refs and all tags
+
 )
 
 # Called after entering just "git" on the command line
@@ -262,6 +280,52 @@ chroma/-git-remote-or-group-verify() {
     # The check for a group is to follow below
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
+}
+
+# A generic action
+chroma/-git-file-verify() {
+    local _wrd="$4"
+
+    [[ -f "$_wrd" ]] && __style=${FAST_THEME_NAME}correct-subtle || \
+        __style=${FAST_THEME_NAME}incorrect-subtle
+}
+
+# An action for the commit's -m/--message options
+chroma/-git-commit-msg-opt-action() {
+    chroma/main-chroma-std-aopt-action "$@"
+}
+
+# An action for the commit's -m/--message options' argument
+chroma/-git-commit-msg-opt-ARG-action() {
+    integer _start="$2" _end="$3"
+    local _scmd="$1" _wrd="$4"
+
+    (( __start >= 0 )) || return
+
+    # Match the message body in case of an --message= option
+    if [[ "$_wrd" = (#b)(--message=)(*) && -n "${match[2]}" ]]; then
+        _wrd="${(Q)${match[2]//\`/x}}"
+        # highlight --message=>>something<<
+        reply+=("$(( __start+10 )) $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
+    fi
+
+    if (( ${#_wrd} > 50 )); then
+        for (( __idx1 = 1, __idx2 = 1; __idx1 <= 50; ++ __idx1, ++ __idx2 )); do
+            # Use __arg from the fast-highlight-process's scope
+            while [[ "${__arg[__idx2]}" != "${_wrd[__idx1]}" ]]; do
+                (( ++ __idx2 ))
+                (( __idx2 > __asize )) && { __idx2=-1; break; }
+            done
+            (( __idx2 == -1 )) && break
+        done
+        if (( __idx2 != -1 )); then
+            if [[ -n "${match[1]}" ]]; then
+                reply+=("$(( __start+__idx2 )) $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+            else
+                reply+=("$(( __start+__idx2-1 )) $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+            fi
+        fi
+    fi
 }
 
 return 0
