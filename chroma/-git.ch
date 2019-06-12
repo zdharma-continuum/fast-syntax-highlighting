@@ -152,18 +152,40 @@ fsh__git__chroma__def=(
     "FILE_#_arg" "NO-OP // chroma/-git-verify-file"
 
     ##
-    ## Unfinished / old follow
+    ## `MERGE'
     ##
 
-    # `MERGE'
-    "subcmd:merge" "E_0_opt_with_arg // E_0_opt_arg // E_1_arg"
-    "E_0_opt_with_arg:(-m|--message=)" "return 1 // NO-OP"
-    "E_0_opt_arg" "// ::-chroma-verify-commit-msg"
-    "E_1_arg" "// ::(-chroma-git-rev-verify||-std-ch-path-verify)" # verify revision or if not succeed, a path
+    "subcmd:merge" "MERGE_0_opt // MERGE_1_arg"
+    MERGE_0_opt
+           "(-m)
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+            (-S|--gpg-sign=|--log=|-e|--strategy=|-X|--strategy-option=|-F|
+             --file) 
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+         || (--help|--commit|--no-commit|-e|--edit|--no-edit|--ff|--no-ff|--ff-only|
+             --log|--no-log|--signoff|--no-signoff|-n|--stat|--no-stat|--squash|
+             --no-squash|--verify-signatures|--no-verify-signatures|--summary|
+             --no-summary|-q|--quiet|-v|--verbose|--progress|--no-progress|
+             --allow-unrelated-histories|--rerere-autoupdate|--no-rerere-autoupdate|
+             --abort|--continue) 
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+    MERGE_1_arg "NO-OP // ::chroma/-git-verify-commit"
 
-    # `MERGE'|`RESET'|`REBASE'
-    "subcmd:(reset|rebase)" "Z_1_arg"
-    "Z_1_arg" "// ::(-chroma-git-rev-verify||-std-ch-path-verify)" # verify revision or if not succeed, a path
+    ##
+    ## RESET
+    ##
+
+    "subcmd:reset" "REST_0_opt // RESET_#_arg // NO_MATCH_#_opt"
+    REST_0_opt "
+        (-q|--soft|--mixed|--hard|--merge|--keep|-p|--patch)
+                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+    "RESET_#_arg" "NO-OP // ::chroma/-git-RESET-verify-commit-or-file"
+
+    ##
+    ## Unfinished / old follow
+    ##
 
     # `REVERT'
     "subcmd:revert" "P_1_arg"
@@ -232,6 +254,7 @@ chroma/-git-first-call() {
     FAST_HIGHLIGHT[chroma-git-fetch-multiple]=0
     FAST_HIGHLIGHT[chroma-git-branch-change]=0
     FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
+    FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit]=0
     return 1
 }
 
@@ -278,7 +301,7 @@ chroma/-git-get-subcommands() {
     reply=( "${__lines_list[@]}" )
 }
 
-# A generic action
+# A generic handler
 chroma/-git-verify-remote() {
     local _wrd="$4"
     -fast-run-git-command "git remote" "chroma-git-remotes-$PWD" "" $(( 2 * 60 ))
@@ -289,7 +312,7 @@ chroma/-git-verify-remote() {
     }
 }
 
-# A generic action - checks if given ref is correct
+# A generic handler - checks if given ref is correct
 chroma/-git-verify-ref() {
     local _wrd="$4"
     _wrd="${_wrd%%:*}"
@@ -317,7 +340,28 @@ chroma/-git-verify-file() {
         __style=${FAST_THEME_NAME}incorrect-subtle
 }
 
-# A handler for the commit's -m/--message options
+# A generic handler that checks if given commit reference is correct
+chroma/-git-verify-commit() {
+    local _wrd="$4"
+    __lines_list=()
+    -fast-run-git-command "git rev-parse --verify --quiet \"$_wrd\"" "chroma-git-commits-$PWD-$_wrd" "" $(( 1.5 * 60 ))
+    if (( ${#__lines_list} )); then
+        __style=${FAST_THEME_NAME}correct-subtle
+        return 0
+    fi
+    __style=${FAST_THEME_NAME}incorrect-subtle
+    return 1
+}
+
+# A generic handler that checks if given commit reference
+# is correct or if it's a file that exists
+chroma/-git-verify-commit-or-file() {
+    chroma/-git-verify-commit "$@" && return
+    chroma/-git-verify-file "$@"
+}
+
+# A handler for the commit's -m/--message options.Currently
+# does the same what chroma/main-chroma-std-aopt-action does
 chroma/-git-commit-msg-opt-action() {
     chroma/main-chroma-std-aopt-action "$@"
 }
@@ -353,6 +397,18 @@ chroma/-git-commit-msg-opt-ARG-action() {
             fi
         fi
     fi
+}
+
+# A RESET handler that checks if given commit reference
+# is correct or if it's a file that exists
+# TODO: differentiate tree-ish from commit
+chroma/-git-RESET-verify-commit-or-file() {
+    chroma/-git-verify-commit "$@" && { FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit]=1; return 0; }
+    (( FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit] )) && {
+        __style=${FAST_THEME_NAME}unknown-token
+        return 1
+    }
+    chroma/-git-verify-file "$@"; return
 }
 
 return 0
