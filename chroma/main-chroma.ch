@@ -131,7 +131,7 @@ chroma/main-process-token.ch() {
     [[ ${#__splitted} -eq 1 && -z "${__splitted[1]}" ]] && __splitted=()
     __splitted=( "${__splitted[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
 
-    chroma/main-chroma-print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "-----" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})}}:-EMPTY-SET!} ${${(j:, :)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}}:-EMPTY-SET!} >> /tmp/fsh-dbg
+    chroma/main-chroma-print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "-----" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})}}:-EMPTY-SET!} ${${(j:, :)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}}:-EMPTY-SET!} >> /tmp/reply
 
     (( ! ${#__splitted} )) && {
         __var_name="${__main_hash_name}[subcmd:*]"
@@ -148,8 +148,8 @@ chroma/main-process-token.ch() {
         chroma/main-chroma-print -rl -- "-z OPT-WITH-ARG-ACTIVE == true" >> /tmp/fsh-dbg
         if [[ "$__wrd" = -* ]]; then
             chroma/main-chroma-print "1st-PATH (-z opt-with-arg-active, non-opt-arg branch, i.e. OPTION BRANCH) [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]" >> /tmp/fsh-dbg
-            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
                 [[ "${__val}" != "${__val%%_([0-9]##|\#)##*}"_${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}_opt(\*|\^|) && "${__val}" != "${__val%%_([0-9]##|\#)*}"_"#"_opt(\*|\^|) ]] && { chroma/main-chroma-print "DIDN'T MATCH $__val / arg counter:${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" >> /tmp/fsh-dbg;  continue; } || chroma/main-chroma-print "Got candidate: $__val" >> /tmp/fsh-dbg
+            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}; do
                 # Create the hash cache-parameter if needed
                 __the_hash_name="fsh__chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//(#b)([\#\^\*])/${map[${match[1]}]}}//[^a-zA-Z0-9_]/_}"
                 [[ "$__val" = *_opt(\*|\^|) && "${(P)+__the_hash_name}" -eq 0 ]] && chroma/main-create-OPTION-hash.ch "$__subcmd" "$__val" "$__the_hash_name" || chroma/main-chroma-print "Not creating, the hash already exists..." >> /tmp/fsh-dbg
@@ -201,12 +201,12 @@ chroma/main-process-token.ch() {
                         __tmp=${#__split}
 
                         # First: del-directive
-                        FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]+="${(j: :)__split[__ivalue+1,__tmp]} "
+                        FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]+="${(j: :)__split[__ivalue+1,__tmp]} "
 
-                        chroma/main-chroma-print -rl ":add / :del directives: __ivalue:$__ivalue, THE __SPLIT[#$__tmp]: " "${__split[@]}" "//" "The FAST_HIGHLIGHT[chroma-*deleted-option-sets]: " ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]} >> /tmp/fsh-dbg
+                        chroma/main-chroma-print -rl ":add / :del directives: __ivalue:$__ivalue, THE __SPLIT[#$__tmp]: " "${__split[@]}" "//" "The FAST_HIGHLIGHT[chroma-*deleted-nodes]: " ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]} >> /tmp/reply
 
                         # Second: add-directive
-                        FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]+="${(j: :)__split[1,__ivalue]} "
+                        FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]+="${(j: :)__split[1,__ivalue]} "
                     fi
                     [[ "$__handler" = ::[^[:space:]]* ]] && __handler="${__handler#::}" || __handler=""
                     [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running handler(1): $__handler" >> /tmp/fsh-dbg; "$__handler" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}" "$__start" "$__end" "$__wrd"; }
@@ -217,22 +217,44 @@ chroma/main-process-token.ch() {
                 fi
             done
         else
-            chroma/main-chroma-print "1st-PATH-B (-z opt-with-arg-active, non-opt-arg branch, ARGUMENT BRANCH [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]) //// added-option-sets: ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}" >> /tmp/fsh-dbg
-            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}; do
                 [[ "${__val}" != "${__val%%_([0-9]##|\#)*}"_"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}"_arg(\*|\^|) && "${__val}" != "${__val%%_([0-9]##|\#)*}"_"#"_arg(\*|\^|) ]] && { chroma/main-chroma-print "Continuing for $__val" >> /tmp/fsh-dbg; continue }
+            chroma/main-chroma-print "1st-PATH-B (-z opt-with-arg-active, non-opt-arg branch, ARGUMENT BRANCH [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]) //// added-nodes: ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}" 
+            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}; do
                 # Create the hash cache-parameter if needed
                 __the_hash_name="fsh__chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//\#/H}//[^a-zA-Z0-9_]/_}"
                 __action="" __handler=""
                 chroma/main-chroma-print "A hit, chosen __val:$__val!" >> /tmp/fsh-dbg
                 __ch_def_name="fsh__${__chroma_name}__chroma__def[$__val]"
-                __split=( "${(P@s://:)__ch_def_name}" )
+                __split=( "${(P@s:<<>>:)__ch_def_name}" )
                 __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
-                __action="${__split[1]}"
-                chroma/main-chroma-print -rl -- "Got action record for $__val, i.e. the split:" "${__split[@]}" "_________" >> /tmp/fsh-dbg
-                [[ "${__split[2]}" = ::[^[:space:]]* ]] && __handler="${__split[2]#::}" || { [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && chroma/main-chroma-print "Error in chroma definition: a handler entry ${(q)__split[2]} without leading \`::'"; }
+
+                __sp=( "${(@s://:)__split[1]}" )
+                __sp=( "${__sp[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
+                __action="${__sp[1]#*::::: ##}"
+
+                # Verify if it's the expected argument
+                [[ "${__sp[1]}" = *:::::* && "$__wrd" != ${~${__sp[1]%% ##:::::*}} ]] && \
+                    { chroma/main-chroma-print -r "mismatch ${__sp[1]%% ##:::::*} != $__wrd, continuing" >> /tmp/fsh-dbg; continue; }
+
+                chroma/main-chroma-print -l -- "Got action record for $__val, i.e. the split:" "${__sp[@]//(#s)/-\t}" "_________" >> /tmp/fsh-dbg
+
+                [[ "${__sp[2]}" = ::[^[:space:]]* ]] && __handler="${__sp[2]#::}" || { [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && chroma/main-chroma-print "=== Error === In chroma definition: a handler entry ${(q)__sp[2]} without leading \`::'" >> /tmp/fsh-dbg; }
                 [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running handler(3): $__handler" >> /tmp/fsh-dbg; "$__handler" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}" "$__start" "$__end" "$__wrd"; }
-                [[ -n "$__action" && "$__action" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running action(3): $__action" >> /tmp/fsh-dbg; eval "$__action"; }
+                [[ -n "$__action" && "$__action" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running action(3): $__action" >> /tmp/fsh-dbg; eval "() { $__action; } \"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}\" \"$__start\" \"$__end\" \"$__wrd\""; }
                 [[ "$__val" != *\* ]] && break
+
+                # Check for argument directives (like :add)
+                if (( ${#__split} >= 2 )); then
+                    for __ in "${(@)__split[2,-1]}"; do
+                        __splitted=( "${(@s://:)__}" )
+                        if [[ "${__splitted[1]}" = add:* ]]; then
+                            FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]+="${__splitted[1]#add:} ${(j: :)__splitted[2,-1]} "
+                        elif [[ "${__splitted[1]}" = del:* ]]; then
+                            FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]+="${__splitted[1]#del:} ${(j: :)__splitted[2,-1]} "
+                        fi
+                    done
+                    chroma/main-chroma-print -l "ARGUMENT :add / :del directives: THE __SPLIT[#${#__split}]: " "${__split[@]//(#s)/-\\t}" "//" "The FAST_HIGHLIGHT[chroma-*deleted-nodes]: " ${(@)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}//(#s)/-\\t} "The FAST_HIGHLIGHT[chroma-*added-nodes]: " ${(@)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}//(#s)/-\\t} >> /tmp/fsh-dbg
+                fi
             done
         fi
     else
@@ -321,8 +343,8 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]=""
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-arg]=""
     FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr]=1
-    FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]=""
-    FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]=""
+    FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]=""
+    FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]=""
     __the_hash_name="fsh__chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
     (( 0 == ${(P)+__the_hash_name} )) && {
         typeset -gA "$__the_hash_name"
