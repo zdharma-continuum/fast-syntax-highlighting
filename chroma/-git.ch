@@ -11,7 +11,7 @@ FAST_HIGHLIGHT[-git.ch-chroma-def]=1
 typeset -gA fsh__git__chroma__def
 fsh__git__chroma__def=(
     "subcmd:NULL" "NULL_0_opt"
-    "NULL_0_opt" "(-C|--exec-path=|--git-dir=|--work-tree=|--namespace=|--super-prefix=)
+    NULL_0_opt "(-C|--exec-path=|--git-dir=|--work-tree=|--namespace=|--super-prefix=)
                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
             || -c
@@ -31,7 +31,7 @@ fsh__git__chroma__def=(
     ## `FETCH'
     ##
 
-    "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_0_opt"
+    "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
     # Special options (^ - has directives, currently - an :add and :del directive)
     "FETCH_MULTIPLE_0_opt^" "
@@ -54,7 +54,7 @@ fsh__git__chroma__def=(
 
     # FETCH_0_opt. FETCH-options (FETCH is an identifier) at position 0 ->
     #   -> before any argument
-    "FETCH_0_opt" "
+    FETCH_0_opt "
               (--depth=|--deepen=|--shallow-exclude=|--shallow-since=|--receive-pack=|
                --refmap=|--recurse-submodules=|-j|--jobs=|--submodule-prefix=|
                --recurse-submodules-default=|-o|--server-option=|--upload-pack|
@@ -73,23 +73,23 @@ fsh__git__chroma__def=(
                    # is set to be argument-less. The argument is a) -o/--option argument
                    # and b) -o/--option=argument.
 
-    "REMOTE_GR_1_arg" "NO-OP // ::chroma/-git-remote-verify" # This definition is generic, reused later
-    "REF_#_arg" "NO-OP // ::chroma/-git-ref-verify" # This too
+    REMOTE_GR_1_arg "NO-OP // ::chroma/-git-verify-remote" # This definition is generic, reused later
+    "REF_#_arg" "NO-OP // ::chroma/-git-verify-ref" # This too
     "REMOTE_GR_#_arg" "NO-OP // ::chroma/-git-remote-or-group-verify" # and this too
     # The hash `#' above denotes: an argument at any position
     # It will nicely match any following (above the first explicitly
     # numbered ones) arguments passed when using --multiple
 
     # A generic action
-    "NO_MATCH_0_opt" "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    NO_MATCH_#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
     ##
     ## PUSH
     ##
 
-    "subcmd:push" "PUSH_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_0_opt"
+    "subcmd:push" "PUSH_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
-    "PUSH_0_opt" "
+    PUSH_0_opt "
               (--receive-pack=|--exec=|--repo=|--push-option=|--signed=|
                   --force-with-lease=|--signed=|--recurse-submodules=)
                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
@@ -102,15 +102,15 @@ fsh__git__chroma__def=(
                --verify|--no-verify|-4|--ipv4|-6|--ipv6)
                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
 
-    "REMOTE_1_arg" "NO-OP // ::chroma/-git-remote-verify" # This definition is generic, reused later
+    REMOTE_1_arg "NO-OP // ::chroma/-git-verify-remote" # This definition is generic, reused later
 
     ##
     ## PULL
     ##
 
-    "subcmd:pull" "PULL_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_0_opt"
+    "subcmd:pull" "PULL_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
-    "PULL_0_opt" "
+    PULL_0_opt "
               (--recurse-submodules=|-S|--gpg-sign=|--log=|-s|--strategy=|-X|
                --strategy-option=|--rebase=|--depth=|--deepen=|--shallow-exclude=|
                --shallow-since=|--negotiation-tip|--upload-pack|-o|--server-option=|
@@ -131,7 +131,7 @@ fsh__git__chroma__def=(
     ## `COMMIT'
     ##
 
-    "subcmd:commit" "COMMIT_#_opt // FILE_#_arg // NO_MATCH_0_opt"
+    "subcmd:commit" "COMMIT_#_opt // FILE_#_arg // NO_MATCH_#_opt"
 
     "COMMIT_#_opt" "
               (-m|--message=)
@@ -149,7 +149,7 @@ fsh__git__chroma__def=(
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action"
 
-    "FILE_#_arg" "NO-OP // chroma/-git-file-verify"
+    "FILE_#_arg" "NO-OP // chroma/-git-verify-file"
 
     ##
     ## Unfinished / old follow
@@ -279,7 +279,7 @@ chroma/-git-get-subcommands() {
 }
 
 # A generic action
-chroma/-git-remote-verify() {
+chroma/-git-verify-remote() {
     local _wrd="$4"
     -fast-run-git-command "git remote" "chroma-git-remotes-$PWD" "" $(( 2 * 60 ))
     [[ -n ${__lines_list[(r)$_wrd]} ]] && {
@@ -289,8 +289,8 @@ chroma/-git-remote-verify() {
     }
 }
 
-# A generic action
-chroma/-git-ref-verify() {
+# A generic action - checks if given ref is correct
+chroma/-git-verify-ref() {
     local _wrd="$4"
     _wrd="${_wrd%%:*}"
     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches-$PWD" "refs/heads" $(( 2 * 60 ))
@@ -301,28 +301,28 @@ chroma/-git-ref-verify() {
     }
 }
 
-# A generic action
+# A generic handler - checks if given remote or group is correct
 chroma/-git-remote-or-group-verify() {
-    chroma/-git-remote-verify "$@" && return 0
+    chroma/-git-verify-remote "$@" && return 0
     # The check for a group is to follow below
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
 }
 
-# A generic action
-chroma/-git-file-verify() {
+# A generic handler - checks whether the file exists
+chroma/-git-verify-file() {
     local _wrd="$4"
 
     [[ -f "$_wrd" ]] && __style=${FAST_THEME_NAME}correct-subtle || \
         __style=${FAST_THEME_NAME}incorrect-subtle
 }
 
-# An action for the commit's -m/--message options
+# A handler for the commit's -m/--message options
 chroma/-git-commit-msg-opt-action() {
     chroma/main-chroma-std-aopt-action "$@"
 }
 
-# An action for the commit's -m/--message options' argument
+# A handler for the commit's -m/--message options' argument
 chroma/-git-commit-msg-opt-ARG-action() {
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"

@@ -37,7 +37,7 @@ map=( "#" "_H" "^" "_D" "*" "_S" )
 
 (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN ))
 
-# Action that highlights the options
+# Handler that highlights the options
 chroma/main-chroma-std-aopt-action() {
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
@@ -50,7 +50,7 @@ chroma/main-chroma-std-aopt-action() {
     }
 }
 
-# Action that highlights the options' arguments
+# Handler that highlights the options' arguments
 chroma/main-chroma-std-aopt-ARG-action() {
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
@@ -60,7 +60,7 @@ chroma/main-chroma-std-aopt-ARG-action() {
     } || __style=${FAST_THEME_NAME}optarg-${${${(M)_wrd:#(-|)<->}:+number}:-string}
 }
 
-# This action also highlights explicit arguments, i.e. --opt=the-explicit-arg
+# This handler also highlights explicit arguments, i.e. --opt=the-explicit-arg
 chroma/main-chroma-std-aopt-SEMI-action() {
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
@@ -74,6 +74,7 @@ chroma/main-chroma-std-aopt-SEMI-action() {
     }
 }
 
+# Creates a hash table for given option set (an *_opt field in the chroma def.)
 chroma/main-create-OPTION-hash.ch() {
     local __subcmd="$1" __option_set_id="$2" __the_hash_name="$3" __ __e __el __the_hash_name __var_name
     local -a __split __sp __s
@@ -118,6 +119,7 @@ chroma/main-create-OPTION-hash.ch() {
     done
 }
 
+# Processes given token
 chroma/main-process-token.ch() {
     local __subcmd="$1" __wrd="$2" __val __var_name __main_hash_name __the_hash_name __i __size
     local -a __splitted __split __added
@@ -226,8 +228,8 @@ chroma/main-process-token.ch() {
                 __split=( "${(P@s://:)__ch_def_name}" )
                 __split=( "${__split[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
                 __action="${__split[1]}"
-                chroma/main-chroma-print -rl -- "Got action record for $__val, i.e. the split:" "${__split[@]}" "^^^^^^^^^^^^^^^^^^^^^" >> /tmp/fsh-dbg
-                [[ "${__split[2]}" = ::[^[:space:]]* ]] && __handler="${__split[2]#::}" || { [[ "$__handler" != "NO-OP" && -n "$__handler" ]] && chroma/main-chroma-print "Error in chroma definition: a handler entry ${(q)__split[2]} without leading \`::'"; }
+                chroma/main-chroma-print -rl -- "Got action record for $__val, i.e. the split:" "${__split[@]}" "_________" >> /tmp/fsh-dbg
+                [[ "${__split[2]}" = ::[^[:space:]]* ]] && __handler="${__split[2]#::}" || { [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && chroma/main-chroma-print "Error in chroma definition: a handler entry ${(q)__split[2]} without leading \`::'"; }
                 [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running handler(3): $__handler" >> /tmp/fsh-dbg; "$__handler" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}" "$__start" "$__end" "$__wrd"; }
                 [[ -n "$__action" && "$__action" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running action(3): $__action" >> /tmp/fsh-dbg; eval "$__action"; }
                 [[ "$__val" != *\* ]] && break
@@ -268,6 +270,8 @@ chroma/main-process-token.ch() {
     chroma/main-chroma-print -- "_________ Exiting chroma/main-process-token.ch $__subcmd / $__wrd _________">> /tmp/fsh-dbg
 }
 
+# Iterates over the chroma def. fields and creates initial
+# fields in the fsh__${__chroma_name}__chroma__def hash
 chroma/-pre_process_chroma_def.ch() {
     local __key __value __ke _val __the_hash_name="$1" __var_name
     local -a __split
