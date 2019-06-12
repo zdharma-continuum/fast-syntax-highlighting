@@ -106,7 +106,7 @@ chroma/main-create-OPTION-hash.ch() {
 
         for __ in $__s; do
             __=${__%\^}
-            [[ "$__" = --*:(add|del) ]] && __var_name="${__the_hash_name}[${__}-directive]" || __var_name="${__the_hash_name}[${__}-opt-action]"
+            [[ "$__" = -*:(add|del) ]] && __var_name="${__the_hash_name}[${__}-directive]" || __var_name="${__the_hash_name}[${__}-opt-action]"
             chroma/main-chroma-print "${(r:70:: :):-${__var_name}} := >>${__sp[1]}${${${#__sp}:#(0|1)}:+ +}<<" >> /tmp/fsh-dbg
             : ${(P)__var_name::=${__sp[1]}${${${#__sp}:#(0|1)}:+ +}}
 

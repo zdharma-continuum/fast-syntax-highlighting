@@ -75,7 +75,7 @@ fsh__git__chroma__def=(
 
     REMOTE_GR_1_arg "NO-OP // ::chroma/-git-verify-remote" # This definition is generic, reused later
     "REF_#_arg" "NO-OP // ::chroma/-git-verify-ref" # This too
-    "REMOTE_GR_#_arg" "NO-OP // ::chroma/-git-remote-or-group-verify" # and this too
+    "REMOTE_GR_#_arg" "NO-OP // ::chroma/-git-verify-remote-or-group" # and this too
     # The hash `#' above denotes: an argument at any position
     # It will nicely match any following (above the first explicitly
     # numbered ones) arguments passed when using --multiple
@@ -162,7 +162,7 @@ fsh__git__chroma__def=(
                        <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
                        <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
             (-S|--gpg-sign=|--log=|-e|--strategy=|-X|--strategy-option=|-F|
-             --file) 
+             --file)
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
          || (--help|--commit|--no-commit|-e|--edit|--no-edit|--ff|--no-ff|--ff-only|
@@ -170,7 +170,7 @@ fsh__git__chroma__def=(
              --no-squash|--verify-signatures|--no-verify-signatures|--summary|
              --no-summary|-q|--quiet|-v|--verbose|--progress|--no-progress|
              --allow-unrelated-histories|--rerere-autoupdate|--no-rerere-autoupdate|
-             --abort|--continue) 
+             --abort|--continue)
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
     MERGE_1_arg "NO-OP // ::chroma/-git-verify-commit"
 
@@ -201,7 +201,7 @@ fsh__git__chroma__def=(
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                 || (--continue|--quit|--abort):del
                         <<>> REVERT_0_opt // REVERT_#_arg"
-                    
+
     "REVERT_#_arg" "NO-OP // ::chroma/-git-verify-commit"
 
     ##
@@ -246,14 +246,40 @@ fsh__git__chroma__def=(
     "COMMIT_FILE_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file"
 
     ##
-    ## Unfinished / old follow
+    ## CHECKOUT
     ##
 
-    # `CHECKOUT'
-    "subcmd:checkout" "R-*1-opt // R_1_arg || S_1_arg"
-    "R-*1-opt:-b" "return 1 // ::-chroma-got--b" # mandatory (the *) -b option, occuring at 1st position
-    "R_1_arg" "// ::-chroma-git-rev-averify"     # *-averify -> opposite functioning - exists -> incorrect, !exists -> correct
+    "subcmd:checkout" "CHECKOUT_BRANCH_0_opt^ //
+                        CHECKOUT_0_opt // FILE_OR_BRANCH_OR_COMMIT_1_arg //
+                        FILE_#_arg // NO_MATCH_#_opt"
 
+    "CHECKOUT_BRANCH_0_opt^" "
+                (-b|-B|--orphan)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+             || (-b|-B|--orphan):del
+                        <<>> FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg
+             || (-b|-B|--orphan):add
+                        <<>> NEW_BRANCH_1_arg // COMMIT_2_arg"
+
+    NEW_BRANCH_1_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+
+    COMMIT_2_arg "NO-OP // ::chroma/-git-verify-commit"
+
+    CHECKOUT_0_opt "
+                --conflict=
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+             || (-q|--quiet|--progress|--no-progress|-f|--force|--ours|--theirs|
+                 -b|-B|-t|--track|--no-track|-l|--detach|--orphan|
+                 --ignore-skip-worktree-bits|-m|--merge|-p|--patch|
+                 --ignore-other-worktrees|--no-ignore-other-worktrees)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-ubranch-or-commit-verify"
+
+    ##
+    ## Unfinished / old follow
+    ##
 
     # OR (main form of the checkout command)
     "S_1_arg" "// ::(-chroma-git-rev-verify||-chroma-git-remote-rev-verify||-std-ch-path-verify)"
@@ -378,7 +404,7 @@ chroma/-git-verify-ref() {
 }
 
 # A generic handler - checks if given remote or group is correct
-chroma/-git-remote-or-group-verify() {
+chroma/-git-verify-remote-or-group() {
     chroma/-git-verify-remote "$@" && return 0
     # The check for a group is to follow below
     integer _start="$2" _end="$3"
@@ -389,8 +415,45 @@ chroma/-git-remote-or-group-verify() {
 chroma/-git-verify-file() {
     local _wrd="$4"
 
-    [[ -f "$_wrd" ]] && __style=${FAST_THEME_NAME}correct-subtle || \
-        __style=${FAST_THEME_NAME}incorrect-subtle
+    [[ -f "$_wrd" ]] && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+chroma/-git-verify-branch() {
+    local _wrd="$4"
+    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches-$PWD" "refs/heads" $(( 2 * 60 ))
+    [[ -n ${__lines_list[(r)$_wrd]} ]] && \
+        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+chroma/-git-verify-also-unfetched-ref() {
+    local _wrd="$4"
+    -fast-run-git-command "git config --get checkout.defaultRemote" \
+                            "chroma-git-defaultRemote-$PWD" "" $(( 2 * 60 ))
+    local remote="${__lines_list[1]:-origin}"
+    -fast-run-git-command "git rev-list --count --no-walk
+                            --glob=\"refs/remotes/$remote/$_wrd\"" \
+                                "chroma-git-unfetched-ref-$PWD" "" $(( 2 * 60 ))
+
+    (( __lines_list[1] )) && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+# A generic handler
+chroma/-git-file-or-ubranch-or-commit-verify() {
+    chroma/-git-verify-commit "$@" && return
+    chroma/-git-verify-file "$@" && return
+    chroma/-git-verify-also-unfetched-ref "$@"
+}
+
+# A generic handler
+chroma/-git-verify-correct-branch-name() {
+    local _wrd="$4"
+    [[ "$_wrd" != ./* && "$_wrd" != *..* && "$_wrd" != *[~\^\ $'\t']* &&
+        "$_wrd" != */ && "$_wrd" != *.lock && "$_wrd" != *\\* ]] && \
+        { return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
 }
 
 # A generic handler that checks if given commit reference is correct
