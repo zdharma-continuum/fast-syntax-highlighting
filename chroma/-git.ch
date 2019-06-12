@@ -31,7 +31,7 @@ fsh__git__chroma__def=(
     ## `FETCH'
     ##
 
-    "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // FETCH_NO_MATCH_0_opt"
+    "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_0_opt"
 
     # Special options (^ - has directives, currently - an :add and :del directive)
     "FETCH_MULTIPLE_0_opt^" "
@@ -57,12 +57,13 @@ fsh__git__chroma__def=(
     "FETCH_0_opt" "
               (--depth=|--deepen=|--shallow-exclude=|--shallow-since=|--receive-pack=|
                --refmap=|--recurse-submodules=|-j|--jobs=|--submodule-prefix=|
-               --recurse-submodules-default=)
+               --recurse-submodules-default=|-o|--server-option=|--upload-pack|
+               --negotiation-tip=)
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
            || (--help|--all|-a|--append|--unshallow|--update-shallow|--dry-run|-f|--force|
-               -k|--multiple|-p|--prune|-n|--no-tags|-t|--tags|--no-recurse-submodules|
-               -u|--update-head-ok|--upload-pack|-q|--quiet|-v|--verbose|--progress|
+               -k|--keep|--multiple|-p|--prune|-n|--no-tags|-t|--tags|--no-recurse-submodules|
+               -u|--update-head-ok|-q|--quiet|-v|--verbose|--progress|
                -4|--ipv4|-6|--ipv6)
                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
                    # Above: note the two <<>>-separated blocks for options that have
@@ -79,13 +80,14 @@ fsh__git__chroma__def=(
     # It will nicely match any following (above the first explicitly
     # numbered ones) arguments passed when using --multiple
 
-    "FETCH_NO_MATCH_0_opt" "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    # A generic action
+    "NO_MATCH_0_opt" "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
     ##
-    ## push
+    ## PUSH
     ##
 
-    "subcmd:push" "PUSH_0_opt // REMOTE_1_arg // REF_#_arg"
+    "subcmd:push" "PUSH_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_0_opt"
 
     "PUSH_0_opt" "
               (--receive-pack=|--exec=|--repo=|--push-option=|--signed=|
@@ -103,10 +105,33 @@ fsh__git__chroma__def=(
     "REMOTE_1_arg" "NO-OP // ::chroma/-git-remote-verify" # This definition is generic, reused later
 
     ##
+    ## PULL
+    ##
+
+    "subcmd:pull" "PULL_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_0_opt"
+
+    "PULL_0_opt" "
+              (--recurse-submodules=|-S|--gpg-sign=|--log=|-s|--strategy=|-X|
+               --strategy-option=|--rebase=|--depth=|--deepen=|--shallow-exclude=|
+               --shallow-since=|--negotiation-tip|--upload-pack|-o|--server-option=|
+               --no-recurse-submodules=)
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+           || (--help|-q|--quiet|-v|--verbose|--progress|--no-recurse-submodules|
+               --commit|--no-commit|--edit|--no-edit|--ff|--no-ff|--ff-only|
+               --log|--no-log|--signoff|--no-signoff|--stat|-n|--no-stat|--squash|
+               --no-squash|--verify-signatures|--no-verify-signatures|--summary|
+               --no-summary|--allow-unrelated-histories|-r|--rebase|--no-rebase|
+               --autostash|--no-autostash|--all|-a|--append|--unshallow|
+               --update-shallow|-f|--force|-k|--keep|--no-tags|-u|--update-head-ok|
+               --progress|-4|--ipv4|-6|--ipv6|recurse-submodules)
+                   <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
+
+    ##
     ## `COMMIT'
     ##
 
-    "subcmd:commit" "COMMIT_#_opt // FILE_#_arg"
+    "subcmd:commit" "COMMIT_#_opt // FILE_#_arg // NO_MATCH_0_opt"
 
     "COMMIT_#_opt" "
               (-m|--message=)
@@ -129,7 +154,6 @@ fsh__git__chroma__def=(
     ##
     ## Unfinished / old follow
     ##
-
 
     # `MERGE'
     "subcmd:merge" "E_0_opt_with_arg // E_0_opt_arg // E_1_arg"
