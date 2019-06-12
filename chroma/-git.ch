@@ -128,7 +128,7 @@ fsh__git__chroma__def=(
                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
 
     ##
-    ## `COMMIT'
+    ## COMMIT
     ##
 
     "subcmd:commit" "COMMIT_#_opt // FILE_#_arg // NO_MATCH_#_opt"
@@ -152,7 +152,7 @@ fsh__git__chroma__def=(
     "FILE_#_arg" "NO-OP // chroma/-git-verify-file"
 
     ##
-    ## `MERGE'
+    ## MERGE
     ##
 
     "subcmd:merge" "MERGE_0_opt // MERGE_1_arg"
@@ -184,12 +184,28 @@ fsh__git__chroma__def=(
     "RESET_#_arg" "NO-OP // ::chroma/-git-RESET-verify-commit-or-file"
 
     ##
-    ## Unfinished / old follow
+    ## REVERT
     ##
 
-    # `REVERT'
-    "subcmd:revert" "P_1_arg"
-    "P_1_arg" "// ::-chroma-git-rev-verify"
+    "subcmd:revert" "REVERT_SEQUENCER_0_opt^ // REVERT_0_opt // REVERT_#_arg // NO_MATCH_#_opt"
+    REVERT_0_opt "
+                (-m|--mainline|-S|--gpg-sign=|--strategy=|-X|--strategy-option=)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+             || (-e|--edit|--no-edit|-n|--no-commit|-s|--signoff)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    "REVERT_SEQUENCER_0_opt^" "
+                (--continue|--quit|--abort)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                || (--continue|--quit|--abort):del
+                        <<>> REVERT_0_opt // REVERT_#_arg"
+                    
+    "REVERT_#_arg" "NO-OP // ::chroma/-git-verify-commit"
+
+    ##
+    ## Unfinished / old follow
+    ##
 
     # `DIFF'
     "subcmd:diff" "Q_1_arg // Q_2_arg"

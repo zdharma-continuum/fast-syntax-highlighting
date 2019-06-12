@@ -99,7 +99,7 @@ chroma/main-create-OPTION-hash.ch() {
 
         chroma/main-chroma-print -l -- "Processing an ||-part - got <<>>-split: _________" "${${__sp[@]}[@]/(#s)/-\\t}" "_________" >> /tmp/fsh-dbg
         __e="${__sp[1]}"
-        __s=( "${(@s:|:)${${__e#\(}%\)}}" )
+        __s=( "${(@)${(@s:|:)${${__e#\(}%\)(:add|:del|)}}//(#e)/${${(M)__e##\(*\)(:add|:del)}:+${(M)__e%(:add|:del)}}}" )
         [[ ${#__s} -eq 1 && -z "${__s[1]}" ]] && __s=()
         __s=( "${__s[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
         shift __sp
