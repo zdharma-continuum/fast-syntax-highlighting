@@ -149,7 +149,8 @@ fsh__git__chroma__def=(
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action"
 
-    "FILE_#_arg" "NO-OP // chroma/-git-verify-file"
+    # A generic action
+    "FILE_#_arg" "NO-OP // ::chroma/-git-verify-file"
 
     ##
     ## MERGE
@@ -204,13 +205,49 @@ fsh__git__chroma__def=(
     "REVERT_#_arg" "NO-OP // ::chroma/-git-verify-commit"
 
     ##
-    ## Unfinished / old follow
+    ## DIFF
     ##
 
-    # `DIFF'
-    "subcmd:diff" "Q_1_arg // Q_2_arg"
-    "Q_1_arg" "// ::(-chroma-git-rev-verify||-std-ch-path-verify)"
-    "Q_2_arg" "// ::(-chroma-git-rev-verify||-std-ch-path-verify)"
+    "subcmd:diff" "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_#_arg // NO_MATCH_#_opt"
+
+    "DIFF_NO_INDEX_0_opt^" "
+                --no-index
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+             || --no-index:del
+                        <<>> COMMIT_FILE_#_arg
+             || --no-index:add
+                        <<>> FILE_#_arg"
+    DIFF_0_opt "
+                (-U|--unified=|--anchored=|--diff-algorithm=|--stat=|--dirstat|
+                 --submodule=|--color=|--color-moved=|--color-moved-ws=|--word-diff=|
+                 --word-diff-regex=|--color-words=|--ws-error-highlight=|--abbrev=|
+                 -B|--break-rewrites=|-M|--find-renames=|-C|--find-copies=|-l|
+                 --diff-filter=|-S|-G|--find-object=|--relative=|-O|--relative=|
+                 --inter-hunk-context=|--ignore-submodules=|--src-prefix=|--dst-prefix=|
+                 --line-prefix=)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                (-p|--patch|-u|-s|--no-patch|--raw|--patch-with-raw|--indent-heuristic|
+                 --no-indent-heuristic|--minimal|--patience|--histogram|--stat|
+                 --compact-summary|--numstat|--shortstat|--dirstat|--summary|
+                 --patch-with-stat|-z|--name-only|--name-status|--submodule|--no-color|
+                 --color-moved|--word-diff|--color-words|--no-renames|--check|
+                 --full-index|--binary|--abbrev|--break-rewrites|--find-renames|
+                 --find-copies|--find-copies-harder|-D|--pickaxe-all|--pickaxe-regex|
+                 --irreversible-delete|-R|--relative|-a|--text|--ignore-cr-at-eol|
+                 --ignore-space-at-eol|-b|--ignore-space-change|-w|--ignore-all-space|
+                 --ignore-blank-lines|-W|--function-context|--exit-code|--quiet|
+                 --ext-diff|--no-ext-diff|--textconv|--no-textconv|--ignore-submodules|
+                 --no-prefix|--ita-invisible-in-index|-1|--base|-2|--ours|-3|--theirs|
+                 -0|--cached)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    # A generic action
+    "COMMIT_FILE_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file"
+
+    ##
+    ## Unfinished / old follow
+    ##
 
     # `CHECKOUT'
     "subcmd:checkout" "R-*1-opt // R_1_arg || S_1_arg"
