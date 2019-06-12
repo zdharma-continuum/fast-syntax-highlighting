@@ -44,7 +44,6 @@ chroma/main-chroma-std-aopt-action() {
 
     [[ "$_wrd" = (#b)(--[a-zA-Z0-9_-]##)=(*) ]] && {
         reply+=("$_start $(( _end - mend[2] + mbegin[2] - 1 )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
-        reply+=("$(( _start + 1 + mend[1] )) $_end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-${${${(M)match[2]:#<->}:+number}:-string}]}")
     } || {
 	[[ "$_wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \
 	    __style=${FAST_THEME_NAME}single-hyphen-option
@@ -59,6 +58,20 @@ chroma/main-chroma-std-aopt-ARG-action() {
     [[ "$_wrd" = (#b)(--[a-zA-Z0-9_-]##)=(*) ]] && {
         reply+=("$(( _start + 1 + mend[1] )) $_end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-${${${(M)match[2]:#<->}:+number}:-string}]}")
     } || __style=${FAST_THEME_NAME}optarg-${${${(M)_wrd:#(-|)<->}:+number}:-string}
+}
+
+# This action also highlights explicit arguments, i.e. --opt=the-explicit-arg
+chroma/main-chroma-std-aopt-SEMI-action() {
+    integer _start="$2" _end="$3"
+    local _scmd="$1" _wrd="$4"
+
+    [[ "$_wrd" = (#b)(--[a-zA-Z0-9_-]##)=(*) ]] && {
+        reply+=("$_start $(( _end - mend[2] + mbegin[2] - 1 )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
+        reply+=("$(( _start + 1 + mend[1] )) $_end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-${${${(M)match[2]:#<->}:+number}:-string}]}")
+    } || {
+	[[ "$_wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \
+	    __style=${FAST_THEME_NAME}single-hyphen-option
+    }
 }
 
 chroma/main-create-OPTION-hash.ch() {
@@ -118,7 +131,13 @@ chroma/main-process-token.ch() {
 
     chroma/main-chroma-print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "-----" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-option-sets]}})}}:-EMPTY-SET!} ${${(j:, :)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-option-sets]}}:-EMPTY-SET!} >> /tmp/fsh-dbg
 
-    (( ! ${#__splitted} )) && return 1
+    (( ! ${#__splitted} )) && {
+        __var_name="${__main_hash_name}[subcmd:*]"
+        __splitted=( "${(@s://:P)__var_name}" )
+        [[ ${#__splitted} -eq 1 && -z "${__splitted[1]}" ]] && __splitted=()
+        __splitted=( "${__splitted[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
+       (( ! ${#__splitted} )) && return 1
+    }
 
     chroma/main-chroma-print -rl -- "---NO-HASH-CREATE-FROM-NOW-ON---" >> /tmp/fsh-dbg
 

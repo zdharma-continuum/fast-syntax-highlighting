@@ -188,6 +188,9 @@ fsh__git__chroma__def=(
     "A_1_arg" "::-chroma-git-averify-ref-and-tag" # opposite (exists -> incorrect-subtle) verification of
                                                   # existence in all refs and all tags
 
+    # All remaining subcommands
+    "subcmd:*" "CATCH_ALL_#_opt"
+    "CATCH_ALL_#_opt" "* <<>> NO-OP // ::chroma/main-chroma-std-aopt-SEMI-action"
 )
 
 # Called after entering just "git" on the command line
