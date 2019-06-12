@@ -343,7 +343,7 @@ chroma/-git-check-if-alias() {
 
     typeset -ga fsh__chroma__git__aliases
     _result=( ${(M)fsh__chroma__git__aliases[@]:#${_wrd}[[:space:]]##*} )
-    chroma/main-chroma-print "Got is-alias-_result: $_result" >> /tmp/fsh-dbg
+    chroma/main-chroma-print "Got is-alias-_result: $_result"
     [[ -n "$_result" ]] && \
 	FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="${${${_result#* }## ##}%% *}"
 }
