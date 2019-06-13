@@ -82,6 +82,7 @@ fsh__git__chroma__def=(
 
     # A generic action
     NO_MATCH_#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    NO_MATCH_#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
     ##
     ## PUSH
@@ -278,14 +279,104 @@ fsh__git__chroma__def=(
     FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-ubranch-or-commit-verify"
 
     ##
-    ## Unfinished / old follow
+    ## REMOTE
     ##
 
-    # OR (main form of the checkout command)
-    "S_1_arg" "// ::(-chroma-git-rev-verify||-chroma-git-remote-rev-verify||-std-ch-path-verify)"
+    subcmd:remote "REMOTE_0_opt // REMOTE_ADD_1_arg // REMOTE_RENAME_1_arg // REMOTE_REMOVE_1_arg //
+                     REMOTE_SET_HEAD_1_arg // REMOTE_SET_BRANCHES_1_arg //
+                     REMOTE_GET_URL_1_arg // REMOTE_SET_URL_1_arg // REMOTE_SHOW_1_arg //
+                     REMOTE_PRUNE_1_arg // REMOTE_UPDATE_1_arg"
 
-    # `REMOTE'
-    "subcmd:remote" "T-*1-arg // T_2_arg || U-*1-arg // U_2_arg || B_0_opt // B_0_arg"
+    REMOTE_0_opt "(-v|--verbose)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_ADD_1_arg "add ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_ADD_OPTS_1_opt // REMOTE_A_NAME_2_arg //
+                         REMOTE_A_URL_3_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_RENAME_1_arg "rename ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_A_NAME_2_arg // REMOTE_A_NAME_3_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_REMOVE_1_arg "remove ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_A_NAME_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SET_HEAD_1_arg "set-head ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_A_NAME_2_arg // BRANCH_3_arg //
+                         REMOTE_SET_HEAD_OPTS_1_opt // REMOTE_SET_HEAD_OPTS_2_opt //
+                         NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SET_BRANCHES_1_arg "set-branches ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_SET_BRANCHES_OPTS_1_opt // REMOTE_A_NAME_2_arg //
+                         BRANCH_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_GET_URL_1_arg "get-url ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_GET_URL_OPTS_1_opt // REMOTE_2_arg //
+                         NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SET_URL_1_arg "set-url ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_SET_URL_OPTS_1_opt^ //
+                         REMOTE_A_NAME_2_arg // REMOTE_A_URL_3_arg // REMOTE_A_URL_4_arg //
+                         NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SHOW_1_arg "show ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_SHOW_OPTS_1_opt // REMOTE_A_NAME_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_PRUNE_1_arg "prune ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_PRUNE_OPTS_1_opt // REMOTE_A_NAME_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_UPDATE_1_arg "update ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_UPDATE_OPTS_1_opt // REMOTE_GR_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_ADD_OPTS_1_opt "
+                    (-t|-m|--mirror=)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+                    (-f|--tags|--no-tags)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_SET_HEAD_OPTS_1_opt "
+                    (-a|--auto|-d|--delete)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_SET_HEAD_OPTS_2_opt "
+                    (-a|--auto|-d|--delete)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_SET_BRANCHES_OPTS_1_opt "
+                    --add
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_GET_URL_OPTS_1_opt "
+                    (--push|--all)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    "REMOTE_SET_URL_OPTS_1_opt^" "
+                    --push|--add|--delete
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                 || (--add|--delete):del
+                        <<>> REMOTE_A_URL_4_arg"
+
+    REMOTE_SHOW_OPTS_1_opt "
+                    -n
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_PRUNE_OPTS_1_opt "
+                    (-n|--dry-run)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_UPDATE_OPTS_1_opt "
+                    (-p|--prune)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_A_NAME_2_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+    REMOTE_A_NAME_3_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+    REMOTE_A_NAME_#_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+    REMOTE_A_URL_3_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
+    REMOTE_A_URL_4_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
+    BRANCH_3_arg "NO-OP // ::chroma/-git-verify-branch"
+    BRANCH_#_arg "NO-OP // ::chroma/-git-verify-branch"
+    REMOTE_2_arg "NO-OP // ::chroma/-git-verify-remote"
+
     "T-*1-arg:add" "// NO-OP"
     "T_2_arg" "// ::-chroma-git-remote-averify-weak" # If 1st arg is add, then second arg is an opposite-good
                                                      # existence check, weak (bad result is highlighted)
@@ -296,6 +387,10 @@ fsh__git__chroma__def=(
     # OR
     "B_#_opt" "// ::-chroma-git-incorrect-cmd-line"
     "B_#_arg" "// ::-chroma-git-incorrect-cmd-line"
+
+    ##
+    ## Unfinished / old follow
+    ##
 
     # `BRANCH'
     "subcmd:branch"  "V-*1-opt // V_1_arg || W_1_arg"            # New Git's main subcommand: branch
@@ -395,12 +490,10 @@ chroma/-git-verify-remote() {
 chroma/-git-verify-ref() {
     local _wrd="$4"
     _wrd="${_wrd%%:*}"
-    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches-$PWD" "refs/heads" $(( 2 * 60 ))
-    [[ -n ${__lines_list[(r)$_wrd]} ]] && {
-        __style=${FAST_THEME_NAME}correct-subtle; return 0
-    } || {
-        __style=${FAST_THEME_NAME}incorrect-subtle; return 1
-    }
+    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-refs-$PWD" "refs/heads" $(( 2 * 60 ))
+    [[ -n ${__lines_list[(r)$_wrd]} ]] && \
+        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
 }
 
 # A generic handler - checks if given remote or group is correct

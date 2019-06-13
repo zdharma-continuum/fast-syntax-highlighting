@@ -74,6 +74,28 @@ chroma/main-chroma-std-aopt-SEMI-action() {
     }
 }
 
+# A handler which verifies the token as an url
+chroma/main-chroma-std-verify-url() {
+    setopt localoptions extendedglob
+    local _wrd="$4" 
+    integer url_correct=0
+    # Correct matches
+    # Correct matches
+    if [[ "$_wrd" = (#b)(git|http|https|ftp|ftps)://([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)(/([a-zA-Z0-9./_~:-]##))(#c0,1) ]]; then
+        url_correct=1
+    elif [[ "$_wrd" = (#b)rsync://([a-zA-Z0-9._~-]##)(/([a-zA-Z0-9./_~:-]##))(#c0,1) ]]; then
+        url_correct=1
+    elif [[ "$_wrd" = (#b)ssh://([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)(/([a-zA-Z0-9./_~:-]##))(#c0,1) ]]; then
+        url_correct=1
+    elif [[ "$_wrd" = (#b)([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##):([a-zA-Z0-9./_~:-](#c0,1)[a-zA-Z0-9._~:-][a-zA-Z0-9./_~:-]#)(#c0,1) ]]; then
+        url_correct=1
+    fi
+
+    (( url_correct )) && \
+        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
 # Creates a hash table for given option set (an *_opt field in the chroma def.)
 chroma/main-create-OPTION-hash.ch() {
     local __subcmd="$1" __option_set_id="$2" __the_hash_name="$3" __ __e __el __the_hash_name __var_name
@@ -131,7 +153,7 @@ chroma/main-process-token.ch() {
     [[ ${#__splitted} -eq 1 && -z "${__splitted[1]}" ]] && __splitted=()
     __splitted=( "${__splitted[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
 
-    chroma/main-chroma-print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "-----" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})}}:-EMPTY-SET!} ${${(j:, :)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}}:-EMPTY-SET!} >> /tmp/reply
+    chroma/main-chroma-print -rl -- "[B] MAIN-PROCESS-TOKEN: got [OPTION/ARG-**S-E-T-S**] //-splitted from subcmd:$__subcmd: ${${(j:, :)__splitted}:-EMPTY-SET!}" "----- __splitted\\Deleted: -----" ${${(j:, :)${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})}}:-EMPTY-SET (deleted)!} "----- Added\\Deleted: -----" ${${(j:, :)${${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})}}:-EMPTY-SET (added)!} -----\ Deleted:\ ----- ${(j:, :)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}} >> /tmp/reply
 
     (( ! ${#__splitted} )) && {
         __var_name="${__main_hash_name}[subcmd:*]"
@@ -148,7 +170,7 @@ chroma/main-process-token.ch() {
         chroma/main-chroma-print -rl -- "-z OPT-WITH-ARG-ACTIVE == true"
         if [[ "$__wrd" = -* ]]; then
             chroma/main-chroma-print "1st-PATH (-z opt-with-arg-active, non-opt-arg branch, i.e. OPTION BRANCH) [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]"
-            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}; do
+            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})} ${${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})}; do
                 [[ "${__val}" != "${__val%%_([0-9]##|\#)##*}"_${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}_opt(\*|\^|) && "${__val}" != "${__val%%_([0-9]##|\#)*}"_"#"_opt(\*|\^|) ]] && { chroma/main-chroma-print "DIDN'T MATCH $__val / arg counter:${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" ;  continue; } || chroma/main-chroma-print "Got candidate: $__val"
                 # Create the hash cache-parameter if needed
                 __the_hash_name="fsh__chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//(#b)([\#\^\*])/${map[${match[1]}]}}//[^a-zA-Z0-9_]/_}"
@@ -189,7 +211,7 @@ chroma/main-process-token.ch() {
                     __handler="${__split[2]%[[:blank:]]+}"
 
                     # Check for directives (like :add)
-                    if [[ "$__val" = *opt\^ ]]; then
+                    if [[ "$__val" = *_opt\^ ]]; then
                         __var_name="${__the_hash_name}[${${${${(M)__wrd#?*=}:+${__wrd%=*}=}:-$__wrd}}:add-directive]"
                         (( ${(P)+__var_name} )) && __split=( "${(@s://:P)__var_name}" ) || __split=()
                         [[ ${#__split} -eq 1 && -z "${__split[1]}" ]] && __split[1]=()
@@ -218,8 +240,8 @@ chroma/main-process-token.ch() {
             done
         else
             chroma/main-chroma-print "1st-PATH-B (-z opt-with-arg-active, non-opt-arg branch, ARGUMENT BRANCH [#${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}]) //// added-nodes: ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}"
-            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})} ${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}; do
-                [[ "${__val}" != "${__val%%_([0-9]##|\#)*}"_"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}"_arg(\*|\^|) && "${__val}" != "${__val%%_([0-9]##|\#)*}"_"#"_arg(\*|\^|) ]] && { chroma/main-chroma-print "Continuing for $__val" ; continue }
+            for __val in ${__splitted[@]:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})} ${${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}:#(${(~j:|:)${(@)=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}})}; do
+                [[ "${__val}" != "${__val%%_([0-9]##|\#)*}"_"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}"_arg(\*|\^|) && "${__val}" != "${__val%%_([0-9]##|\#)*}"_"#"_arg(\*|\^|) ]] && { chroma/main-chroma-print "Continuing for $__val / arg counter ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}" ; continue }
                 # Create the hash cache-parameter if needed
                 __the_hash_name="fsh__chroma__${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}__${__subcmd//[^a-zA-Z0-9_]/_}__${${__val//\#/H}//[^a-zA-Z0-9_]/_}"
                 __action="" __handler=""
@@ -241,7 +263,6 @@ chroma/main-process-token.ch() {
                 [[ "${__sp[2]}" = ::[^[:space:]]* ]] && __handler="${__sp[2]#::}" || { [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && chroma/main-chroma-print "=== Error === In chroma definition: a handler entry ${(q)__sp[2]} without leading \`::'" ; }
                 [[ -n "$__handler" && "$__handler" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running handler(3): $__handler" ; "$__handler" "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}" "$__start" "$__end" "$__wrd"; }
                 [[ -n "$__action" && "$__action" != "NO-OP" ]] && { chroma/main-chroma-print -rl -- "Running action(3): $__action" ; eval "() { $__action; } \"${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]:-NULL}\" \"$__start\" \"$__end\" \"$__wrd\""; }
-                [[ "$__val" != *\* ]] && break
 
                 # Check for argument directives (like :add)
                 if (( ${#__split} >= 2 )); then
@@ -255,6 +276,8 @@ chroma/main-process-token.ch() {
                     done
                     chroma/main-chroma-print -l "ARGUMENT :add / :del directives: THE __SPLIT[#${#__split}]: " "${__split[@]//(#s)/-\\t}" "//" "The FAST_HIGHLIGHT[chroma-*deleted-nodes]: " ${(@)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-deleted-nodes]}//(#s)/-\\t} "The FAST_HIGHLIGHT[chroma-*added-nodes]: " ${(@)${=FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-added-nodes]}//(#s)/-\\t}
                 fi
+
+                [[ "$__val" != *\* ]] && break
             done
         fi
     else
