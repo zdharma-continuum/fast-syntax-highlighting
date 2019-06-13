@@ -10,7 +10,7 @@ FAST_HIGHLIGHT[-git.ch-chroma-def]=1
 
 typeset -gA fsh__git__chroma__def
 fsh__git__chroma__def=(
-    "subcmd:NULL" "NULL_0_opt"
+    subcmd:NULL "NULL_0_opt"
     NULL_0_opt "(-C|--exec-path=|--git-dir=|--work-tree=|--namespace=|--super-prefix=)
                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
@@ -31,7 +31,7 @@ fsh__git__chroma__def=(
     ## `FETCH'
     ##
 
-    "subcmd:fetch" "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_#_opt"
+    subcmd:fetch "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
     # Special options (^ - has directives, currently - an :add and :del directive)
     "FETCH_MULTIPLE_0_opt^" "
@@ -73,7 +73,7 @@ fsh__git__chroma__def=(
                    # is set to be argument-less. The argument is a) -o/--option argument
                    # and b) -o/--option=argument.
 
-    REMOTE_GR_1_arg "NO-OP // ::chroma/-git-verify-remote" # This definition is generic, reused later
+    REMOTE_GR_1_arg "NO-OP // ::chroma/-git-verify-remote-or-group" # This definition is generic, reused later
     "REF_#_arg" "NO-OP // ::chroma/-git-verify-ref" # This too
     "REMOTE_GR_#_arg" "NO-OP // ::chroma/-git-verify-remote-or-group" # and this too
     # The hash `#' above denotes: an argument at any position
@@ -87,7 +87,7 @@ fsh__git__chroma__def=(
     ## PUSH
     ##
 
-    "subcmd:push" "PUSH_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
+    subcmd:push "PUSH_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
     PUSH_0_opt "
               (--receive-pack=|--exec=|--repo=|--push-option=|--signed=|
@@ -108,7 +108,7 @@ fsh__git__chroma__def=(
     ## PULL
     ##
 
-    "subcmd:pull" "PULL_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
+    subcmd:pull "PULL_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
     PULL_0_opt "
               (--recurse-submodules=|-S|--gpg-sign=|--log=|-s|--strategy=|-X|
@@ -131,7 +131,7 @@ fsh__git__chroma__def=(
     ## COMMIT
     ##
 
-    "subcmd:commit" "COMMIT_#_opt // FILE_#_arg // NO_MATCH_#_opt"
+    subcmd:commit "COMMIT_#_opt // FILE_#_arg // NO_MATCH_#_opt"
 
     "COMMIT_#_opt" "
               (-m|--message=)
@@ -156,7 +156,7 @@ fsh__git__chroma__def=(
     ## MERGE
     ##
 
-    "subcmd:merge" "MERGE_0_opt // MERGE_1_arg"
+    subcmd:merge "MERGE_0_opt // MERGE_1_arg"
     MERGE_0_opt
            "(-m)
                        <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
@@ -178,8 +178,8 @@ fsh__git__chroma__def=(
     ## RESET
     ##
 
-    "subcmd:reset" "REST_0_opt // RESET_#_arg // NO_MATCH_#_opt"
-    REST_0_opt "
+    subcmd:reset "RESET_0_opt // RESET_#_arg // NO_MATCH_#_opt"
+    RESET_0_opt "
         (-q|--soft|--mixed|--hard|--merge|--keep|-p|--patch)
                     <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
     "RESET_#_arg" "NO-OP // ::chroma/-git-RESET-verify-commit-or-file"
@@ -188,7 +188,7 @@ fsh__git__chroma__def=(
     ## REVERT
     ##
 
-    "subcmd:revert" "REVERT_SEQUENCER_0_opt^ // REVERT_0_opt // REVERT_#_arg // NO_MATCH_#_opt"
+    subcmd:revert "REVERT_SEQUENCER_0_opt^ // REVERT_0_opt // REVERT_#_arg // NO_MATCH_#_opt"
     REVERT_0_opt "
                 (-m|--mainline|-S|--gpg-sign=|--strategy=|-X|--strategy-option=)
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
@@ -208,7 +208,7 @@ fsh__git__chroma__def=(
     ## DIFF
     ##
 
-    "subcmd:diff" "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_#_arg // NO_MATCH_#_opt"
+    subcmd:diff "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_#_arg // NO_MATCH_#_opt"
 
     "DIFF_NO_INDEX_0_opt^" "
                 --no-index
@@ -227,7 +227,7 @@ fsh__git__chroma__def=(
                  --line-prefix=)
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
-                (-p|--patch|-u|-s|--no-patch|--raw|--patch-with-raw|--indent-heuristic|
+             || (-p|--patch|-u|-s|--no-patch|--raw|--patch-with-raw|--indent-heuristic|
                  --no-indent-heuristic|--minimal|--patience|--histogram|--stat|
                  --compact-summary|--numstat|--shortstat|--dirstat|--summary|
                  --patch-with-stat|-z|--name-only|--name-status|--submodule|--no-color|
@@ -249,7 +249,7 @@ fsh__git__chroma__def=(
     ## CHECKOUT
     ##
 
-    "subcmd:checkout" "CHECKOUT_BRANCH_0_opt^ //
+    subcmd:checkout "CHECKOUT_BRANCH_0_opt^ //
                         CHECKOUT_0_opt // FILE_OR_BRANCH_OR_COMMIT_1_arg //
                         FILE_#_arg // NO_MATCH_#_opt"
 
