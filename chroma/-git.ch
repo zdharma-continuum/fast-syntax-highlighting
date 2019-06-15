@@ -241,7 +241,9 @@ fsh__git__chroma__def=(
                 (--continue|--quit|--abort)
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
                 || (--continue|--quit|--abort):del
-                        <<>> REVERT_0_opt // REVERT_#_arg"
+                        <<>> REVERT_0_opt // REVERT_#_arg
+                || (--continue|--quit|--abort):add
+                        <<>> NO_MATCH_#_arg"
 
     "REVERT_#_arg" "NO-OP // ::chroma/-git-verify-commit"
 
@@ -250,6 +252,8 @@ fsh__git__chroma__def=(
     ##
     ## DIFF
     ##
+    ##  TODO: When a second argument is also a path and it points to a directory, then
+    ##        git appends the previous file name to it – good to implement this too
     ## {{{
 
     subcmd:diff "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_#_arg // NO_MATCH_#_opt"
@@ -260,7 +264,7 @@ fsh__git__chroma__def=(
              || --no-index:del
                         <<>> COMMIT_FILE_#_arg
              || --no-index:add
-                        <<>> FILE_#_arg"
+                        <<>> FILE_1_arg // FILE_2_arg // NO_MATCH_#_arg"
     DIFF_0_opt "
                 (-U|--unified=|--anchored=|--diff-algorithm=|--stat=|--dirstat|
                  --submodule=|--color=|--color-moved=|--color-moved-ws=|--word-diff=|
@@ -289,6 +293,12 @@ fsh__git__chroma__def=(
     # A generic action
     "COMMIT_FILE_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file"
 
+    # A generic action
+    "FILE_1_arg" "NO-OP // ::chroma/-git-verify-file"
+
+    # A generic action
+    "FILE_2_arg" "NO-OP // ::chroma/-git-verify-file"
+
     ## }}}
 
     ##
@@ -297,7 +307,7 @@ fsh__git__chroma__def=(
     ## {{{
 
     subcmd:checkout "CHECKOUT_BRANCH_0_opt^ //
-                        CHECKOUT_0_opt // FILE_OR_BRANCH_OR_COMMIT_1_arg //
+                        CHECKOUT_0_opt // COMMIT_1_arg // FILE_#_arg //
                         FILE_#_arg // NO_MATCH_#_opt"
 
     "CHECKOUT_BRANCH_0_opt^" "
@@ -306,7 +316,7 @@ fsh__git__chroma__def=(
              || (-b|-B|--orphan):del
                         <<>> FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg
              || (-b|-B|--orphan):add
-                        <<>> NEW_BRANCH_1_arg // COMMIT_2_arg"
+                        <<>> NEW_BRANCH_1_arg // COMMIT_2_arg // NO_MATCH_#_arg"
 
     NEW_BRANCH_1_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
 
@@ -322,6 +332,10 @@ fsh__git__chroma__def=(
                  --ignore-other-worktrees|--no-ignore-other-worktrees)
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
 
+    # A generic action
+    COMMIT_1_arg "NO-OP // ::chroma/-git-verify-commit"
+
+    # Unused
     FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-ubranch-or-commit-verify"
 
     ## }}}
