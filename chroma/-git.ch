@@ -10,6 +10,11 @@ FAST_HIGHLIGHT[-git.ch-chroma-def]=1
 
 typeset -gA fsh__git__chroma__def
 fsh__git__chroma__def=(
+    ##
+    ## No subcommand
+    ##
+    ## {{{
+
     subcmd:NULL "NULL_0_opt"
     NULL_0_opt "(-C|--exec-path=|--git-dir=|--work-tree=|--namespace=|--super-prefix=)
                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
@@ -27,9 +32,12 @@ fsh__git__chroma__def=(
 
     "subcmd-hook" "chroma/-git-check-if-alias"
 
+    ## }}}
+
     ##
     ## `FETCH'
     ##
+    ## {{{
 
     subcmd:fetch "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
@@ -84,9 +92,12 @@ fsh__git__chroma__def=(
     NO_MATCH_#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
     NO_MATCH_#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
+    ## }}}
+
     ##
     ## PUSH
     ##
+    ## {{{
 
     subcmd:push "PUSH_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
@@ -128,9 +139,12 @@ fsh__git__chroma__def=(
                --progress|-4|--ipv4|-6|--ipv6|recurse-submodules)
                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
 
+    ## }}}
+
     ##
     ## COMMIT
     ##
+    ## {{{
 
     subcmd:commit "COMMIT_#_opt // FILE_#_arg // NO_MATCH_#_opt"
 
@@ -153,9 +167,12 @@ fsh__git__chroma__def=(
     # A generic action
     "FILE_#_arg" "NO-OP // ::chroma/-git-verify-file"
 
+    ## }}}
+
     ##
     ## MERGE
     ##
+    ## {{{
 
     subcmd:merge "MERGE_0_opt // MERGE_1_arg"
     MERGE_0_opt
@@ -175,9 +192,12 @@ fsh__git__chroma__def=(
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
     MERGE_1_arg "NO-OP // ::chroma/-git-verify-commit"
 
+    ## }}}
+
     ##
     ## RESET
     ##
+    ## {{{
 
     subcmd:reset "RESET_0_opt // RESET_#_arg // NO_MATCH_#_opt"
     RESET_0_opt "
@@ -185,9 +205,12 @@ fsh__git__chroma__def=(
                     <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
     "RESET_#_arg" "NO-OP // ::chroma/-git-RESET-verify-commit-or-file"
 
+    ## }}}
+
     ##
     ## REVERT
     ##
+    ## {{{
 
     subcmd:revert "REVERT_SEQUENCER_0_opt^ // REVERT_0_opt // REVERT_#_arg // NO_MATCH_#_opt"
     REVERT_0_opt "
@@ -205,9 +228,12 @@ fsh__git__chroma__def=(
 
     "REVERT_#_arg" "NO-OP // ::chroma/-git-verify-commit"
 
+    ## }}}
+
     ##
     ## DIFF
     ##
+    ## {{{
 
     subcmd:diff "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_#_arg // NO_MATCH_#_opt"
 
@@ -246,9 +272,12 @@ fsh__git__chroma__def=(
     # A generic action
     "COMMIT_FILE_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file"
 
+    ## }}}
+
     ##
     ## CHECKOUT
     ##
+    ## {{{
 
     subcmd:checkout "CHECKOUT_BRANCH_0_opt^ //
                         CHECKOUT_0_opt // FILE_OR_BRANCH_OR_COMMIT_1_arg //
@@ -278,9 +307,12 @@ fsh__git__chroma__def=(
 
     FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-ubranch-or-commit-verify"
 
+    ## }}}
+
     ##
     ## REMOTE
     ##
+    ## {{{
 
     subcmd:remote "REMOTE_0_opt // REMOTE_ADD_1_arg // REMOTE_RENAME_1_arg // REMOTE_REMOVE_1_arg //
                      REMOTE_SET_HEAD_1_arg // REMOTE_SET_BRANCHES_1_arg //
@@ -377,40 +409,17 @@ fsh__git__chroma__def=(
     REMOTE_2_arg "NO-OP // ::chroma/-git-verify-remote"
     REMOTE_#_arg "NO-OP // ::chroma/-git-verify-remote"
 
-    "T-*1-arg:add" "// NO-OP"
-    "T_2_arg" "// ::-chroma-git-remote-averify-weak" # If 1st arg is add, then second arg is an opposite-good
-                                                     # existence check, weak (bad result is highlighted)
-    # OR
-    "U-*1-arg:!chroma_git_remote_subcommands" "// ::-chroma-git-remote-subcommand" # Take subcommands from array
-    "U_2_arg" "::-chroma-git-remote-verify"                                        # Verify the `git remote subcmd {arg}'
-
-    # OR
-    "B_#_opt" "// ::-chroma-git-incorrect-cmd-line"
-    "B_#_arg" "// ::-chroma-git-incorrect-cmd-line"
+    ## }}}
 
     ##
-    ## Unfinished / old follow
+    #3 All remaining subcommands
     ##
+    ## {{{
 
-    # `BRANCH'
-    "subcmd:branch"  "V-*1-opt // V_1_arg || W_1_arg"            # New Git's main subcommand: branch
-    "V-*1-opt:!branch_change_options" "::-chroma-git-branch-opt" # Alternative of (required: the *) options, from array `branch_change_options'
-    "V_1_arg" "::-chroma-git-verify-ref"                         # 1st argument must be an existing branch name (i.e.
-                                                                 # incorrect-subtle is being used)
-    # OR
-    "W_1_arg" "::-chroma-git-verify-ref-weak" # 1st argument can be an existing branch, that would be applying
-                                              # the correct-subtle style
-
-    # `TAG'
-    "subcmd:tag" "A_0_opt_with_arg // A_0_opt_arg // A_1_arg" # 0 meaning: before any argument
-    "A_0_opt_with_arg:(-u|-m|-F|-d|--contains|--no-contains|--points-at|--merged|--no-merged)" "return 1 // NO-OP"
-    "A_0_opt_arg" "::-chroma-handle-tag-option-argument"
-    "A_1_arg" "::-chroma-git-averify-ref-and-tag" # opposite (exists -> incorrect-subtle) verification of
-                                                  # existence in all refs and all tags
-
-    # All remaining subcommands
     "subcmd:*" "CATCH_ALL_#_opt"
     "CATCH_ALL_#_opt" "* <<>> NO-OP // ::chroma/main-chroma-std-aopt-SEMI-action"
+
+    ## }}}
 )
 
 # Called after entering just "git" on the command line
