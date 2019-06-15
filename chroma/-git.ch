@@ -393,7 +393,7 @@ fsh__git__chroma__def=(
     REMOTE_ADD_OPTS_1_opt "
                     (-t|-m|--mirror=)
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                        <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
                  || (-f|--tags|--no-tags)
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
 
