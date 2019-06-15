@@ -3,25 +3,427 @@
 #
 # Chroma function for command `git'. It colorizes the part of command
 # line that holds `git' invocation.
-#
-# $1 - 0 or 1, denoting if it's first call to the chroma, or following one
-# $2 - the current token, also accessible by $__arg from the above scope -
-#      basically a private copy of $__arg
-# $3 - a private copy of $_start_pos, i.e. the position of the token in the
-#      command line buffer, used to add region_highlight entry (see man),
-#      because Zsh colorizes by *ranges* in command line buffer
-# $4 - a private copy of $_end_pos from the above scope
-#
 
-(( next_word = 2 | 8192 ))
+(( FAST_HIGHLIGHT[-git.ch-chroma-def] )) && return 1
 
-local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-local __style
-integer __idx1 __idx2
-local -a __lines_list chroma_git_remote_subcommands
-chroma_git_remote_subcommands=(add rename remove set-head set-branches get-url set-url set-url set-url show prune update)
+FAST_HIGHLIGHT[-git.ch-chroma-def]=1
 
-if (( __first_call )); then
+typeset -gA fsh__git__chroma__def
+fsh__git__chroma__def=(
+    ##
+    ## No subcommand
+    ##
+    ## {{{
+
+    subcmd:NULL "NULL_0_opt"
+    NULL_0_opt "(-C|--exec-path=|--git-dir=|--work-tree=|--namespace=|--super-prefix=)
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+            || -c
+                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP
+                    <<>> __style=\${FAST_THEME_NAME}optarg-string // NO-OP
+            || (--version|--help|--html-path|--man-path|--info-path|-p|--paginate|
+		-P|--no-pager|--no-replace-objects|--bare)
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+
+    "subcommands" "::chroma/-git-get-subcommands" # run a function (the :: causes this) and use `reply'
+    #"subcommands" "(fetch|pull)" # run a function (the :: causes this) and use `reply'
+
+    "subcmd-hook" "chroma/-git-check-if-alias"
+
+    ## }}}
+
+    ##
+    ## `FETCH'
+    ##
+    ## {{{
+
+    subcmd:fetch "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_#_opt"
+
+    # Special options (^ - has directives, currently - an :add and :del directive)
+    "FETCH_MULTIPLE_0_opt^" "
+                --multiple
+                        <<>> __style=\${FAST_THEME_NAME}double-hyphen-option // NO-OP
+                || --multiple:add
+                        <<>> REMOTE_GR_#_arg
+                || --multiple:del
+                        <<>> REMOTE_GR_1_arg // REF_#_arg" # when --multiple is passed, then
+                                        # there is no refspec argument, only remotes-ids
+                                        # follow unlimited # of them, hence the # in the
+                                        # REF_#_arg
+
+    # Special options (^ - has directives - an :del-directive)
+    "FETCH_ALL_0_opt^" "
+                --all
+                    <<>> __style=\${FAST_THEME_NAME}double-hyphen-option // NO-OP
+                || --all:del
+                    <<>> REMOTE_GR_1_arg // REF_#_arg" # --all can be only followed by options
+
+    # FETCH_0_opt. FETCH-options (FETCH is an identifier) at position 0 ->
+    #   -> before any argument
+    FETCH_0_opt "
+              (--depth=|--deepen=|--shallow-exclude=|--shallow-since=|--receive-pack=|
+               --refmap=|--recurse-submodules=|-j|--jobs=|--submodule-prefix=|
+               --recurse-submodules-default=|-o|--server-option=|--upload-pack|
+               --negotiation-tip=)
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+           || (--help|--all|-a|--append|--unshallow|--update-shallow|--dry-run|-f|--force|
+               -k|--keep|--multiple|-p|--prune|-n|--no-tags|-t|--tags|--no-recurse-submodules|
+               -u|--update-head-ok|-q|--quiet|-v|--verbose|--progress|
+               -4|--ipv4|-6|--ipv6)
+                   <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
+                   # Above: note the two <<>>-separated blocks for options that have
+                   # some arguments – the second pair of action/handler is being
+                   # run when an option argument is occurred (first one: the option
+                   # itself). If there is only one <<>>-separated block, then the option
+                   # is set to be argument-less. The argument is a) -o/--option argument
+                   # and b) -o/--option=argument.
+
+    REMOTE_GR_1_arg "NO-OP // ::chroma/-git-verify-remote-or-group" # This definition is generic, reused later
+    "REF_#_arg" "NO-OP // ::chroma/-git-verify-ref" # This too
+    "REMOTE_GR_#_arg" "NO-OP // ::chroma/-git-verify-remote-or-group" # and this too
+    # The hash `#' above denotes: an argument at any position
+    # It will nicely match any following (above the first explicitly
+    # numbered ones) arguments passed when using --multiple
+
+    # A generic action
+    NO_MATCH_#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    NO_MATCH_#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+
+    ## }}}
+
+    ##
+    ## PUSH
+    ##
+    ## {{{
+
+    subcmd:push "PUSH_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
+
+    PUSH_0_opt "
+              (--receive-pack=|--exec=|--repo=|--push-option=|--signed=|
+                  --force-with-lease=|--signed=|--recurse-submodules=)
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+           || (--help|--all|--mirror|--tags|--follow-tags|--atomic|-n|--dry-run|
+               --porcelain|--delete|--tags|--follow-tags|--signed|--no-signed|
+               --atomic|--no-atomic|-o|--push-option|--force-with-lease|
+               --no-force-with-lease|-f|--force|-u|--set-upstream|--thin|
+               --no-thin|-q|--quiet|-v|--verbose|--progress|--no-recurse-submodules|
+               --verify|--no-verify|-4|--ipv4|-6|--ipv6)
+                   <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
+
+    REMOTE_1_arg "NO-OP // ::chroma/-git-verify-remote" # This definition is generic, reused later
+
+    ##
+    ## PULL
+    ##
+
+    subcmd:pull "PULL_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
+
+    PULL_0_opt "
+              (--recurse-submodules=|-S|--gpg-sign=|--log=|-s|--strategy=|-X|
+               --strategy-option=|--rebase=|--depth=|--deepen=|--shallow-exclude=|
+               --shallow-since=|--negotiation-tip|--upload-pack|-o|--server-option=|
+               --no-recurse-submodules=)
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+           || (--help|-q|--quiet|-v|--verbose|--progress|--no-recurse-submodules|
+               --commit|--no-commit|--edit|--no-edit|--ff|--no-ff|--ff-only|
+               --log|--no-log|--signoff|--no-signoff|--stat|-n|--no-stat|--squash|
+               --no-squash|--verify-signatures|--no-verify-signatures|--summary|
+               --no-summary|--allow-unrelated-histories|-r|--rebase|--no-rebase|
+               --autostash|--no-autostash|--all|-a|--append|--unshallow|
+               --update-shallow|-f|--force|-k|--keep|--no-tags|-u|--update-head-ok|
+               --progress|-4|--ipv4|-6|--ipv6|recurse-submodules)
+                   <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
+
+    ## }}}
+
+    ##
+    ## COMMIT
+    ##
+    ## {{{
+
+    subcmd:commit "COMMIT_#_opt // FILE_#_arg // NO_MATCH_#_opt"
+
+    "COMMIT_#_opt" "
+              (-m|--message=)
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+           || (--help|-a|--all|-p|--patch|--reset-author|--short|--branch|
+               --porcelain|--long|-z|--null|-s|--signoff|-n|--no-verify|
+               --allow-empty|--allow-empty-message|-e|--edit|--no-edit|
+               --amend|--no-post-rewrite|-i|--include|-o|--only|--untracked-files|
+               -v|--verbose|-q|--quiet|--dry-run|--status|--no-status|--no-gpg-sign)
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+           || (-C|--reuse-message=|-c|--reedit-message=|--fixup=|--squash=|
+               -F|--file=|--author=|--date=|-t|--template=|--cleanup=|
+               -u|--untracked-files=|-S|--gpg-sign=)
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action"
+
+    # A generic action
+    "FILE_#_arg" "NO-OP // ::chroma/-git-verify-file"
+
+    ## }}}
+
+    ##
+    ## MERGE
+    ##
+    ## {{{
+
+    subcmd:merge "MERGE_0_opt // MERGE_1_arg"
+    MERGE_0_opt
+           "(-m)
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
+                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+            (-S|--gpg-sign=|--log=|-e|--strategy=|-X|--strategy-option=|-F|
+             --file)
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+         || (--help|--commit|--no-commit|-e|--edit|--no-edit|--ff|--no-ff|--ff-only|
+             --log|--no-log|--signoff|--no-signoff|-n|--stat|--no-stat|--squash|
+             --no-squash|--verify-signatures|--no-verify-signatures|--summary|
+             --no-summary|-q|--quiet|-v|--verbose|--progress|--no-progress|
+             --allow-unrelated-histories|--rerere-autoupdate|--no-rerere-autoupdate|
+             --abort|--continue)
+                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+    MERGE_1_arg "NO-OP // ::chroma/-git-verify-commit"
+
+    ## }}}
+
+    ##
+    ## RESET
+    ##
+    ## {{{
+
+    subcmd:reset "RESET_0_opt // RESET_#_arg // NO_MATCH_#_opt"
+    RESET_0_opt "
+        (-q|--soft|--mixed|--hard|--merge|--keep|-p|--patch)
+                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+    "RESET_#_arg" "NO-OP // ::chroma/-git-RESET-verify-commit-or-file"
+
+    ## }}}
+
+    ##
+    ## REVERT
+    ##
+    ## {{{
+
+    subcmd:revert "REVERT_SEQUENCER_0_opt^ // REVERT_0_opt // REVERT_#_arg // NO_MATCH_#_opt"
+    REVERT_0_opt "
+                (-m|--mainline|-S|--gpg-sign=|--strategy=|-X|--strategy-option=)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+             || (-e|--edit|--no-edit|-n|--no-commit|-s|--signoff)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    "REVERT_SEQUENCER_0_opt^" "
+                (--continue|--quit|--abort)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                || (--continue|--quit|--abort):del
+                        <<>> REVERT_0_opt // REVERT_#_arg"
+
+    "REVERT_#_arg" "NO-OP // ::chroma/-git-verify-commit"
+
+    ## }}}
+
+    ##
+    ## DIFF
+    ##
+    ## {{{
+
+    subcmd:diff "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_#_arg // NO_MATCH_#_opt"
+
+    "DIFF_NO_INDEX_0_opt^" "
+                --no-index
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+             || --no-index:del
+                        <<>> COMMIT_FILE_#_arg
+             || --no-index:add
+                        <<>> FILE_#_arg"
+    DIFF_0_opt "
+                (-U|--unified=|--anchored=|--diff-algorithm=|--stat=|--dirstat|
+                 --submodule=|--color=|--color-moved=|--color-moved-ws=|--word-diff=|
+                 --word-diff-regex=|--color-words=|--ws-error-highlight=|--abbrev=|
+                 -B|--break-rewrites=|-M|--find-renames=|-C|--find-copies=|-l|
+                 --diff-filter=|-S|-G|--find-object=|--relative=|-O|--relative=|
+                 --inter-hunk-context=|--ignore-submodules=|--src-prefix=|--dst-prefix=|
+                 --line-prefix=)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+             || (-p|--patch|-u|-s|--no-patch|--raw|--patch-with-raw|--indent-heuristic|
+                 --no-indent-heuristic|--minimal|--patience|--histogram|--stat|
+                 --compact-summary|--numstat|--shortstat|--dirstat|--summary|
+                 --patch-with-stat|-z|--name-only|--name-status|--submodule|--no-color|
+                 --color-moved|--word-diff|--color-words|--no-renames|--check|
+                 --full-index|--binary|--abbrev|--break-rewrites|--find-renames|
+                 --find-copies|--find-copies-harder|-D|--pickaxe-all|--pickaxe-regex|
+                 --irreversible-delete|-R|--relative|-a|--text|--ignore-cr-at-eol|
+                 --ignore-space-at-eol|-b|--ignore-space-change|-w|--ignore-all-space|
+                 --ignore-blank-lines|-W|--function-context|--exit-code|--quiet|
+                 --ext-diff|--no-ext-diff|--textconv|--no-textconv|--ignore-submodules|
+                 --no-prefix|--ita-invisible-in-index|-1|--base|-2|--ours|-3|--theirs|
+                 -0|--cached)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    # A generic action
+    "COMMIT_FILE_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file"
+
+    ## }}}
+
+    ##
+    ## CHECKOUT
+    ##
+    ## {{{
+
+    subcmd:checkout "CHECKOUT_BRANCH_0_opt^ //
+                        CHECKOUT_0_opt // FILE_OR_BRANCH_OR_COMMIT_1_arg //
+                        FILE_#_arg // NO_MATCH_#_opt"
+
+    "CHECKOUT_BRANCH_0_opt^" "
+                (-b|-B|--orphan)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+             || (-b|-B|--orphan):del
+                        <<>> FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg
+             || (-b|-B|--orphan):add
+                        <<>> NEW_BRANCH_1_arg // COMMIT_2_arg"
+
+    NEW_BRANCH_1_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+
+    COMMIT_2_arg "NO-OP // ::chroma/-git-verify-commit"
+
+    CHECKOUT_0_opt "
+                --conflict=
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+             || (-q|--quiet|--progress|--no-progress|-f|--force|--ours|--theirs|
+                 -b|-B|-t|--track|--no-track|-l|--detach|--orphan|
+                 --ignore-skip-worktree-bits|-m|--merge|-p|--patch|
+                 --ignore-other-worktrees|--no-ignore-other-worktrees)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-ubranch-or-commit-verify"
+
+    ## }}}
+
+    ##
+    ## REMOTE
+    ##
+    ## {{{
+
+    subcmd:remote "REMOTE_0_opt // REMOTE_ADD_1_arg // REMOTE_RENAME_1_arg // REMOTE_REMOVE_1_arg //
+                     REMOTE_SET_HEAD_1_arg // REMOTE_SET_BRANCHES_1_arg //
+                     REMOTE_GET_URL_1_arg // REMOTE_SET_URL_1_arg // REMOTE_SHOW_1_arg //
+                     REMOTE_PRUNE_1_arg // REMOTE_UPDATE_1_arg"
+
+    REMOTE_0_opt "(-v|--verbose)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_ADD_1_arg "add ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_ADD_OPTS_1_opt // REMOTE_A_NAME_2_arg //
+                         REMOTE_A_URL_3_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_RENAME_1_arg "rename ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_2_arg // REMOTE_A_NAME_3_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_REMOVE_1_arg "remove ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SET_HEAD_1_arg "set-head ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_2_arg // BRANCH_3_arg //
+                         REMOTE_SET_HEAD_OPTS_1_opt // REMOTE_SET_HEAD_OPTS_2_opt //
+                         NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SET_BRANCHES_1_arg "set-branches ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_SET_BRANCHES_OPTS_1_opt // REMOTE_2_arg //
+                         BRANCH_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_GET_URL_1_arg "get-url ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_GET_URL_OPTS_1_opt // REMOTE_2_arg //
+                         NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SET_URL_1_arg "set-url ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_SET_URL_OPTS_1_opt^ //
+                         REMOTE_2_arg // REMOTE_A_URL_3_arg // REMOTE_A_URL_4_arg //
+                         NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    REMOTE_SHOW_1_arg "show ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_SHOW_OPTS_1_opt // REMOTE_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_PRUNE_1_arg "prune ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_PRUNE_OPTS_1_opt // REMOTE_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_UPDATE_1_arg "update ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
+                         add:REMOTE_UPDATE_OPTS_1_opt // REMOTE_GR_#_arg // NO_MATCH_#_opt"
+
+    REMOTE_ADD_OPTS_1_opt "
+                    (-t|-m|--mirror=)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+                 || (-f|--tags|--no-tags)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_SET_HEAD_OPTS_1_opt "
+                    (-a|--auto|-d|--delete)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_SET_HEAD_OPTS_2_opt "
+                    (-a|--auto|-d|--delete)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_SET_BRANCHES_OPTS_1_opt "
+                    --add
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_GET_URL_OPTS_1_opt "
+                    (--push|--all)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    "REMOTE_SET_URL_OPTS_1_opt^" "
+                    --push|--add|--delete
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                 || (--add|--delete):del
+                        <<>> REMOTE_A_URL_4_arg"
+
+    REMOTE_SHOW_OPTS_1_opt "
+                    -n
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_PRUNE_OPTS_1_opt "
+                    (-n|--dry-run)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_UPDATE_OPTS_1_opt "
+                    (-p|--prune)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    REMOTE_A_NAME_2_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+    REMOTE_A_NAME_3_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+    REMOTE_A_URL_3_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
+    REMOTE_A_URL_4_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
+    BRANCH_3_arg "NO-OP // ::chroma/-git-verify-branch"
+    BRANCH_#_arg "NO-OP // ::chroma/-git-verify-branch"
+    REMOTE_2_arg "NO-OP // ::chroma/-git-verify-remote"
+    REMOTE_#_arg "NO-OP // ::chroma/-git-verify-remote"
+
+    ## }}}
+
+    ##
+    #3 All remaining subcommands
+    ##
+    ## {{{
+
+    "subcmd:*" "CATCH_ALL_#_opt"
+    "CATCH_ALL_#_opt" "* <<>> NO-OP // ::chroma/main-chroma-std-aopt-SEMI-action"
+
+    ## }}}
+)
+
+# Called after entering just "git" on the command line
+chroma/-git-first-call() {
     # Called for the first time - new command
     # FAST_HIGHLIGHT is used because it survives between calls, and
     # allows to use a single global hash only, instead of multiple
@@ -36,346 +438,197 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-git-fetch-multiple]=0
     FAST_HIGHLIGHT[chroma-git-branch-change]=0
     FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
+    FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit]=0
     return 1
-else
-    # Following call, i.e. not the first one
+}
 
-    # Check if chroma should end – test if token is of type
-    # "starts new command", if so pass-through – chroma ends
-    [[ "$__arg_type" = 3 ]] && return 2
+chroma/-git-check-if-alias() {
+    local _wrd="$1"
+    local -a _result
 
-    if [[ "$__wrd" = "--" ]]; then
-        FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]=1
-        __style=${FAST_THEME_NAME}double-hyphen-option
-    elif [[ "$__wrd" = -* && ${FAST_HIGHLIGHT[chroma-git-got-subcommand]} -eq 0 ]]; then
-        # Options occuring before a subcommand
-        if (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] == 0 )); then
-            if [[ "$__wrd" = -[^[:space:]-]#C ]]; then
-                FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
-            elif [[ "$__wrd" = -[^[:space:]-]#c ]]; then
-                FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=1
-            fi
-        fi
-        return 1
+    typeset -ga fsh__chroma__git__aliases
+    _result=( ${(M)fsh__chroma__git__aliases[@]:#${_wrd}[[:space:]]##*} )
+    chroma/main-chroma-print "Got is-alias-_result: $_result"
+    [[ -n "$_result" ]] && \
+	FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="${${${_result#* }## ##}%% *}"
+}
+
+# A hook that returns the list of git's
+# available subcommands in $reply
+chroma/-git-get-subcommands() {
+    local __svalue
+    integer __ivalue
+    LANG=C -fast-run-command "git help -a" chroma-${FAST_HIGHLIGHT[chroma-current]}-subcmd-list "" $(( 15 * 60 ))
+    if [[ "${__lines_list[1]}" = See* ]]; then
+        # (**)
+        # git >= v2.20, the aliases in the `git help -a' command
+        __lines_list=( ${${${${(M)__lines_list[@]:#([[:space:]][[:space:]]#[a-z]*|Command aliases)}##[[:space:]]##}//Command\ aliases/Command_aliases}} )
+        __svalue="+${__lines_list[(I)Command_aliases]}"
+        __lines_list[1,__svalue-1]=( ${(@)__lines_list[1,__svalue-1]%%[[:space:]]##*} )
     else
-        # If at e.g. '>' or destination/source spec (of the redirection)
-        if (( in_redirection > 0 )); then
-            return 1
-        # If at main git option taking argument in a separate word (-C and -c)
-        elif (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] > 0 && \
-            0 == FAST_HIGHLIGHT[chroma-git-got-subcommand] ))
-        then
-            # Remember the value
-            __idx2=${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}
-            # Reset the is-argument mark-field
-            FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
+        # (**)
+        # git < v2.20, add aliases through extra code
+        __lines_list=( ${(s: :)${(M)__lines_list[@]:#  [a-z]*}} )
 
-            (( __idx2 == 2 )) && return 1
-            # Other options' args (i.e. arg of -c) aren't routed to the big-loop
-            # as they aren't paths and aren't handled in any special way there
-        elif (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
-            FAST_HIGHLIGHT[chroma-git-got-subcommand]=1
+        __svalue=${#__lines_list}
+        # This allows to check if the command is an alias - we want to
+        # highlight the aliased command just like the target command of
+        # the alias
+        -fast-run-command "+git config --get-regexp 'alias.*'" chroma-${FAST_HIGHLIGHT[chroma-current]}-alias-list "[[:space:]]#alias." $(( 15 * 60 ))
+    fi
 
-            # Check if the command is an alias - we want to highlight the
-            # aliased command just like the target command of the alias
-            -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 10 * 60 ))
-            # Grep for line: alias.{user-entered-subcmd}[[:space:]], and remove alias. prefix
-            __lines_list=( ${${(M)__lines_list[@]:#alias.${__wrd}[[:space:]]##*}#alias.} )
+    __tmp=${#__lines_list}
+    typeset -ga fsh__chroma__git__aliases
+    fsh__chroma__git__aliases=( ${__lines_list[__svalue+1,__tmp]} )
+    [[ ${__lines_list[__svalue]} != "Command_aliases" ]] && (( ++ __svalue, __ivalue=0, 1 )) || (( __ivalue=1 ))
+    __lines_list[__svalue,__tmp]=( ${(@)__lines_list[__svalue+__ivalue,__tmp]%%[[:space:]]##*} )
+    reply=( "${__lines_list[@]}" )
+}
 
-            if (( ${#__lines_list} > 0 )); then
-                # (*)
-                # First remove alias name (#*[[:space:]]) and the space after it, then
-                # remove any leading spaces from what's left (##[[:space:]]##), then
-                # remove everything except the first word that's in the left line
-                # (%%[[:space:]]##*, i.e.: "everything from right side up to any space")
-                FAST_HIGHLIGHT[chroma-git-subcommand]="${${${__lines_list[1]#*[[:space:]]}##[[:space:]]##}%%[[:space:]]##*}"
+# A generic handler
+chroma/-git-verify-remote() {
+    local _wrd="$4"
+    -fast-run-git-command "git remote" "chroma-git-remotes-$PWD" "" $(( 2 * 60 ))
+    [[ -n ${__lines_list[(r)$_wrd]} ]] && {
+        __style=${FAST_THEME_NAME}correct-subtle; return 0
+    } || {
+        [[ $_wrd != *:* ]] && { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+    }
+}
+
+# A generic handler - checks if given ref is correct
+chroma/-git-verify-ref() {
+    local _wrd="$4"
+    _wrd="${_wrd%%:*}"
+    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-refs-$PWD" "refs/heads" $(( 2 * 60 ))
+    [[ -n ${__lines_list[(r)$_wrd]} ]] && \
+        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+# A generic handler - checks if given remote or group is correct
+chroma/-git-verify-remote-or-group() {
+    chroma/-git-verify-remote "$@" && return 0
+    # The check for a group is to follow below
+    integer _start="$2" _end="$3"
+    local _scmd="$1" _wrd="$4"
+}
+
+# A generic handler - checks whether the file exists
+chroma/-git-verify-file() {
+    local _wrd="$4"
+
+    [[ -f "$_wrd" ]] && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+chroma/-git-verify-branch() {
+    local _wrd="$4"
+    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches-$PWD" "refs/heads" $(( 2 * 60 ))
+    [[ -n ${__lines_list[(r)$_wrd]} ]] && \
+        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+chroma/-git-verify-also-unfetched-ref() {
+    local _wrd="$4"
+    -fast-run-git-command "git config --get checkout.defaultRemote" \
+                            "chroma-git-defaultRemote-$PWD" "" $(( 2 * 60 ))
+    local remote="${__lines_list[1]:-origin}"
+    -fast-run-git-command "git rev-list --count --no-walk
+                            --glob=\"refs/remotes/$remote/$_wrd\"" \
+                                "chroma-git-unfetched-ref-$PWD" "" $(( 2 * 60 ))
+
+    (( __lines_list[1] )) && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+# A generic handler
+chroma/-git-file-or-ubranch-or-commit-verify() {
+    chroma/-git-verify-commit "$@" && return
+    chroma/-git-verify-file "$@" && return
+    chroma/-git-verify-also-unfetched-ref "$@"
+}
+
+# A generic handler
+chroma/-git-verify-correct-branch-name() {
+    local _wrd="$4"
+    [[ "$_wrd" != ./* && "$_wrd" != *..* && "$_wrd" != *[~\^\ $'\t']* &&
+        "$_wrd" != */ && "$_wrd" != *.lock && "$_wrd" != *\\* ]] && \
+        { return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+# A generic handler that checks if given commit reference is correct
+chroma/-git-verify-commit() {
+    local _wrd="$4"
+    __lines_list=()
+    -fast-run-git-command "git rev-parse --verify --quiet \"$_wrd\"" "chroma-git-commits-$PWD-$_wrd" "" $(( 1.5 * 60 ))
+    if (( ${#__lines_list} )); then
+        __style=${FAST_THEME_NAME}correct-subtle
+        return 0
+    fi
+    __style=${FAST_THEME_NAME}incorrect-subtle
+    return 1
+}
+
+# A generic handler that checks if given commit reference
+# is correct or if it's a file that exists
+chroma/-git-verify-commit-or-file() {
+    chroma/-git-verify-commit "$@" && return
+    chroma/-git-verify-file "$@"
+}
+
+# A handler for the commit's -m/--message options.Currently
+# does the same what chroma/main-chroma-std-aopt-action does
+chroma/-git-commit-msg-opt-action() {
+    chroma/main-chroma-std-aopt-action "$@"
+}
+
+# A handler for the commit's -m/--message options' argument
+chroma/-git-commit-msg-opt-ARG-action() {
+    integer _start="$2" _end="$3"
+    local _scmd="$1" _wrd="$4"
+
+    (( __start >= 0 )) || return
+
+    # Match the message body in case of an --message= option
+    if [[ "$_wrd" = (#b)(--message=)(*) && -n "${match[2]}" ]]; then
+        _wrd="${(Q)${match[2]//\`/x}}"
+        # highlight --message=>>something<<
+        reply+=("$(( __start+10 )) $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
+    fi
+
+    if (( ${#_wrd} > 50 )); then
+        for (( __idx1 = 1, __idx2 = 1; __idx1 <= 50; ++ __idx1, ++ __idx2 )); do
+            # Use __arg from the fast-highlight-process's scope
+            while [[ "${__arg[__idx2]}" != "${_wrd[__idx1]}" ]]; do
+                (( ++ __idx2 ))
+                (( __idx2 > __asize )) && { __idx2=-1; break; }
+            done
+            (( __idx2 == -1 )) && break
+        done
+        if (( __idx2 != -1 )); then
+            if [[ -n "${match[1]}" ]]; then
+                reply+=("$(( __start+__idx2 )) $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
             else
-                FAST_HIGHLIGHT[chroma-git-subcommand]="$__wrd"
-            fi
-            if (( __start_pos >= 0 )); then
-                # if subcommand exists
-                LANG=C -fast-run-command "git help -a" chroma-git-subcmd-list "" $(( 10 * 60 ))
-                # (s: :) will split on every space, but because the expression
-                # isn't double-quoted, the empty elements will be eradicated
-                # Some further knowledge-base: s-flag is special, it skips
-                # empty elements and creates an array (not a concatenated
-                # string) even when double-quoted. The normally needed @-flag
-                # that logically breaks the concaetnated string back into array
-                # in case of double-quoting has additional effect for s-flag:
-                # it finally blocks empty-elements eradication.
-                if [[ "${__lines_list[1]}" = See* ]]; then
-                    # (**)
-                    # git >= v2.20
-                    __lines_list=( ${(M)${${${(M)__lines_list[@]:# [[:blank:]]#[a-z]*}##[[:blank:]]##}%%[[:blank:]]##*}:#${FAST_HIGHLIGHT[chroma-git-subcommand]}} )
-                else
-                    # (**)
-                    # git < v2.20
-                    __lines_list=( ${(M)${(s: :)${(M)__lines_list[@]:#  [a-z]*}}:#${FAST_HIGHLIGHT[chroma-git-subcommand]}} )
-                fi
-
-                # Above we've checked:
-                # 1) If given subcommand is an alias (*)
-                # 2) If the command, or command pointed by the alias, exists (**)
-                # 3) There's little problem, git v2.20 outputs aliases in git help -a,
-                #    which means that alias will be recognized as correct if it will
-                #    point at another alias or on itself. That's a minor problem, a
-                #    TODO for future planned optimization for v2.20 Git
-                # 4) Notice that the above situation is better than the previous - the
-                #    alias is being verified to point to a valid git subcommand
-                # That's all that's needed to decide on the correctnes:
-                if (( ${#__lines_list} > 0 )); then
-                    __style=${FAST_THEME_NAME}subcommand
-                else
-                    __style=${FAST_THEME_NAME}incorrect-subtle
-                fi
-            fi
-            # The counter includes the subcommand itself
-            (( FAST_HIGHLIGHT[chroma-git-counter] += 1 ))
-        else
-            __wrd="${__wrd//\`/x}"
-            __arg="${__arg//\`/x}"
-            __wrd="${(Q)__wrd}"
-            if [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" \
-                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "pull" \
-                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "fetch" ]] \
-                && (( ${FAST_HIGHLIGHT[chroma-git-fetch-multiple]} == 0 )); then
-                # if not option
-                if [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]]; then
-                    (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
-                    if (( __idx1 == 2 )); then
-                        -fast-run-git-command "git remote" "chroma-git-remotes" ""
-                    else
-                        __wrd="${__wrd%%:*}"
-                        -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
-                    fi
-                    # if remote/ref exists
-                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
-                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
-                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
-                    # if ref (__idx1 == 3) does not exist and subcommand is push
-                    elif (( __idx1 != 2 )) && [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "push" ]]; then
-                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
-                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
-                    # if not existing remote name, because not an URL (i.e. no colon)
-                    elif [[ $__idx1 -eq 2 && $__wrd != *:* ]]; then
-                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos+${#__wrd}-${#PREBUFFER}, __start >= 0 )) && \
-                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
-                    fi
-                # if option
-                else
-                    if [[ "$__wrd" = "--multiple" && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "fetch" ]]; then
-                        FAST_HIGHLIGHT[chroma-git-fetch-multiple]=1
-                        __style=${FAST_THEME_NAME}double-hyphen-option
-                    else
-                        return 1
-                    fi
-                fi
-            elif (( ${FAST_HIGHLIGHT[chroma-git-fetch-multiple]} )) \
-                && [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]]; then
-                -fast-run-git-command "git remote" "chroma-git-remotes" ""
-                if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
-                    __style=${FAST_THEME_NAME}correct-subtle
-                fi
-            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "commit" ]]; then
-                match[1]=""
-                match[2]=""
-                # if previous argument is -m or current argument is --message=something
-                if (( FAST_HIGHLIGHT[chrome-git-got-msg1] == 1 && ! FAST_HIGHLIGHT[chrome-git-got-anymsg] )) \
-                    || [[ "$__wrd" = (#b)(--message=)(*) && "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
-                    FAST_HIGHLIGHT[chrome-git-got-msg1]=0
-                    FAST_HIGHLIGHT[chrome-git-got-anymsg]=1
-                    if [[ -n "${match[1]}" ]]; then
-                        __wrd="${(Q)${match[2]//\`/x}}"
-                        # highlight (--message=)something
-                        (( __start=__start_pos-${#PREBUFFER}, __end=__start_pos-${#PREBUFFER}+10, __start >= 0 )) && \
-                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
-                        # highlight --message=(something)
-                        (( __start=__start_pos-${#PREBUFFER}+10, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
-                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
-                    else
-                        (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
-                            reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
-                    fi
-                    local __firstline=${__wrd%%$'\n'*}
-                    if (( ${#__firstline} > 50 )); then
-                        for (( __idx1 = 1, __idx2 = 1; __idx1 <= 50; ++ __idx1, ++ __idx2 )); do
-                            while [[ "${__arg[__idx2]}" != "${__firstline[__idx1]}" ]]; do
-                                (( ++ __idx2 ))
-                                (( __idx2 > __asize )) && { __idx2=-1; break; }
-                            done
-                            (( __idx2 == -1 )) && break
-                        done
-                        if (( __idx2 != -1 )); then
-                            if [[ -n "${match[1]}" ]]; then
-                                (( __start=__start_pos-${#PREBUFFER}+__idx2, __end=__end_pos-${#PREBUFFER}-$#__wrd+$#__firstline-1, __start >= 0 )) && \
-                                    reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
-                            else
-                                (( __start=__start_pos-${#PREBUFFER}+__idx2-1, __end=__end_pos-${#PREBUFFER}-$#__wrd+$#__firstline-1, __start >= 0 )) && \
-                                    reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
-                            fi
-                        fi
-                    fi
-                # if before --
-                elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 ]]; then
-                    if [[ "$__wrd" = -[^[:space:]-]#m ]]; then
-                        FAST_HIGHLIGHT[chrome-git-got-msg1]=1
-                        __style=${FAST_THEME_NAME}single-hyphen-option
-                    else
-                        return 1
-                    fi
-                # if after -- is file
-                elif [[ -e "$__wrd" ]]; then
-                    __style=${FAST_THEME_NAME}path
-                else
-                    __style=${FAST_THEME_NAME}incorrect-subtle
-                fi
-            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]] \
-                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "revert" ]] \
-                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "merge" ]] \
-                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] \
-                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "reset" ]] \
-                || [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "rebase" ]]; then
-
-                # if doing `git checkout -b ...'
-                if [[ "$__wrd" = -[^[:space:]-]#b && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" ]]; then
-                    FAST_HIGHLIGHT[chroma-git-checkout-new]=1
-                    __style=${FAST_THEME_NAME}single-hyphen-option
-                # if command is not checkout -b something
-                elif [[ "${FAST_HIGHLIGHT[chroma-git-checkout-new]}" = 0 ]]; then
-                    # if not option
-                    if [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 1 ]]; then
-                        (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
-                        if (( __idx1 == 2 )) || \
-                            [[ "$__idx1" = 3 && "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]]; then
-                            # if is ref
-                            if command git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
-                                __style=${FAST_THEME_NAME}correct-subtle
-                            # if is file and subcommand is checkout or diff
-                            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" \
-                                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "reset" \
-                                || "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "diff" ]] && [[ -e ${~__wrd} ]]; then
-                                __style=${FAST_THEME_NAME}path
-                            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "checkout" && \
-                                    "1" = "$(command git rev-list --count --no-walk --glob="refs/remotes/${$(git \
-                                        config --get checkout.defaultRemote):-*}/$__wrd")" ]]
-                            then
-                                __style=${FAST_THEME_NAME}correct-subtle
-                            else
-                                __style=${FAST_THEME_NAME}incorrect-subtle
-                            fi
-                        fi
-                    # if option
-                    else
-                        return 1
-                    fi
-                # if option
-                elif [[ "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" = 0 && "$__wrd" = -* ]]; then
-                    return 1
-                fi
-            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "remote" && "$__wrd" != -* ]]; then
-                (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
-                if [[ "$__idx1" = 2 ]]; then
-                    if (( ${chroma_git_remote_subcommands[(I)$__wrd]} )); then
-                        FAST_HIGHLIGHT[chroma-git-remote-subcommand]="$__wrd"
-                        __style=${FAST_THEME_NAME}subcommand
-                    else
-                        __style=${FAST_THEME_NAME}incorrect-subtle
-                    fi
-                elif [[ "$__idx1" = 3 && "$FAST_HIGHLIGHT[chroma-git-remote-subcommand]" = "add" ]]; then
-                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
-                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
-                        __style=${FAST_THEME_NAME}incorrect-subtle
-                    fi
-                elif [[ "$__idx1" = 3 && -n "$FAST_HIGHLIGHT[chroma-git-remote-subcommand]" ]]; then
-                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
-                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
-                        __style=${FAST_THEME_NAME}correct-subtle
-                    else
-                        __style=${FAST_THEME_NAME}incorrect-subtle
-                    fi
-                fi
-            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "branch" ]]; then
-                if [[ "$__wrd" = --delete \
-                    ||  "$__wrd" = --edit-description \
-                    ||  "$__wrd" = --set-upstream-to=* \
-                    ||  "$__wrd" = --unset-upstream \
-                    ||  "$__wrd" = -[^[:space:]-]#d \
-                    ||  "$__wrd" = -[^[:space:]-]#D ]]; then
-                    FAST_HIGHLIGHT[chroma-git-branch-change]=1
-                    return 1
-                elif [[ "$__wrd" != -* ]]; then
-                    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
-                    if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
-                        __style=${FAST_THEME_NAME}correct-subtle
-                    elif (( FAST_HIGHLIGHT[chroma-git-branch-change] )); then
-                        __style=${FAST_THEME_NAME}incorrect-subtle
-                    fi
-                else
-                    return 1
-                fi
-            elif [[ "${FAST_HIGHLIGHT[chroma-git-subcommand]}" = "tag" ]]; then
-                if [[ "${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}" -le 0 ]]; then
-                    if [[ "$__wrd" =  -[^[:space:]-]#(u|m) ]]; then
-                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=1
-                    elif [[ "$__wrd" = -[^[:space:]-]#F ]]; then
-                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=2
-                    elif [[ "$__wrd" = -[^[:space:]-]#d ]]; then
-                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=3
-                    elif [[ "$__wrd" = (--contains|--no-contains|--points-at|--merged|--no-merged) ]]; then
-                        FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=4
-                    fi
-                    if [[ "$__wrd" != -* ]]; then
-                        (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
-                        if [[ ${FAST_HIGHLIGHT[chroma-git-counter]} -eq 2 ]]; then
-                            -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
-                            -fast-run-git-command "+git tag" "chroma-git-tags" ""
-                            [[ -n ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}incorrect-subtle
-                        elif [[ ${FAST_HIGHLIGHT[chroma-git-counter]} -eq 3 ]]; then
-                        fi
-                    else
-                        return 1
-                    fi
-                else
-                    case "${FAST_HIGHLIGHT[chroma-git-option-with-argument-active]}" in
-                        (1) 
-                            __style=${FAST_THEME_NAME}optarg-string
-                            ;;
-                        (2)
-                            FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
-                            return 1;
-                            ;;
-                        (3)
-                            -fast-run-git-command "git tag" "chroma-git-tags" ""
-                            [[ -n ${__lines_list[(r)$__wrd]} ]] && \
-                                __style=${FAST_THEME_NAME}correct-subtle || \
-                                __style=${FAST_THEME_NAME}incorrect-subtle
-                            ;;
-                        (4)
-                            if git rev-parse --verify --quiet "$__wrd" >/dev/null 2>&1; then
-                                __style=${FAST_THEME_NAME}correct-subtle
-                            else
-                                __style=${FAST_THEME_NAME}incorrect-subtle
-                            fi
-                            ;;
-                    esac
-                    FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
-                fi
-            else
-                return 1
+                reply+=("$(( __start+__idx2-1 )) $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
             fi
         fi
     fi
-fi
+}
 
-# Add region_highlight entry (via `reply' array)
-if [[ -n "$__style" ]]; then
-    (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
-        && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[$__style]}")
-fi
-
-# We aren't passing-through, do obligatory things ourselves
-(( this_word = next_word ))
-_start_pos=$_end_pos
+# A RESET handler that checks if given commit reference
+# is correct or if it's a file that exists
+# TODO: differentiate tree-ish from commit
+chroma/-git-RESET-verify-commit-or-file() {
+    chroma/-git-verify-commit "$@" && { FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit]=1; return 0; }
+    (( FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit] )) && {
+        __style=${FAST_THEME_NAME}unknown-token
+        return 1
+    }
+    chroma/-git-verify-file "$@"; return
+}
 
 return 0
 

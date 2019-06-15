@@ -18,13 +18,20 @@
 # User should not forget to define this array, the below code
 # will only ensure that it's array (can also define a global)
 typeset -ga __lines_list
+local -a __response
 
 if [[ -z "${FAST_HIGHLIGHT[$2-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[$2-cache-born-at] )) -gt ${4:-5} ]]; then
     FAST_HIGHLIGHT[$2-cache-born-at]="$EPOCHSECONDS"
-    __lines_list=( ${${(f)"$(command ${(Qz)1} 2>/dev/null)"}#$3} )
-    FAST_HIGHLIGHT[$2-cache]="${(j:;:)__lines_list};"
+    __response=( ${${(f)"$(command ${(Qz)1#+} 2>/dev/null)"}#${~3}} )
+    [[ "$1" = "+"* ]] && __lines_list+=( "${__response[@]}" ) || __lines_list=( "${__response[@]}" )
+    FAST_HIGHLIGHT[$2-cache]="${(j:;:)__response}"
 else
-    __lines_list=( "${(s:;:)FAST_HIGHLIGHT[$2-cache]}" )
+    # Quoted (s:;:) flag without @ will skip empty elements. It
+    # still produces array output, interesingly. All this is for
+    # the trailing ";" above, to skip last, empty element.
+    [[ "$1" = "+"* ]] && \
+        __lines_list+=( "${(@s:;:)FAST_HIGHLIGHT[$2-cache]}" ) || \
+        __lines_list=( "${(@s:;:)FAST_HIGHLIGHT[$2-cache]}" )
 fi
 
 # vim:ft=zsh:et:sw=4
