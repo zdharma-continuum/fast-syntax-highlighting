@@ -39,7 +39,8 @@ fsh__git__chroma__def=(
     ##
     ## {{{
 
-    subcmd:fetch "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt // REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_#_opt"
+    subcmd:fetch "FETCH_MULTIPLE_0_opt^ // FETCH_ALL_0_opt^ // FETCH_0_opt //
+                  REMOTE_GR_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
     # Special options (^ - has directives, currently - an :add and :del directive)
     "FETCH_MULTIPLE_0_opt^" "
@@ -116,9 +117,12 @@ fsh__git__chroma__def=(
 
     REMOTE_1_arg "NO-OP // ::chroma/-git-verify-remote" # This definition is generic, reused later
 
+    ### }}}
+
     ##
     ## PULL
     ##
+    ## {{{
 
     subcmd:pull "PULL_0_opt // REMOTE_1_arg // REF_#_arg // NO_MATCH_#_opt"
 
@@ -174,7 +178,7 @@ fsh__git__chroma__def=(
     ##
     ## {{{
 
-    subcmd:merge "MERGE_0_opt // MERGE_1_arg"
+    subcmd:merge "MERGE_0_opt // COMMIT_#_arg"
     MERGE_0_opt
            "(-m)
                        <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
@@ -190,7 +194,7 @@ fsh__git__chroma__def=(
              --allow-unrelated-histories|--rerere-autoupdate|--no-rerere-autoupdate|
              --abort|--continue)
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
-    MERGE_1_arg "NO-OP // ::chroma/-git-verify-commit"
+    COMMIT_#_arg "NO-OP // ::chroma/-git-verify-commit"
 
     ## }}}
 
