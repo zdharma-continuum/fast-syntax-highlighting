@@ -81,13 +81,15 @@ chroma/main-chroma-std-verify-url() {
     integer url_correct=0
     # Correct matches
     # Correct matches
-    if [[ "$_wrd" = (#b)(git|http|https|ftp|ftps)://([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)(/([a-zA-Z0-9./_~:-]##))(#c0,1) ]]; then
+    if [[ "$_wrd" = (#b)(git|http|https|ftp|ftps|file)://([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)(/([a-zA-Z0-9./_~:-]##))(#c0,1) ]]; then
         url_correct=1
     elif [[ "$_wrd" = (#b)rsync://([a-zA-Z0-9._~-]##)(/([a-zA-Z0-9./_~:-]##))(#c0,1) ]]; then
         url_correct=1
     elif [[ "$_wrd" = (#b)ssh://([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)(/([a-zA-Z0-9./_~:-]##))(#c0,1) ]]; then
         url_correct=1
     elif [[ "$_wrd" = (#b)([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##):([a-zA-Z0-9./_~:-](#c0,1)[a-zA-Z0-9._~:-][a-zA-Z0-9./_~:-]#)(#c0,1) ]]; then
+        url_correct=1
+    elif [[ "$_wrd" = (#b)[[:alnum:]/_~:.-]## ]]; then
         url_correct=1
     fi
 
