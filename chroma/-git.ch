@@ -203,11 +203,24 @@ fsh__git__chroma__def=(
     ##
     ## {{{
 
-    subcmd:reset "RESET_0_opt // RESET_#_arg // NO_MATCH_#_opt"
+    subcmd:reset "RESET_0_opt^ // RESET_0_opt // RESET_#_arg // NO_MATCH_#_opt"
+    "RESET_0_opt^" "
+        (--soft|--mixed|--hard|--merge|--keep)
+                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+     || (--soft|--mixed|--hard|--merge|--keep):del
+                    <<>> RESET_0_opt // RESET_#_arg
+     || (--soft|--mixed|--hard|--merge|--keep):add
+                    <<>> RESET_1_arg // NO_MATCH_#_arg
+        "
+
     RESET_0_opt "
-        (-q|--soft|--mixed|--hard|--merge|--keep|-p|--patch)
+        (-q|-p|--patch)
                     <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    RESET_1_arg "NO-OP // ::chroma/-git-verify-commit"
+
     "RESET_#_arg" "NO-OP // ::chroma/-git-RESET-verify-commit-or-file"
+
 
     ## }}}
 
@@ -443,6 +456,7 @@ chroma/-git-first-call() {
     FAST_HIGHLIGHT[chroma-git-branch-change]=0
     FAST_HIGHLIGHT[chroma-git-option-with-argument-active]=0
     FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit]=0
+    FAST_HIGHLIGHT[chroma-git-reset-etc-saw-file]=0
     return 1
 }
 
@@ -622,16 +636,33 @@ chroma/-git-commit-msg-opt-ARG-action() {
     fi
 }
 
-# A RESET handler that checks if given commit reference
-# is correct or if it's a file that exists
+# A RESET handler
 # TODO: differentiate tree-ish from commit
 chroma/-git-RESET-verify-commit-or-file() {
-    chroma/-git-verify-commit "$@" && { FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit]=1; return 0; }
-    (( FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit] )) && {
-        __style=${FAST_THEME_NAME}unknown-token
-        return 1
+    chroma/-git-verify-commit "$@" && {
+        chroma/-git-verify-file "$@" && {
+            # TODO: with -p/--patch, the <paths> are optional,
+            # and this argument will be taken as a commit in a
+            # specific circumstances
+            FAST_HIGHLIGHT[chroma-git-reset-etc-saw-file]=1
+            return 0
+        }
+
+        (( FAST_HIGHLIGHT[chroma-git-reset-etc-saw-file] ||
+            FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit] )) && \
+            { __style=${FAST_THEME_NAME}unknown-token; return 1; }
+
+        FAST_HIGHLIGHT[chroma-git-reset-etc-saw-commit]=1
+
+        __style=${FAST_THEME_NAME}correct-subtle
+
+        return 0
     }
-    chroma/-git-verify-file "$@"; return
+
+    chroma/-git-verify-file "$@" && \
+        { FAST_HIGHLIGHT[chroma-git-reset-etc-saw-file]=1; return 0; }
+
+    return 1
 }
 
 return 0
