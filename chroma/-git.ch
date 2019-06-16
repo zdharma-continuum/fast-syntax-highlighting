@@ -585,9 +585,12 @@ chroma/-git-file-or-ubranch-or-commit-verify() {
 # A generic handler
 chroma/-git-verify-correct-branch-name() {
     local _wrd="$4"
+    chroma/-git-verify-remote "$@" && \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 0; }
+
     [[ "$_wrd" != ./* && "$_wrd" != *..* && "$_wrd" != *[~\^\ $'\t']* &&
         "$_wrd" != */ && "$_wrd" != *.lock && "$_wrd" != *\\* ]] && \
-        { return 0; } || \
+        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
 }
 
