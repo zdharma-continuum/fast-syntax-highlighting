@@ -14,7 +14,7 @@ typeset -gA FAST_WHATIS_CACHE
 -fast-whatis-chroma-callback() {
     local THEFD="$1" input check=2
 
-    @zts-read-all "$THEFD" input
+    -fast-zts-read-all "$THEFD" input
 
     zle -F "$THEFD"
     exec {THEFD}<&-
