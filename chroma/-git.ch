@@ -706,6 +706,9 @@ chroma/-git-commit-msg-opt-ARG-action() {
         _wrd="${(Q)${match[2]//\`/x}}"
         # highlight --message=>>something<<
         reply+=("$(( __start+10 )) $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
+    elif [[ "$_wrd" != --message ]]; then
+        # highlight the message's body
+        reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
     fi
 
     if (( ${#_wrd} > 50 )); then
