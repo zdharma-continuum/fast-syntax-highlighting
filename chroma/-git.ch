@@ -611,7 +611,7 @@ chroma/-git-get-subcommands() {
     if [[ "${__lines_list[1]}" = See* ]]; then
         # (**)
         # git >= v2.20, the aliases in the `git help -a' command
-        __lines_list=( ${${${${(M)__lines_list[@]:#([[:space:]][[:space:]]#[a-z]*|Command aliases)}##[[:space:]]##}//Command\ aliases/Command_aliases}} )
+        __lines_list=( ${${${${(M)__lines_list[@]:#([[:space:]](#c3,3)[a-zA-Z0-9_]*|Command aliases)}##[[:space:]]##}//(#s)Command\ aliases(#e)/Command_aliases}} )
         __svalue="+${__lines_list[(I)Command_aliases]}"
         __lines_list[1,__svalue-1]=( ${(@)__lines_list[1,__svalue-1]%%[[:space:]]##*} )
     else
