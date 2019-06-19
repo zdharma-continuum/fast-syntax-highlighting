@@ -492,7 +492,75 @@ fsh__git__chroma__def=(
     LOG_1_arg "NO-OP // ::chroma/-git-verify-rev-range-or-file"
 
     ##
-    #3 All remaining subcommands
+    ## TAG
+    ##
+
+    subcmd:tag "TAG_D_0_opt^ // TAG_L_0_opt^ // TAG_V_0_opt^ // TAG_0_opt //
+                TAG_NEW_1_arg // COMMIT_2_arg // NO_MATCH_#_arg // NO_MATCH_#_opt"
+
+    TAG_0_opt "
+                (-u|--local-user=|--cleanup=)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+             || -m
+                            <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
+                            <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+             || (-F|--file)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // ::chroma/-git-verify-file
+             || (-a|--annotate|-s|--sign|-f|-e|--edit)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    TAG_NEW_1_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+
+    TAG_1_arg "NO-OP // ::chroma/-git-verify-tag-name"
+
+    "TAG_D_0_opt^" "
+                (-d)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+             || -d:add
+                            <<>> TAG_#_arg
+             || -d:del
+                            <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg //
+                            NO_MATCH_#_arg"
+
+    "TAG_#_arg" "NO-OP // ::chroma/-git-verify-tag-name"
+
+    "TAG_L_0_opt^" "
+                (-l)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+             || -l:add
+                            <<>> TAG_L_0_opt // TAG_PAT_#_arg
+             || -l:del
+                            <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg
+                            NO_MATCH_#_arg"
+
+    "TAG_L_0_opt" "
+                (-n|--contains|--no-contains|--points-at|--column=|--sort=|--format=|
+                 --color=)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+             || (--column|--no-column|--create-reflog|--merged|--no-merged|--color|-i)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    "TAG_PAT_#_arg" "NO-OP // ::chroma/main-chroma-std-verify-pattern"
+
+    "TAG_V_0_opt^" "
+                (-v)
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+             || -v:add
+                            <<>> TAG_V_0_opt // TAG_#_arg
+             || -v:del
+                            <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg
+                            NO_MATCH_#_arg"
+
+    "TAG_V_0_opt" "
+                --format=
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action"
+
+    ##
+    ## All remaining subcommands
     ##
     ## {{{
 
@@ -686,6 +754,14 @@ chroma/-git-verify-rev-range-or-file() {
 
     __style=""
     return 1
+}
+
+chroma/-git-verify-tag-name() {
+    local _wrd="$4"
+    -fast-run-git-command "git tag" "chroma-git-tags-$PWD" "" $(( 2*60 ))
+    [[ -n ${__lines_list[(r)$_wrd]} ]] && \
+        __style=${FAST_THEME_NAME}correct-subtle || \
+        __style=${FAST_THEME_NAME}incorrect-subtle
 }
 
 # A handler for the commit's -m/--message options.Currently

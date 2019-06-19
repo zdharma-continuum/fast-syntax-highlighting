@@ -74,7 +74,7 @@ chroma/main-chroma-std-aopt-SEMI-action() {
     }
 }
 
-# A handler which verifies the token as an url
+# A handler which verifies the token as an GIT url
 chroma/main-chroma-std-verify-url() {
     setopt localoptions extendedglob
     local _wrd="$4"
@@ -96,6 +96,13 @@ chroma/main-chroma-std-verify-url() {
     (( url_correct )) && \
         { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
+# A handler which verifies the token as a shell wildcard
+chroma/main-chroma-std-verify-pattern() {
+    setopt localoptions extendedglob
+    local _wrd="$4"
+    __style=${FAST_THEME_NAME}globbing-ext
 }
 
 # Creates a hash table for given option set (an *_opt field in the chroma def.)
