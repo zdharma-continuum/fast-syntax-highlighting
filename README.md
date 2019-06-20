@@ -149,6 +149,8 @@ Comparing to the project `zsh-users/zsh-syntax-highlighting` (the upper line):
 
 ### Strings
 
+Exact highlighting that recognizes quotings.
+
 <div style="width:100%;background-color:black;border:3px solid black;border-radius:6px;margin:5px 0;padding:2px 5px">
   <img
     src="https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/ideal-string.png"
@@ -228,7 +230,7 @@ Highlighting that is specific for a given command.
 
 The [chromas](https://github.com/zdharma/fast-syntax-highlighting/tree/master/chroma)
 that are enabled by default can be found
-[here](https://github.com/zdharma/fast-syntax-highlighting/blob/master/fast-highlight#L156).
+[here](https://github.com/zdharma/fast-syntax-highlighting/blob/master/fast-highlight#L166).
 
 ### Math-mode highlighting
 
