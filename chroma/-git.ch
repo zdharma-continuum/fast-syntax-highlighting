@@ -522,7 +522,7 @@ fsh__git__chroma__def=(
                 (-d)
                             <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
              || -d:add
-                            <<>> TAG_#_arg
+                            <<>> TAG_#_arg // NO_MATCH_#_opt
              || -d:del
                             <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg"
 
@@ -550,7 +550,7 @@ fsh__git__chroma__def=(
                 (-v)
                             <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
              || -v:add
-                            <<>> TAG_V_0_opt // TAG_#_arg
+                            <<>> TAG_V_0_opt // TAG_#_arg // NO_MATCH_#_opt
              || -v:del
                             <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg"
 
@@ -702,6 +702,9 @@ chroma/-git-file-or-ubranch-or-commit-verify() {
 # A generic handler
 chroma/-git-verify-correct-branch-name() {
     local _wrd="$4"
+    chroma/-git-verify-commit "$@" && \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 0; }
+
     chroma/-git-verify-remote "$@" && \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 0; }
 
