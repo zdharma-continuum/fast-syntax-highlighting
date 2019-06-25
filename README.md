@@ -36,6 +36,7 @@ Feature rich syntax highlighting for Zsh.
     uses **abstract definitions** instead of **top-down, regular code**. The first effect
     is the highlighting for the `git` command it is now **maximally faithful**, it
     follows the `git` command almost completely.
+    [Screencast](https://asciinema.org/a/253411)
 
 # Installation
 
