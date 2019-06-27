@@ -140,7 +140,7 @@ fsh__git__chroma__def=(
                --no-summary|--allow-unrelated-histories|-r|--rebase|--no-rebase|
                --autostash|--no-autostash|--all|-a|--append|--unshallow|
                --update-shallow|-f|--force|-k|--keep|--no-tags|-u|--update-head-ok|
-               --progress|-4|--ipv4|-6|--ipv6|recurse-submodules)
+               --progress|-4|--ipv4|-6|--ipv6|--recurse-submodules)
                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
 
     ## }}}
