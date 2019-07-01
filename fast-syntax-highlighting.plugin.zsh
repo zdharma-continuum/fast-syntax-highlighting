@@ -317,7 +317,7 @@ autoload -Uz -- chroma/-git.ch chroma/-hub.ch chroma/-lab.ch chroma/-example.ch 
                 chroma/-subcommand.ch chroma/-autorandr.ch chroma/-nmcli.ch \
                 chroma/-fast-theme.ch chroma/-node.ch chroma/-fpath_peq.ch \
                 chroma/-precommand.ch chroma/-subversion.ch chroma/-ionice.ch \
-                chroma/-nice.ch chroma/main-chroma.ch chroma/-ogit.ch
+                chroma/-nice.ch chroma/main-chroma.ch chroma/-ogit.ch chroma/-zplugin.ch
 
 source "${0:h}/fast-highlight"
 source "${0:h}/fast-string-highlight"
