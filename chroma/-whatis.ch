@@ -23,17 +23,11 @@ typeset -gA FAST_WHATIS_CACHE
         if [[ "${input%$'\n'}" = *[^0-9]'0' ]]; then
             if [[ "${input#test$'\n'}" = *nothing\ appropriate* ]]; then
                 FAST_HIGHLIGHT[whatis_chroma_type]=2
-            elif [[ "${input#test$'\n'man$'\n'}" = *manual\ entry* ]]; then
-                # TODO: somehow withdrawn from using man here in
-                # favor of the whatis command
-                FAST_HIGHLIGHT[whatis_chroma_type]=2
             else
                 FAST_HIGHLIGHT[whatis_chroma_type]=0
             fi
         else
-            [[ "${input#test$'\n'}" = man* ]] && \
-                FAST_HIGHLIGHT[whatis_chroma_type]=3 || \
-                FAST_HIGHLIGHT[whatis_chroma_type]=1
+            FAST_HIGHLIGHT[whatis_chroma_type]=1
         fi
     elif [[ "$input" = type2* ]]; then
         [[ "$input" != *nothing\ appropriate* ]] && check=1 || check=0
@@ -63,22 +57,13 @@ typeset -gA FAST_WHATIS_CACHE
 zle -N -- -fast-whatis-chroma-callback
 
 if (( __first_call )) && [[ -z "${FAST_HIGHLIGHT[whatis_chroma_type]}" ]] ;then
-    if ! command -v man > /dev/null; then
-        if ! command -v whatis > /dev/null; then
-            FAST_HIGHLIGHT[whatis_chroma_type]=0
-            return 1
-        fi
-        integer have_man=0
-    else
-        integer have_man=1
+    if ! command -v whatis > /dev/null; then
+        FAST_HIGHLIGHT[whatis_chroma_type]=0
+        return 1
     fi
 
-    (( have_man )) && \
-        exec {THEFD}< <( echo "test\nman"; man "osx man fallback check" 2>&1; echo "$?"; ) || \
-        exec {THEFD}< <( echo "test"; whatis "osx whatis fallback check" 2>&1; echo "$?"; )
-
+    exec {THEFD}< <( echo "test"; whatis "osx whatis fallback check"; echo "$?"; )
     command true # a workaround of Zsh bug
-
     zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
 fi
 
@@ -93,29 +78,12 @@ elif (( ! FAST_HIGHLIGHT[whatis_chroma_type] )); then
 else
     if [[ -z "${FAST_WHATIS_CACHE[$__wrd]}" ]]; then
         if (( FAST_HIGHLIGHT[whatis_chroma_type] == 2 )); then
-            (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} ))
-            exec {THEFD}< \
-                <(
-                    echo "type2"
-                    echo "$__start/$__end"
-                    whatis "$__wrd"
-                )
-
+            exec {THEFD}< <( echo "type2"; (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} )); echo "$__start/$__end"; whatis "$__wrd"; )
             command true # see above
-
             zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
         else
-            (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} ))
-            local cmd=${${${(M)FAST_HIGHLIGHT[whatis_chroma_type]:#3}:+man}:-whatis}
-            exec {THEFD}< \
-                <(
-                    echo "type1"
-                    echo "$__start/$__end"
-                    "$cmd" ${${(M)cmd:#man}:+-t} "$__wrd" > /dev/null; echo "$?"
-                )
-
+            exec {THEFD}< <( echo "type1"; (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} )); echo "$__start/$__end"; whatis "$__wrd" > /dev/null; echo "$?"; )
             command true
-
             zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
         fi
     else
