@@ -33,7 +33,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:ice "ICE_#_arg"
+    subcmd:ice "ICE_#_arg // NO_MATCH_#_opt"
 
     "ICE_#_arg" "NO-OP // ::chroma/-zplugin-check-ice-mod"
 
@@ -44,7 +44,11 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:snippet "SNIPPET_1_arg"
+    subcmd:snippet "SNIPPET_0_opt // SNIPPET_1_arg // NO_MATCH_#_opt //
+                    NO_MATCH_#_arg"
+
+    SNIPPET_0_opt "(-f|--command)
+                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
 
     SNIPPET_1_arg "NO-OP // ::chroma/-zplugin-verify-snippet"
 
@@ -69,7 +73,8 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:light "LIGHT_0_opt // LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+    subcmd:light "LIGHT_0_opt // LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt //
+                  NO_MATCH_#_arg"
 
     LIGHT_0_opt "-b
                     <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
@@ -81,7 +86,8 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:(unload|report) "UNLOAD_1_arg // UNLOAD_2_arg"
+    subcmd:(unload|report) "UNLOAD_1_arg // UNLOAD_2_arg // NO_MATCH_#_opt //
+                  NO_MATCH_#_arg"
 
     UNLOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-loaded-plugin"
 
@@ -95,7 +101,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:cenable "COMPLETION_1_arg"
+    subcmd:cenable "COMPLETION_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     COMPLETION_1_arg "NO-OP // ::chroma/-zplugin-verify-disabled-completion"
 
@@ -106,7 +112,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:cdisable "DISCOMPLETION_1_arg"
+    subcmd:cdisable "DISCOMPLETION_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     DISCOMPLETION_1_arg "NO-OP // ::chroma/-zplugin-verify-completion"
 
@@ -118,7 +124,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:uncompile "UNCOMPILE_1_arg"
+    subcmd:uncompile "UNCOMPILE_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     UNCOMPILE_1_arg "NO-OP // ::chroma/-zplugin-verify-compiled-plugin"
 
