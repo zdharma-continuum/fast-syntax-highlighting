@@ -32,7 +32,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    "subcmd:(load|light|compile|stress|edit|glance|recall|update|status|cd|changes)"
+    "subcmd:(load|light|compile|stress|edit|glance|recall|update|status|cd|changes|delete)"
         "LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
@@ -86,6 +86,18 @@ fsh__zplugin__chroma__def=(
     subcmd:cdisable "DISCOMPLETION_1_arg"
 
     DISCOMPLETION_1_arg "NO-OP // ::chroma/-zplugin-verify-completion"
+
+    ## }}}
+
+
+    ##
+    ## `light'
+    ##
+    ## {{{
+
+    subcmd:uncompile "UNCOMPILE_1_arg"
+
+    UNCOMPILE_1_arg "NO-OP // ::chroma/-zplugin-verify-compiled-plugin"
 
     ## }}}
 
@@ -180,6 +192,27 @@ chroma/-zplugin-verify-disabled-completion() {
     return 0
 }
 
+chroma/-zplugin-verify-compiled-plugin() {
+    local _scmd="$1" _wrd="$4"
+
+    typeset -a plugins
+    plugins=( "${ZPLGM[PLUGINS_DIR]}"/*(N) )
+
+    typeset -a show_plugins p matches
+    for p in "${plugins[@]}"; do
+        matches=( $p/*.zwc(N) )
+        if [ "$#matches" -ne "0" ]; then
+            p="${p:t}"
+            [[ "$p" = (_local---zplugin|custom) ]] && continue
+            p="${p//---//}"
+            show_plugins+=( "$p" )
+        fi
+    done
+
+    [[ -n "${show_plugins[(r)$_wrd]}" ]] && \
+        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        return 1
+}
 
 return 0
 
