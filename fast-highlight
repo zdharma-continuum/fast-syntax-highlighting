@@ -433,6 +433,9 @@ typeset -ga ZLAST_COMMANDS
   FAST_HIGHLIGHT[chroma-autoload-elements]=""
   # Restart FPATH elements gathering
   FAST_HIGHLIGHT[chroma-fpath_peq-elements]=""
+  # Restart svn zplugin's ICE gathering
+  FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]=0
+  FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]=""
 
   [[ -n $ZCALC_ACTIVE ]] && {
     _start_pos=0; _end_pos=__len; __arg=$__buf

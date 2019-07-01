@@ -27,6 +27,18 @@ fsh__zplugin__chroma__def=(
     NO_MATCH_#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
     NO_MATCH_#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
+
+    ##
+    ## `ice'
+    ##
+    ## {{{
+
+    subcmd:ice "ICE_#_arg"
+
+    "ICE_#_arg" "NO-OP // ::chroma/-zplugin-check-ice-mod"
+
+    ## }}}
+
     ##
     ## `load'
     ##
@@ -112,6 +124,10 @@ fsh__zplugin__chroma__def=(
     ## }}}
 )
 
+#chroma/-zplugin-first-call() {
+    # This is being done in the proper place - in -fast-highlight-process
+    #FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]=0
+#}
 
 chroma/-zplugin-verify-plugin() {
     local _scmd="$1" _wrd="$4"
@@ -199,6 +215,41 @@ chroma/-zplugin-verify-compiled-plugin() {
     [[ -n "${show_plugins[(r)$_wrd]}" ]] && \
         { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
         return 1
+}
+
+
+chroma/-zplugin-check-ice-mod() {
+    local _scmd="$1" _wrd="$4"
+    [[ "$_wrd" = (svn(\'|\")*|svn) ]] && \
+        FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]=1
+    [[ "$_wrd" = (#b)(id-as(:|)(\'|\")(*)(\'|\")|id-as:(*)|id-as(*)) ]] && \
+        FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]="${match[4]}${match[6]}${match[7]}"
+
+    # Copy from zplugin-autoload.zsh / -zplg-recall
+    local -a ice_order nval_ices
+    ice_order=(
+        svn proto from teleid bindmap cloneopts id-as depth if wait load
+        unload blockf pick bpick src as ver silent lucid notify mv cp
+        atinit atclone atload atpull nocd run-atpull has cloneonly make
+        service trackbinds multisrc compile nocompile nocompletions
+        reset-prompt
+    )
+    nval_ices=(
+            blockf silent lucid trackbinds cloneonly nocd run-atpull
+            nocompletions svn
+    )
+
+    if [[ "$_wrd" = (#b)(${(~j:|:)${ice_order[@]:#(${(~j:|:)nval_ices[@]})}})(*) ]]; then
+        reply+=("$(( __start )) $(( __start+${mend[1]} )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
+        reply+=("$(( __start+${mbegin[2]} )) $(( __end )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-string]}")
+        return 0
+    elif [[ "$_wrd" = (#b)(${(~j:|:)nval_ices[@]}) ]]; then
+        __style=${FAST_THEME_NAME}single-hyphen-option
+        return 0
+    else
+        __style=${FAST_THEME_NAME}incorrect-subtle
+        return 1
+    fi
 }
 
 return 0
