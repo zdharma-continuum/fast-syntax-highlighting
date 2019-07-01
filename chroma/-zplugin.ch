@@ -53,6 +53,19 @@ fsh__zplugin__chroma__def=(
 
     ## }}}
 
+    ##
+    ## `light'
+    ##
+    ## {{{
+
+    subcmd:(unload|report) "UNLOAD_1_arg // UNLOAD_2_arg"
+
+    UNLOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-loaded-plugin"
+
+    UNLOAD_2_arg "NO-OP // ::chroma/-zplugin-verify-loaded-plugin"
+
+    ## }}}
+
 
     ##
     ## `cenable'
