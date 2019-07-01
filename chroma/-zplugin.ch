@@ -40,6 +40,17 @@ fsh__zplugin__chroma__def=(
     ## }}}
 
     ##
+    ## `snippet'
+    ##
+    ## {{{
+
+    subcmd:snippet "SNIPPET_1_arg"
+
+    SNIPPET_1_arg "NO-OP // ::chroma/-zplugin-verify-snippet"
+
+    ## }}}
+
+    ##
     ## `load'
     ##
     ## {{{
@@ -217,6 +228,29 @@ chroma/-zplugin-verify-compiled-plugin() {
         return 1
 }
 
+chroma/-zplugin-verify-snippet() {
+    local _scmd="$1" url="$4" dirname local_dir
+    url="${${url#"${url%%[! $'\t']*}"}%/}"
+    id_as="${FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]:-${ZPLG_ICE[id-as]:-$url}}"
+
+    filename="${${id_as%%\?*}:t}"
+    dirname="${${id_as%%\?*}:t}"
+    local_dir="${${${id_as%%\?*}:h}/:\/\//--}"
+    [[ "$local_dir" = "." ]] && local_dir="" || local_dir="${${${${${local_dir#/}//\//--}//=/--EQ--}//\?/--QM--}//\&/--AMP--}"
+    local_dir="${ZPLGM[SNIPPETS_DIR]}${local_dir:+/$local_dir}"
+
+    (( ${+ZPLG_ICE[svn]} || ${FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]} )) && {
+        # TODO: handle the SVN path's specifics
+        [[ -d "$local_dir/$dirname" ]] && \
+            { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+            return 1
+    } || {
+        # TODO: handle the non-SVN path's specifics
+        [[ -d "$local_dir/$dirname" ]] && \
+            { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+            return 1
+    }
+}
 
 chroma/-zplugin-check-ice-mod() {
     local _scmd="$1" _wrd="$4"
