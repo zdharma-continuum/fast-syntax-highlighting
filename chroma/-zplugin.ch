@@ -149,7 +149,7 @@ fsh__zplugin__chroma__def=(
 chroma/-zplugin-verify-plugin() {
     local _scmd="$1" _wrd="$4"
 
-    [[ -d "$_wrd" ]] && \\
+    [[ -d "$_wrd" ]] && \
         { __style=${FAST_THEME_NAME}correct-subtle; return 0; }
 
     typeset -a plugins
