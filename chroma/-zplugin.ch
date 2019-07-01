@@ -112,19 +112,6 @@ fsh__zplugin__chroma__def=(
     ## }}}
 )
 
-chroma/-git-verify-tag-name() {
-    local _wrd="$4"
-    -fast-run-git-command "git tag" "chroma-git-tags-$PWD" "" $(( 2*60 ))
-    [[ -n ${__lines_list[(r)$_wrd]} ]] && \
-        __style=${FAST_THEME_NAME}correct-subtle || \
-        __style=${FAST_THEME_NAME}incorrect-subtle
-}
-
-# A handler for the commit's -m/--message options.Currently
-# does the same what chroma/main-chroma-std-aopt-action does
-chroma/-git-commit-msg-opt-action() {
-    chroma/main-chroma-std-aopt-action "$@"
-}
 
 chroma/-zplugin-verify-plugin() {
     local _scmd="$1" _wrd="$4"
