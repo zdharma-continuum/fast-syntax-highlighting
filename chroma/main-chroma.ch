@@ -330,7 +330,7 @@ chroma/-pre_process_chroma_def.ch() {
     local __key __value __ke _val __the_hash_name="$1" __var_name
     local -a __split
 
-    chroma/main-chroma-print -rl -- "Starting PRE-PROCESS for __the_hash_name:$__the_hash_name"
+    chroma/main-chroma-print -rl -- "Starting PRE_PROCESS for __the_hash_name:$__the_hash_name"
 
     __ch_def_name="fsh__${__chroma_name}__chroma__def[subcommands]"
     local __subcmds="${(P)__ch_def_name}"
@@ -381,7 +381,7 @@ if (( __first_call )); then
     (( 0 == ${(P)+__the_hash_name} )) && {
         typeset -gA "$__the_hash_name"
         chroma/-pre_process_chroma_def.ch "$__the_hash_name"
-    } || chroma/main-chroma-print "...No... [\$+var: ${(P)+__the_hash_name}]"
+    } || chroma/main-chroma-print "...No... [\${+$__the_hash_name} ${(P)+__the_hash_name}]"
     return 1
 else
     (( ++ FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-call-nr] ))
