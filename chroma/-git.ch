@@ -307,14 +307,14 @@ fsh__git__chroma__def=(
     ## {{{
 
     subcmd:checkout "CHECKOUT_BRANCH_0_opt^ //
-                        CHECKOUT_0_opt // COMMIT_1_arg // FILE_#_arg //
+                        CHECKOUT_0_opt // FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg //
                         FILE_#_arg // NO_MATCH_#_opt"
 
     "CHECKOUT_BRANCH_0_opt^" "
                 (-b|-B|--orphan)
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
              || (-b|-B|--orphan):del
-                        <<>> COMMIT_1_arg // FILE_#_arg // FILE_#_arg
+                        <<>> FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg // FILE_#_arg
              || (-b|-B|--orphan):add
                         <<>> NEW_BRANCH_1_arg // COMMIT_2_arg // NO_MATCH_#_arg"
 
