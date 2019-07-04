@@ -1099,10 +1099,19 @@ typeset -ga ZLAST_COMMANDS
         if (( this_word & BIT_case_nempty_item == 0 )) && [[ $__arg = "esac" ]]; then
           (( next_word = 1 ))
           __style=${FAST_THEME_NAME}reserved-word
-        elif [[ $__arg = [\)\(] ]]; then
-          __style=${FAST_THEME_NAME}case-parentheses
-          [[ $__arg = \) ]] && (( next_word = BIT_case_code | 1 )) || (( next_word = BIT_case_item | BIT_case_nempty_item ))
+        elif [[ $__arg = (\(*\)|\)|\() ]]; then
+          [[ $__arg = *\) ]] && (( next_word = BIT_case_code | 1 )) || (( next_word = BIT_case_item | BIT_case_nempty_item ))
           _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) )
+          (( ${#__arg} > 1 )) && {
+            _FAST_COMPLEX_BRACKETS+=( $(( _start_pos+${#__arg}-1-__PBUFLEN )) )
+            (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && \
+              reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-parentheses]}")
+            (( __start=_start_pos+1-__PBUFLEN, __end=_end_pos-1-__PBUFLEN, __start >= 0 )) && \
+              reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-condition]}")
+            already_added=1
+          } || {
+            __style=${FAST_THEME_NAME}case-parentheses
+          }
         else
           (( next_word = BIT_case_item | BIT_case_nempty_item ))
           __style=${FAST_THEME_NAME}case-condition
