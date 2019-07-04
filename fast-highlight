@@ -1178,8 +1178,16 @@ typeset -ga ZLAST_COMMANDS
   done
 
   # Run on fake buffer with replaced parentheses: ")" into "x"
-  __inputs=( ${(0)${(S)_mybuf//(#b)*\$\(([^\)]#)(\)|(#e))/${mbegin[1]};${mend[1]}${__nul}}%$__nul*} )
-  if [[ ${__inputs[1]} != $_mybuf ]]; then
+  if [[ "$_mybuf" = *$__nul* ]]; then
+    # Try to avoid conflict with the \0, however
+    # we have to split at *some* character - \7
+    # is ^G, so one cannot have null and ^G at
+    # the same time on the command line
+    __nul=$'\7'
+  fi
+
+  __inputs=( ${(ps:$__nul:)${(S)_mybuf//(#b)*\$\(([^\)]#)(\)|(#e))/${mbegin[1]};${mend[1]}${__nul}}%$__nul*} )
+  if [[ "${__inputs[1]}" != "$_mybuf" && -n "${__inputs[1]}" ]]; then
     if [[ -n ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}secondary]} ]]; then
       __idx=1
       __tmp=$FAST_THEME_NAME
