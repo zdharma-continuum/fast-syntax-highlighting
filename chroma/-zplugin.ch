@@ -59,8 +59,26 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    "subcmd:(load|light|compile|stress|edit|glance|recall|update|status|cd|changes|delete)"
+    "subcmd:(load|light|compile|stress|edit|glance|recall|status|cd|changes|delete)"
         "LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+
+    LOAD_2_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+
+    ## }}}
+
+    ##
+    ## `load'
+    ##
+    ## {{{
+
+    subcmd:update "UPDATE_0_opt // LOAD_1_arg // LOAD_2_arg //
+                   NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    UPDATE_0_opt "
+            (--all|-r|--reset)
+                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
 
     LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
 
