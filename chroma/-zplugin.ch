@@ -59,7 +59,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    "subcmd:(load|light|compile|stress|edit|glance|recall|status|cd|changes|delete)"
+    "subcmd:(load|light|compile|stress|edit|glance|recall|status|cd|changes)"
         "LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
@@ -69,7 +69,7 @@ fsh__zplugin__chroma__def=(
     ## }}}
 
     ##
-    ## `load'
+    ## `update'
     ##
     ## {{{
 
@@ -100,7 +100,7 @@ fsh__zplugin__chroma__def=(
     ## }}}
 
     ##
-    ## `light'
+    ## `unload|report'
     ##
     ## {{{
 
@@ -113,6 +113,23 @@ fsh__zplugin__chroma__def=(
 
     ## }}}
 
+    ##
+    ## `delete'
+    ##
+    ## {{{
+
+    "subcmd:delete"
+        "DELETE_0_opt // LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    DELETE_0_opt "
+            (--all|--clean)
+                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+
+    LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+
+    LOAD_2_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+
+    ## }}}
 
     ##
     ## `cenable'
