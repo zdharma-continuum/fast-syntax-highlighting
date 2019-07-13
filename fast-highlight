@@ -1222,6 +1222,8 @@ typeset -ga ZLAST_COMMANDS
 
 -fast-highlight-check-path()
 {
+  (( _start_pos-__PBUFLEN >= 0 )) || \
+    { [[ $1 != "noasync" ]] && print -r -- "- $_start_pos $_end_pos"; return 1; }
   [[ $1 != "noasync" ]] && {
     print -r -- ${sysparams[pid]}
     # This is to fill cache
@@ -1294,6 +1296,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
 # $1 - additional style to glue-in to added style
 -fast-highlight-string()
 {
+  (( _start_pos-__PBUFLEN >= 0 )) || return 0
   _mybuf=$__arg
   __idx=_start_pos
 
@@ -1329,6 +1332,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
 # Parameters used: _mybuf, __idx, _end_idx, __style
 -fast-highlight-math-string()
 {
+  (( _start_pos-__PBUFLEN >= 0 )) || return 0
   _mybuf=$__arg
   __idx=_start_pos
 
@@ -1364,6 +1368,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
 # Highlight special chars inside dollar-quoted strings
 -fast-highlight-dollar-string()
 {
+  (( _start_pos-__PBUFLEN >= 0 )) || return 0
   local i j k __style
   local AA
   integer c
