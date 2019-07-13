@@ -610,12 +610,14 @@ typeset -ga ZLAST_COMMANDS
       (( next_word = (next_word & ~2) | 4 | 1 ))
      else
        _mybuf=${${(Q)__arg}#\"}
+       # TODO: optimize-out 2 first comparisons
        if [[ $_mybuf = (#b)\$([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(*) || \
              $_mybuf = (#b)\$\{([a-zA-Z_][a-zA-Z0-9_:-]#|[0-9]##)\}(*) || \
-             $_mybuf = (#b)(*)(*)\$([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(*) ]] && \
+             $_mybuf = (#b)(*)(*)\$([a-zA-Z_][a-zA-Z0-9_]#|[0-9]##)(*) || \
+             $_mybuf = (#b)(*)(*)\$\{([a-zA-Z_][a-zA-Z0-9_:-]#|[0-9]##)(*) ]] && \
          [[ -v ${match[1]%%:-*} || -v ${match[3]%%:-*} ]]; then
          [[ -n "${match[3]}" ]] && \
-           -fast-highlight-main-type ${match[1]}${match[2]}${(P)match[3]%%:-*}${match[4]} || \
+           -fast-highlight-main-type ${match[1]}${match[2]}${(P)match[3]%%:-*}${match[4]#\}} || \
            -fast-highlight-main-type ${(P)match[1]%%:-*}${match[2]}
        elif [[ $braces_stack = T* ]]; then # T - typedef, etc.
          REPLY=none
