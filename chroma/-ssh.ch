@@ -64,7 +64,6 @@ local -a match mbegin mend completions_user completions_host
                             user_style=
                             () {
                                 # Zstyle clobbers reply for sure
-                                local mbegin mend match reply
                                 zstyle -a ":completion:*:users" users completions_users
                             }
                             (( ! $#completions_users )) && completions_users=(${(k)userdirs})
