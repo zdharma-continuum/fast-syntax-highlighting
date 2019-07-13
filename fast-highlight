@@ -675,7 +675,7 @@ typeset -ga ZLAST_COMMANDS
         none)           # Assign?
                         if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( $braces_stack = T* && ${__arg_type} != 3 ) ]]; then
                           __style=${FAST_THEME_NAME}assign
-                          [[ $__arg = ?*[=]* ]] && FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
+                          FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
                           # Handle array assignment
                           [[ $__arg = (#b)*=(\()*(\))* || $__arg = (#b)*=(\()* ]] && {
