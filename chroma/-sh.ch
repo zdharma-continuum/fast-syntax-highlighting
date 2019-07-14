@@ -46,7 +46,8 @@ local -a __lines_list
             done
 
             FAST_HIGHLIGHT[chrome-git-got-c]=0
-            -fast-highlight-process "$PREBUFFER" "${__wrd}" "$(( __start_pos + __idx2 - 1 ))"
+            (( _start_pos-__PBUFLEN >= 0 )) && \
+                -fast-highlight-process "$PREBUFFER" "${__wrd}" "$(( __start_pos + __idx2 - 1 ))"
         elif [[ "$__wrd" = -*c* ]]; then
             FAST_HIGHLIGHT[chrome-git-got-c]=1
         else
