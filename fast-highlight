@@ -1341,7 +1341,7 @@ zle -N -- fast-highlight-check-path-handler -fast-highlight-check-path-handler
 
     [[ ${match[1]} = [0-9]* ]] && __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]} || {
       [[ ${match[1]} = [a-zA-Z_]* ]] && {
-        [[ -n ${(P)match[1]} || ${FAST_ASSIGNS_SEEN[${match[1]}]} = 1 ]] && \
+        [[ -v ${match[1]} || ${FAST_ASSIGNS_SEEN[${match[1]}]} = 1 ]] && \
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathvar]} || \
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}
       } || {
