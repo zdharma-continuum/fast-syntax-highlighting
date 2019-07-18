@@ -1,0 +1,15 @@
+#!/usr/bin/env zunit
+@setup {
+    load "../fast-highlight"
+}
+
+@test 'ls /usr/bin' {
+    PREBUFFER=""
+    BUFFER="ls /usr/bin"
+    run -fast-highlight-process "$PREBUFFER" "$BUFFER" 0 \; print -rl -- \$reply
+
+    assert "$lines[1]" same_as "0 2 fg=green"
+    assert "$lines[2]" same_as "3 11 fg=magenta,underline"
+}
+
+# vim:ft=zsh:sw=4:sts=4:et
