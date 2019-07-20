@@ -790,8 +790,10 @@ chroma/-git-commit-msg-opt-ARG-action() {
         reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}")
     fi
 
-    if (( ${#_wrd} > 50 )); then
-        for (( __idx1 = 1, __idx2 = 1; __idx1 <= 50; ++ __idx1, ++ __idx2 )); do
+    integer length=${FAST_HIGHLIGHT[git-cmsg-len]:-50}
+
+    if (( ${#_wrd} > length )); then
+        for (( __idx1 = 1, __idx2 = 1; __idx1 <= length; ++ __idx1, ++ __idx2 )); do
             # Use __arg from the fast-highlight-process's scope
             while [[ "${__arg[__idx2]}" != "${_wrd[__idx1]}" ]]; do
                 (( ++ __idx2 ))
