@@ -90,8 +90,8 @@ fsh__git__chroma__def=(
     # numbered ones) arguments passed when using --multiple
 
     # A generic action
-    NO_MATCH_#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
-    NO_MATCH_#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    NO_MATCH_\#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    NO_MATCH_\#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
     ## }}}
 
@@ -194,7 +194,7 @@ fsh__git__chroma__def=(
              --allow-unrelated-histories|--rerere-autoupdate|--no-rerere-autoupdate|
              --abort|--continue)
                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
-    COMMIT_#_arg "NO-OP // ::chroma/-git-verify-commit"
+    COMMIT_\#_arg "NO-OP // ::chroma/-git-verify-commit"
 
     ## }}}
 
@@ -256,13 +256,13 @@ fsh__git__chroma__def=(
     ##        git appends the previous file name to it – good to implement this too
     ## {{{
 
-    subcmd:diff "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_#_arg // NO_MATCH_#_opt"
+    subcmd:diff "DIFF_NO_INDEX_0_opt^ // DIFF_0_opt // COMMIT_FILE_DIR_#_arg // NO_MATCH_#_opt"
 
     "DIFF_NO_INDEX_0_opt^" "
                 --no-index
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
              || --no-index:del
-                        <<>> COMMIT_FILE_#_arg
+                        <<>> COMMIT_FILE_DIR_#_arg
              || --no-index:add
                         <<>> FILE_1_arg // FILE_2_arg // NO_MATCH_#_arg"
     DIFF_0_opt "
@@ -291,7 +291,7 @@ fsh__git__chroma__def=(
                         <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
 
     # A generic action
-    "COMMIT_FILE_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file"
+    "COMMIT_FILE_DIR_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file-or-dir"
 
     # A generic action
     "FILE_1_arg" "NO-OP // ::chroma/-git-verify-file"
@@ -436,9 +436,9 @@ fsh__git__chroma__def=(
     REMOTE_A_URL_3_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
     REMOTE_A_URL_4_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
     BRANCH_3_arg "NO-OP // ::chroma/-git-verify-branch"
-    BRANCH_#_arg "NO-OP // ::chroma/-git-verify-branch"
+    BRANCH_\#_arg "NO-OP // ::chroma/-git-verify-branch"
     REMOTE_2_arg "NO-OP // ::chroma/-git-verify-remote"
-    REMOTE_#_arg "NO-OP // ::chroma/-git-verify-remote"
+    REMOTE_\#_arg "NO-OP // ::chroma/-git-verify-remote"
 
     ## }}}
 
@@ -671,6 +671,14 @@ chroma/-git-verify-file() {
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
 }
 
+# A generic handler - checks whether the file exists
+chroma/-git-verify-file-or-dir() {
+    local _wrd="$4"
+
+    [[ -f "$_wrd" || -d "$_wrd" ]] && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
+        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+}
+
 chroma/-git-verify-branch() {
     local _wrd="$4"
     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches-$PWD" "refs/heads" $(( 2 * 60 ))
@@ -732,6 +740,13 @@ chroma/-git-verify-commit() {
 chroma/-git-verify-commit-or-file() {
     chroma/-git-verify-commit "$@" && return
     chroma/-git-verify-file "$@"
+}
+
+# A generic handler that checks if given commit reference
+# is correct or if it's a file or directives that exists
+chroma/-git-verify-commit-or-file-or-dir() {
+    chroma/-git-verify-commit "$@" && return
+    chroma/-git-verify-file-or-dir "$@"
 }
 
 # A generic handler that checks if given revision range
