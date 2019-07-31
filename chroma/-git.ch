@@ -307,7 +307,7 @@ fsh__git__chroma__def=(
     ## {{{
 
     subcmd:checkout "CHECKOUT_BRANCH_0_opt^ //
-                        CHECKOUT_0_opt // FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg //
+                        CHECKOUT_0_opt // FILE_OR_DIR_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg //
                         FILE_#_arg // NO_MATCH_#_opt"
 
     "CHECKOUT_BRANCH_0_opt^" "
@@ -337,6 +337,7 @@ fsh__git__chroma__def=(
 
     # Unused
     FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-ubranch-or-commit-verify"
+    FILE_OR_DIR_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-dir-or-ubranch-or-commit-verify"
 
     ## }}}
 
@@ -704,6 +705,13 @@ chroma/-git-verify-also-unfetched-ref() {
 chroma/-git-file-or-ubranch-or-commit-verify() {
     chroma/-git-verify-commit "$@" && return
     chroma/-git-verify-file "$@" && return
+    chroma/-git-verify-also-unfetched-ref "$@"
+}
+
+# A generic handler
+chroma/-git-file-or-dir-or-ubranch-or-commit-verify() {
+    chroma/-git-verify-commit "$@" && return
+    chroma/-git-verify-file-or-dir "$@" && return
     chroma/-git-verify-also-unfetched-ref "$@"
 }
 
