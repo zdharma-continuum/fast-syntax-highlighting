@@ -176,6 +176,7 @@ map=(
     case-condition              "- correct-subtle"
     correct-subtle              "-"
     incorrect-subtle            "-"
+    subtle-separator            "- commandseparator"
     subtle-bg                   "- correct-subtle"
     path-to-dir                 "- path"
     paired-bracket              "- subtle-bg correct-subtle"
@@ -200,7 +201,7 @@ order=(
     back-dollar-quoted-argument assign redirection comment variable mathvar 
     mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
     for-loop-separator exec-descriptor here-string-tri here-string-text here-string-var secondary
-    case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-bg
+    case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-separator subtle-bg
     path-to-dir paired-bracket bracket-level-1 bracket-level-2 bracket-level-3
     global-alias subcommand single-sq-bracket double-sq-bracket double-paren
     optarg-string optarg-number recursive-base
