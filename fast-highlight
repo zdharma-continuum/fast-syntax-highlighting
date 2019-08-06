@@ -1265,7 +1265,7 @@ typeset -ga ZLAST_COMMANDS
           val=${FAST_HIGHLIGHT[path-queue]}
           val[idx-1,idx+${#stripped}]=""
           FAST_HIGHLIGHT[path-queue]=$val
-          [[ ${FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]%D} = 1 && ${#val} -le 27 ]] && zle .redisplay
+          [[ ${FAST_HIGHLIGHT[cache-path-${(q)val}-${stripped%% *}]%D} = 1 && ${#val} -le 27 ]] && zle -R
         }
       fi
     fi
