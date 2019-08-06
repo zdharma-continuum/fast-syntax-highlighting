@@ -324,6 +324,7 @@ chroma/-zplugin-check-ice-mod() {
     if [[ "$_wrd" = (#b)(${(~j:|:)${ice_order[@]:#(${(~j:|:)nval_ices[@]})}})(*) ]]; then
         reply+=("$(( __start )) $(( __start+${mend[1]} )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
         reply+=("$(( __start+${mbegin[2]} )) $(( __end )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-string]}")
+        -fast-highlight-string
         return 0
     elif [[ "$_wrd" = (#b)(${(~j:|:)nval_ices[@]}) ]]; then
         __style=${FAST_THEME_NAME}single-hyphen-option
