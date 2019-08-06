@@ -35,6 +35,8 @@
 # the plugin directory (i.e. set ZERO parameter)
 # http://zdharma.org/Zsh-100-Commits-Club/Zsh-Plugin-Standard.html
 0="${${ZERO:-${0:#$ZSH_ARGZERO}}:-${(%):-%N}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
 typeset -g FAST_BASE_DIR="${0:h}"
 typeset -ga _FAST_MAIN_CACHE
 # Holds list of indices pointing at brackets that
