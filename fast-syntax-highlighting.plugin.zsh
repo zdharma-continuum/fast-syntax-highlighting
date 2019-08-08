@@ -217,8 +217,8 @@ _zsh_highlight_call_widget()
 _zsh_highlight_bind_widgets()
 {
   setopt localoptions noksharrays
-  typeset -F SECONDS
-  local prefix=orig-s$SECONDS-r$RANDOM # unique each time, in case we're sourced more than once
+  local -F2 SECONDS
+  local prefix=orig-s${SECONDS/./}-r$(( RANDOM % 1000 )) # unique each time, in case we're sourced more than once
 
   # Load ZSH module zsh/zleparameter, needed to override user defined widgets.
   zmodload zsh/zleparameter 2>/dev/null || {
