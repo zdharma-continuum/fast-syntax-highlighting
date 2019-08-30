@@ -307,7 +307,7 @@ chroma/-zplugin-check-ice-mod() {
         unload blockf pick bpick src as ver silent lucid notify mv cp
         atinit atclone atload atpull nocd run-atpull has cloneonly make
         service trackbinds multisrc compile nocompile nocompletions
-        reset-prompt
+        reset-prompt wrap-track
         # Include all additional ices – after
         # stripping them from the possible: ''
         ${(@s.|.)${ZPLG_EXTS[ice-mods]//\'\'/}}
