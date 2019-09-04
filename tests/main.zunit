@@ -74,4 +74,18 @@ reply=()
     assert "$reply[11]" same_as ""
 }
 
+@test '-fast-highlight-process "$PREBUFFER" "$BUFFER" 0' {
+    reply=()
+    PREBUFFER=""
+    BUFFER='-fast-highlight-process "$PREBUFFER" "$BUFFER" 0'
+    evl -fast-highlight-process "\$PREBUFFER" "\$BUFFER" 0
+
+    assert "$reply[1]" same_as "0 23 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}function]}"
+    assert "$reply[2]" same_as "24 36 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}"
+    assert "$reply[3]" same_as "25 35 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}"
+    assert "$reply[4]" same_as "37 46 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}"
+    assert "$reply[5]" same_as "38 45 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}"
+    assert "$reply[6]" same_as ""
+}
+
 # vim:ft=zsh:sw=4:sts=4:et
