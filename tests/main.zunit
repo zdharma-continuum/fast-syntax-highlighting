@@ -1,15 +1,77 @@
 #!/usr/bin/env zunit
 @setup {
     load "../fast-highlight"
+    setopt interactive_comments
+    -fast-highlight-fill-option-variables
 }
 
 @test 'ls /usr/bin' {
+reply=()
     PREBUFFER=""
     BUFFER="ls /usr/bin"
     evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
 
-    assert "$reply[1]" same_as "0 2 fg=green"
-    assert "$reply[2]" same_as "3 11 fg=magenta,underline"
+    assert "$reply[1]" same_as "0 2 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[2]" same_as "3 11 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path-to-dir]}"
+    assert "$reply[3]" same_as ""
+}
+
+@test 'ls /bin/ls' {
+    reply=()
+    PREBUFFER=""
+    BUFFER="ls /usr/bin/ls"
+    evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
+
+    assert "$reply[1]" same_as "0 2 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[2]" same_as "3 14 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}"
+    assert "$reply[3]" same_as ""
+}
+
+
+@test 'ls /bin/ls\\n # a comment\\nls /usr/bin' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'ls /usr/bin/ls\n # a comment\nls /usr/bin'
+    evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
+
+    assert "$reply[1]" same_as "0 2 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[2]" same_as "3 14 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}"
+    assert "$reply[3]" same_as "16 27 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}comment]}"
+    assert "$reply[4]" same_as "28 30 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[5]" same_as "31 39 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path-to-dir]}"
+    assert "$reply[6]" same_as ""
+}
+
+
+@test 'exec {FD}< <( ls /bin )' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'exec {FD}< <( ls /bin )'
+    evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
+
+    assert "$reply[1]" same_as "0 4 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}precommand]}"
+    assert "$reply[2]" same_as "5 9 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}exec-descriptor]}"
+    assert "$reply[3]" same_as ""
+}
+
+
+@test 'case x in x) a;; (y) ;; esac' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'case x in\nx) a;;\n(y)\n;;\nesac'
+    evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
+
+    assert "$reply[1]" same_as "0 4 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}"
+    assert "$reply[2]" same_as "5 6 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-input]}"
+    assert "$reply[3]" same_as "7 9 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-parentheses]}"
+    assert "$reply[4]" same_as "10 11 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-condition]}"
+    assert "$reply[5]" same_as "11 12 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-parentheses]}"
+    assert "$reply[6]" same_as "13 14 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}unknown-token]}"
+    assert "$reply[7]" same_as "17 18 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-parentheses]}"
+    assert "$reply[8]" same_as "18 19 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-condition]}"
+    assert "$reply[9]" same_as "19 20 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}case-parentheses]}"
+    assert "$reply[10]" same_as "24 28 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}reserved-word]}"
+    assert "$reply[11]" same_as ""
 }
 
 # vim:ft=zsh:sw=4:sts=4:et
