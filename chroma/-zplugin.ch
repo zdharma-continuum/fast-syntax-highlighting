@@ -1,5 +1,5 @@
 # -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
-# Copyright (c) 2018 Sebastian Gniazdowski
+# Copyright (c) 2018-2019 Sebastian Gniazdowski
 #
 # Chroma function for command `git'. It colorizes the part of command
 # line that holds `git' invocation.
