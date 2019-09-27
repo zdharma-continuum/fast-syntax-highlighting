@@ -14,16 +14,17 @@ local THEFD check __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
     emulate -L zsh
     setopt extendedglob warncreateglobal typesetsilent
 
-    local THEFD="$1" input check=2
+    local THEFD="$1" input check=2 nl=$'\n' __wrd __style
 
     -fast-zts-read-all "$THEFD" input
 
     zle -F "$THEFD"
     exec {THEFD}<&-
 
+    __wrd="${${input#[^$nl]#$nl}%%$nl*}"
     if [[ "$input" = test* ]]; then
-        if [[ "${input%$'\n'}" = *[^0-9]'0' ]]; then
-            if [[ "${input#test$'\n'}" = *nothing\ appropriate* ]]; then
+        if [[ "${input%$nl}" = *[^0-9]'0' ]]; then
+            if [[ "${input#test$nl}" = *nothing\ appropriate* ]]; then
                 FAST_HIGHLIGHT[whatis_chroma_type]=2
             else
                 FAST_HIGHLIGHT[whatis_chroma_type]=0
@@ -34,7 +35,7 @@ local THEFD check __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
     elif [[ "$input" = type2* ]]; then
         [[ "$input" != *nothing\ appropriate* ]] && check=1 || check=0
     elif [[ "$input" = type1* ]]; then
-        [[ "${input%$'\n'}" = *0 ]] && check=1 || check=0
+        [[ "${input%$nl}" = *0 ]] && check=1 || check=0
     fi
 
     if (( check != 2 )); then
@@ -47,7 +48,7 @@ local THEFD check __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}
         fi
         local -a start_end
-        start_end=( ${(s:/:)${${(M)${${input#type?$'\n'}}#*$'\n'}%$'\n'}} )
+        start_end=( ${(s:/:)${${(M)${${input#type?${nl}[^$nl]#$nl}}#*$nl}%$nl}} )
         (( start_end[1] >= 0 )) && region_highlight+=("$start_end[1] $start_end[2] $__style")
         zle -R
     fi
@@ -82,6 +83,7 @@ else
         if (( FAST_HIGHLIGHT[whatis_chroma_type] == 2 )); then
             exec {THEFD}< <(
                 echo "type2"
+                print "$__wrd"
                 (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} ))
                 echo "$__start/$__end"
                 whatis "$__wrd" 2>/dev/null
@@ -91,6 +93,7 @@ else
         else
             exec {THEFD}< <(
                 echo "type1"
+                print "$__wrd"
                 (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} ))
                 echo "$__start/$__end"
                 whatis "$__wrd" > /dev/null 2>&1
