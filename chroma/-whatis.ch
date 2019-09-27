@@ -11,6 +11,9 @@ local THEFD check __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 }
 
 -fast-whatis-chroma-callback() {
+    emulate -L zsh
+    setopt extendedglob warncreateglobal typesetsilent
+
     local THEFD="$1" input check=2
 
     -fast-zts-read-all "$THEFD" input
