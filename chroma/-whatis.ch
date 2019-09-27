@@ -112,11 +112,12 @@ else
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}
         elif [[ ${~__wrd} = */* && -e ${~__wrd} ]] then
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}
-        else
+        elif (( FAST_HIGHLIGHT[whatis_chroma_type] )); then
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}
         fi
-        (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) \
-            && reply+=("$__start $__end $__style")
+        [[ -n "$__style" ]] && \
+            (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
+                reply+=("$__start $__end $__style")
     fi
 fi
 (( this_word = next_word ))
