@@ -1,7 +1,6 @@
 # vim:ft=zsh:et:sw=4
 (( next_word = 2 | 8192 ))
 local THEFD check __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
-typeset -gA FAST_WHATIS_CACHE
 
 (( ! ${+FAST_HIGHLIGHT[whatis_chroma_callback_was_ran]} )) && \
         FAST_HIGHLIGHT[whatis_chroma_callback_was_ran]=0
@@ -36,7 +35,7 @@ typeset -gA FAST_WHATIS_CACHE
     fi
 
     if (( check != 2 )); then
-        FAST_WHATIS_CACHE[$__wrd]=$check
+        FAST_HIGHLIGHT[whatis-cache-$__wrd]=$check
         if (( check )) then
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}
         elif [[ ${~__wrd} = */* && -e ${~__wrd} ]] then
@@ -76,7 +75,7 @@ elif (( ! FAST_HIGHLIGHT[whatis_chroma_type] )); then
     # had a chance to establish the whatis_chroma_type field
     (( FAST_HIGHLIGHT[whatis_chroma_callback_was_ran] )) && return 1
 else
-    if [[ -z "${FAST_WHATIS_CACHE[$__wrd]}" ]]; then
+    if [[ -z "${FAST_HIGHLIGHT[whatis-cache-$__wrd]}" ]]; then
         if (( FAST_HIGHLIGHT[whatis_chroma_type] == 2 )); then
             exec {THEFD}< <(
                 echo "type2"
@@ -98,7 +97,7 @@ else
             zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
         fi
     else
-        check=${FAST_WHATIS_CACHE[$__wrd]}
+        check=${FAST_HIGHLIGHT[whatis-cache-$__wrd]}
         if (( check )) then
             __style=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}
         elif [[ ${~__wrd} = */* && -e ${~__wrd} ]] then
