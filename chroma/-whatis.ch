@@ -65,7 +65,11 @@ if (( __first_call )) && [[ -z "${FAST_HIGHLIGHT[whatis_chroma_type]}" ]] ;then
         return 1
     fi
 
-    exec {THEFD}< <( echo "test"; whatis "osx whatis fallback check"; echo "$?"; )
+    exec {THEFD}< <(
+        print "test"
+        LANG=C whatis "osx whatis fallback check"
+        print "$?"
+    )
     command true # a workaround of Zsh bug
     zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
 fi
@@ -86,7 +90,7 @@ else
                 print "$__wrd"
                 (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} ))
                 echo "$__start/$__end"
-                whatis "$__wrd" 2>/dev/null
+                LANG=C whatis "$__wrd" 2>/dev/null
             )
             command true # see above
             zle -F ${${FAST_HIGHLIGHT[whatis_chroma_zle_-F_have_-w_opt]:#0}:+-w} "$THEFD" -fast-whatis-chroma-callback
@@ -96,7 +100,7 @@ else
                 print "$__wrd"
                 (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER} ))
                 echo "$__start/$__end"
-                whatis "$__wrd" > /dev/null 2>&1
+                LANG=C whatis "$__wrd" &> /dev/null
                 echo "$?"
             )
             command true
