@@ -16,14 +16,14 @@ reply=()
     assert "$reply[3]" same_as ""
 }
 
-@test 'ls /bin/ls' {
+@test 'ls /bin/df' {
     reply=()
     PREBUFFER=""
-    BUFFER="ls /usr/bin/ls"
+    BUFFER="ls /bin/df"
     evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
 
     assert "$reply[1]" same_as "0 2 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
-    assert "$reply[2]" same_as "3 14 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}"
+    assert "$reply[2]" same_as "3 10 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}"
     assert "$reply[3]" same_as ""
 }
 
