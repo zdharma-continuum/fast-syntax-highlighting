@@ -174,7 +174,6 @@ chroma/main-process-token.ch() {
 
     chroma/main-chroma-print -rl -- "---NO-HASH-CREATE-FROM-NOW-ON---"
 
-    # Options occuring before a subcommand
     if [[ -z "${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-option-with-arg-active]}" ]]; then
         chroma/main-chroma-print -rl -- "-z OPT-WITH-ARG-ACTIVE == true"
         if [[ "$__wrd" = -* ]]; then
