@@ -31,14 +31,14 @@ reply=()
 @test 'ls /bin/ls\\n # a comment\\nls /usr/bin' {
     reply=()
     PREBUFFER=""
-    BUFFER=$'ls /usr/bin/ls\n # a comment\nls /usr/bin'
+    BUFFER=$'ls /bin/df\n # a comment\nls /usr/bin'
     evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
 
     assert "$reply[1]" same_as "0 2 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
-    assert "$reply[2]" same_as "3 14 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}"
-    assert "$reply[3]" same_as "16 27 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}comment]}"
-    assert "$reply[4]" same_as "28 30 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
-    assert "$reply[5]" same_as "31 39 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path-to-dir]}"
+    assert "$reply[2]" same_as "3 10 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path]}"
+    assert "$reply[3]" same_as "12 23 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}comment]}"
+    assert "$reply[4]" same_as "24 26 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[5]" same_as "27 35 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path-to-dir]}"
     assert "$reply[6]" same_as ""
 }
 
