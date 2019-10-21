@@ -28,7 +28,7 @@ local __chroma_name="${1#\%}" __first_call="$2" __wrd="$3" __start_pos="$4" __en
 (( !FAST_HIGHLIGHT[-${__chroma_name}.ch-chroma-def] )) && chroma/-${__chroma_name}.ch
 
 chroma/main-chroma-print -r -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-chroma/main-chroma-print -r -- @@@@@@@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4" @@@@@@@
+chroma/main-chroma-print -r -- @@@@@@@  local __chroma_name="${1#\%}" __first_call="$2" __wrd="$3" __start_pos="$4" __end_pos="$5" @@@@@@@
 local __style __entry __value __action __handler __tmp __svalue __hspaces=$'\t ' __nl=$'\n' __ch_def_name
 integer __idx1 __idx2 __start __end __ivalue __have_value=0
 local -a __lines_list __avalue
