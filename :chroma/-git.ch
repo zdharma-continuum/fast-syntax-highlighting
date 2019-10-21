@@ -17,20 +17,20 @@ fsh__git__chroma__def=(
 
     subcmd:NULL "NULL_0_opt"
     NULL_0_opt "(-C|--exec-path=|--git-dir=|--work-tree=|--namespace=|--super-prefix=)
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
             || -c
                     <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP
                     <<>> __style=\${FAST_THEME_NAME}optarg-string // NO-OP
             || (--version|--help|--html-path|--man-path|--info-path|-p|--paginate|
 		-P|--no-pager|--no-replace-objects|--bare)
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
 
-    "subcommands" "::chroma/-git-get-subcommands" # run a function (the :: causes this) and use `reply'
+    "subcommands" ":::chroma/-git-get-subcommands" # run a function (the :: causes this) and use `reply'
     #"subcommands" "(fetch|pull)" # run a function (the :: causes this) and use `reply'
 
-    "subcmd-hook" "chroma/-git-check-if-alias"
+    "subcmd-hook" ":chroma/-git-check-if-alias"
 
     ## }}}
 
@@ -68,8 +68,8 @@ fsh__git__chroma__def=(
                --refmap=|--recurse-submodules=|-j|--jobs=|--submodule-prefix=|
                --recurse-submodules-default=|-o|--server-option=|--upload-pack|
                --negotiation-tip=)
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
            || (--help|--all|-a|--append|--unshallow|--update-shallow|--dry-run|-f|--force|
                -k|--keep|--multiple|-p|--prune|-n|--no-tags|-t|--tags|--no-recurse-submodules|
                -u|--update-head-ok|-q|--quiet|-v|--verbose|--progress|
@@ -82,9 +82,9 @@ fsh__git__chroma__def=(
                    # is set to be argument-less. The argument is a) -o/--option argument
                    # and b) -o/--option=argument.
 
-    REMOTE_GR_1_arg "NO-OP // ::chroma/-git-verify-remote-or-group" # This definition is generic, reused later
-    "REF_#_arg" "NO-OP // ::chroma/-git-verify-ref" # This too
-    "REMOTE_GR_#_arg" "NO-OP // ::chroma/-git-verify-remote-or-group" # and this too
+    REMOTE_GR_1_arg "NO-OP // :::chroma/-git-verify-remote-or-group" # This definition is generic, reused later
+    "REF_#_arg" "NO-OP // :::chroma/-git-verify-ref" # This too
+    "REMOTE_GR_#_arg" "NO-OP // :::chroma/-git-verify-remote-or-group" # and this too
     # The hash `#' above denotes: an argument at any position
     # It will nicely match any following (above the first explicitly
     # numbered ones) arguments passed when using --multiple
@@ -105,8 +105,8 @@ fsh__git__chroma__def=(
     PUSH_0_opt "
               (--receive-pack=|--exec=|--repo=|--push-option=|--signed=|
                   --force-with-lease=|--signed=|--recurse-submodules=)
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
            || (--help|--all|--mirror|--tags|--follow-tags|--atomic|-n|--dry-run|
                --porcelain|--delete|--tags|--follow-tags|--signed|--no-signed|
                --atomic|--no-atomic|-o|--push-option|--force-with-lease|
@@ -115,7 +115,7 @@ fsh__git__chroma__def=(
                --verify|--no-verify|-4|--ipv4|-6|--ipv6)
                    <<>> __style=\${FAST_THEME_NAME}single-hyphen-option // NO-OP"
 
-    REMOTE_1_arg "NO-OP // ::chroma/-git-verify-remote" # This definition is generic, reused later
+    REMOTE_1_arg "NO-OP // :::chroma/-git-verify-remote" # This definition is generic, reused later
 
     ### }}}
 
@@ -131,8 +131,8 @@ fsh__git__chroma__def=(
                --strategy-option=|--rebase=|--depth=|--deepen=|--shallow-exclude=|
                --shallow-since=|--negotiation-tip|--upload-pack|-o|--server-option=|
                --no-recurse-submodules=)
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
            || (--help|-q|--quiet|-v|--verbose|--progress|--no-recurse-submodules|
                --commit|--no-commit|--edit|--no-edit|--ff|--no-ff|--ff-only|
                --log|--no-log|--signoff|--no-signoff|--stat|-n|--no-stat|--squash|
@@ -154,22 +154,22 @@ fsh__git__chroma__def=(
 
     "COMMIT_#_opt" "
               (-m|--message=|-am)
-                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
-                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+                       <<>> NO-OP // :::chroma/-git-commit-msg-opt-action
+                       <<>> NO-OP // :::chroma/-git-commit-msg-opt-ARG-action
            || (--help|-a|--all|-p|--patch|--reset-author|--short|--branch|
                --porcelain|--long|-z|--null|-s|--signoff|-n|--no-verify|
                --allow-empty|--allow-empty-message|-e|--edit|--no-edit|
                --amend|--no-post-rewrite|-i|--include|-o|--only|--untracked-files|
                -v|--verbose|-q|--quiet|--dry-run|--status|--no-status|--no-gpg-sign)
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
            || (-C|--reuse-message=|-c|--reedit-message=|--fixup=|--squash=|
                -F|--file=|--author=|--date=|-t|--template=|--cleanup=|
                -u|--untracked-files=|-S|--gpg-sign=)
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action"
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action"
 
     # A generic action
-    "FILE_#_arg" "NO-OP // ::chroma/-git-verify-file"
+    "FILE_#_arg" "NO-OP // :::chroma/-git-verify-file"
 
     ## }}}
 
@@ -181,20 +181,20 @@ fsh__git__chroma__def=(
     subcmd:merge "MERGE_0_opt // COMMIT_#_arg"
     MERGE_0_opt
            "(-m)
-                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
-                       <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+                       <<>> NO-OP // :::chroma/-git-commit-msg-opt-action
+                       <<>> NO-OP // :::chroma/-git-commit-msg-opt-ARG-action
             (-S|--gpg-sign=|--log=|-e|--strategy=|-X|--strategy-option=|-F|
              --file)
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
          || (--help|--commit|--no-commit|-e|--edit|--no-edit|--ff|--no-ff|--ff-only|
              --log|--no-log|--signoff|--no-signoff|-n|--stat|--no-stat|--squash|
              --no-squash|--verify-signatures|--no-verify-signatures|--summary|
              --no-summary|-q|--quiet|-v|--verbose|--progress|--no-progress|
              --allow-unrelated-histories|--rerere-autoupdate|--no-rerere-autoupdate|
              --abort|--continue)
-                       <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
-    COMMIT_\#_arg "NO-OP // ::chroma/-git-verify-commit"
+                       <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+    COMMIT_\#_arg "NO-OP // :::chroma/-git-verify-commit"
 
     ## }}}
 
@@ -206,7 +206,7 @@ fsh__git__chroma__def=(
     subcmd:reset "RESET_0_opt^ // RESET_0_opt // RESET_#_arg // NO_MATCH_#_opt"
     "RESET_0_opt^" "
         (--soft|--mixed|--hard|--merge|--keep)
-                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
      || (--soft|--mixed|--hard|--merge|--keep):del
                     <<>> RESET_0_opt // RESET_#_arg
      || (--soft|--mixed|--hard|--merge|--keep):add
@@ -215,11 +215,11 @@ fsh__git__chroma__def=(
 
     RESET_0_opt "
         (-q|-p|--patch)
-                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    RESET_1_arg "NO-OP // ::chroma/-git-verify-commit"
+    RESET_1_arg "NO-OP // :::chroma/-git-verify-commit"
 
-    "RESET_#_arg" "NO-OP // ::chroma/-git-RESET-verify-commit-or-file"
+    "RESET_#_arg" "NO-OP // :::chroma/-git-RESET-verify-commit-or-file"
 
 
     ## }}}
@@ -232,20 +232,20 @@ fsh__git__chroma__def=(
     subcmd:revert "REVERT_SEQUENCER_0_opt^ // REVERT_0_opt // REVERT_#_arg // NO_MATCH_#_opt"
     REVERT_0_opt "
                 (-m|--mainline|-S|--gpg-sign=|--strategy=|-X|--strategy-option=)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
              || (-e|--edit|--no-edit|-n|--no-commit|-s|--signoff)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     "REVERT_SEQUENCER_0_opt^" "
                 (--continue|--quit|--abort)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
                 || (--continue|--quit|--abort):del
                         <<>> REVERT_0_opt // REVERT_#_arg
                 || (--continue|--quit|--abort):add
                         <<>> NO_MATCH_#_arg"
 
-    "REVERT_#_arg" "NO-OP // ::chroma/-git-verify-commit"
+    "REVERT_#_arg" "NO-OP // :::chroma/-git-verify-commit"
 
     ## }}}
 
@@ -260,7 +260,7 @@ fsh__git__chroma__def=(
 
     "DIFF_NO_INDEX_0_opt^" "
                 --no-index
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
              || --no-index:del
                         <<>> COMMIT_FILE_DIR_#_arg
              || --no-index:add
@@ -273,8 +273,8 @@ fsh__git__chroma__def=(
                  --diff-filter=|-S|-G|--find-object=|--relative=|-O|--relative=|
                  --inter-hunk-context=|--ignore-submodules=|--src-prefix=|--dst-prefix=|
                  --line-prefix=)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
              || (-p|--patch|-u|-s|--no-patch|--raw|--patch-with-raw|--indent-heuristic|
                  --no-indent-heuristic|--minimal|--patience|--histogram|--stat|
                  --compact-summary|--numstat|--shortstat|--dirstat|--summary|
@@ -288,16 +288,16 @@ fsh__git__chroma__def=(
                  --ext-diff|--no-ext-diff|--textconv|--no-textconv|--ignore-submodules|
                  --no-prefix|--ita-invisible-in-index|-1|--base|-2|--ours|-3|--theirs|
                  -0|--cached)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     # A generic action
-    "COMMIT_FILE_DIR_#_arg" "NO-OP // ::chroma/-git-verify-commit-or-file-or-dir"
+    "COMMIT_FILE_DIR_#_arg" "NO-OP // :::chroma/-git-verify-commit-or-file-or-dir"
 
     # A generic action
-    "FILE_1_arg" "NO-OP // ::chroma/-git-verify-file"
+    "FILE_1_arg" "NO-OP // :::chroma/-git-verify-file"
 
     # A generic action
-    "FILE_2_arg" "NO-OP // ::chroma/-git-verify-file"
+    "FILE_2_arg" "NO-OP // :::chroma/-git-verify-file"
 
     ## }}}
 
@@ -312,32 +312,32 @@ fsh__git__chroma__def=(
 
     "CHECKOUT_BRANCH_0_opt^" "
                 (-b|-B|--orphan)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
              || (-b|-B|--orphan):del
                         <<>> FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg // FILE_#_arg
              || (-b|-B|--orphan):add
                         <<>> NEW_BRANCH_1_arg // COMMIT_2_arg // NO_MATCH_#_arg"
 
-    NEW_BRANCH_1_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+    NEW_BRANCH_1_arg "NO-OP // :::chroma/-git-verify-correct-branch-name"
 
-    COMMIT_2_arg "NO-OP // ::chroma/-git-verify-commit"
+    COMMIT_2_arg "NO-OP // :::chroma/-git-verify-commit"
 
     CHECKOUT_0_opt "
                 --conflict=
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
              || (-q|--quiet|--progress|--no-progress|-f|--force|--ours|--theirs|
                  -b|-B|-t|--track|--no-track|-l|--detach|--orphan|
                  --ignore-skip-worktree-bits|-m|--merge|-p|--patch|
                  --ignore-other-worktrees|--no-ignore-other-worktrees)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     # A generic action
-    COMMIT_1_arg "NO-OP // ::chroma/-git-verify-commit"
+    COMMIT_1_arg "NO-OP // :::chroma/-git-verify-commit"
 
     # Unused
-    FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-ubranch-or-commit-verify"
-    FILE_OR_DIR_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // ::chroma/-git-file-or-dir-or-ubranch-or-commit-verify"
+    FILE_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // :::chroma/-git-file-or-ubranch-or-commit-verify"
+    FILE_OR_DIR_OR_BRANCH_OR_COMMIT_1_arg "NO-OP // :::chroma/-git-file-or-dir-or-ubranch-or-commit-verify"
 
     ## }}}
 
@@ -352,7 +352,7 @@ fsh__git__chroma__def=(
                      REMOTE_PRUNE_1_arg // REMOTE_UPDATE_1_arg"
 
     REMOTE_0_opt "(-v|--verbose)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     REMOTE_ADD_1_arg "add ::::: __style=${FAST_THEME_NAME}subcommand // NO-OP <<>>
                          add:REMOTE_ADD_OPTS_1_opt // REMOTE_A_NAME_2_arg //
@@ -393,53 +393,53 @@ fsh__git__chroma__def=(
 
     REMOTE_ADD_OPTS_1_opt "
                     (-t|-m|--mirror=)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
                  || (-f|--tags|--no-tags)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     REMOTE_SET_HEAD_OPTS_1_opt "
                     (-a|--auto|-d|--delete)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     REMOTE_SET_HEAD_OPTS_2_opt "
                     (-a|--auto|-d|--delete)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     REMOTE_SET_BRANCHES_OPTS_1_opt "
                     --add
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     REMOTE_GET_URL_OPTS_1_opt "
                     (--push|--all)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     "REMOTE_SET_URL_OPTS_1_opt^" "
                     --push|--add|--delete
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
                  || (--add|--delete):del
                         <<>> REMOTE_A_URL_4_arg"
 
     REMOTE_SHOW_OPTS_1_opt "
                     -n
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     REMOTE_PRUNE_OPTS_1_opt "
                     (-n|--dry-run)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     REMOTE_UPDATE_OPTS_1_opt "
                     (-p|--prune)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    REMOTE_A_NAME_2_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
-    REMOTE_A_NAME_3_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
-    REMOTE_A_URL_3_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
-    REMOTE_A_URL_4_arg "NO-OP // ::chroma/main-chroma-std-verify-url"
-    BRANCH_3_arg "NO-OP // ::chroma/-git-verify-branch"
-    BRANCH_\#_arg "NO-OP // ::chroma/-git-verify-branch"
-    REMOTE_2_arg "NO-OP // ::chroma/-git-verify-remote"
-    REMOTE_\#_arg "NO-OP // ::chroma/-git-verify-remote"
+    REMOTE_A_NAME_2_arg "NO-OP // :::chroma/-git-verify-correct-branch-name"
+    REMOTE_A_NAME_3_arg "NO-OP // :::chroma/-git-verify-correct-branch-name"
+    REMOTE_A_URL_3_arg "NO-OP // :::chroma/main-chroma-std-verify-url"
+    REMOTE_A_URL_4_arg "NO-OP // :::chroma/main-chroma-std-verify-url"
+    BRANCH_3_arg "NO-OP // :::chroma/-git-verify-branch"
+    BRANCH_\#_arg "NO-OP // :::chroma/-git-verify-branch"
+    REMOTE_2_arg "NO-OP // :::chroma/-git-verify-remote"
+    REMOTE_\#_arg "NO-OP // :::chroma/-git-verify-remote"
 
     ## }}}
 
@@ -461,8 +461,8 @@ fsh__git__chroma__def=(
                  --find-renames=|-C|--find-copies=|-l|--diff-filter=|-S|-G|--find-object=|
                  --relative=|-O|--relative=|--inter-hunk-context=|--ignore-submodules=|
                  --src-prefix=|--dst-prefix=|--line-prefix=)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
 
              || (--follow|--decorate|--no-decorate|--source|--use-mailmap|--full-diff|
                  --log-size|--all-match|--invert-grep|-i|--regexp-ignore-case|--basic-regexp|
@@ -488,9 +488,9 @@ fsh__git__chroma__def=(
                  --ignore-blank-lines|-W|--function-context|--ext-diff|--no-ext-diff|
                  --textconv|--no-textconv|--ignore-submodules|--no-prefix|
                  --ita-invisible-in-index)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    LOG_1_arg "NO-OP // ::chroma/-git-verify-rev-range-or-file"
+    LOG_1_arg "NO-OP // :::chroma/-git-verify-rev-range-or-file"
 
     ##
     ## TAG
@@ -500,38 +500,38 @@ fsh__git__chroma__def=(
 
     "TAG_0_opt^" "
                 (-u|--local-user=|--cleanup=)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
              || -m
-                            <<>> NO-OP // ::chroma/-git-commit-msg-opt-action
-                            <<>> NO-OP // ::chroma/-git-commit-msg-opt-ARG-action
+                            <<>> NO-OP // :::chroma/-git-commit-msg-opt-action
+                            <<>> NO-OP // :::chroma/-git-commit-msg-opt-ARG-action
              || (-F|--file)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                            <<>> NO-OP // ::chroma/-git-verify-file
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/-git-verify-file
              || (-a|--annotate|-s|--sign|-f|-e|--edit)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
              || (-u|--local-user=|--cleanup=|-m|-F|--file|-a|--annotate|-s|--sign|
                  -f|-e|--edit):add
                             <<>> TAG_NEW_1_arg // COMMIT_2_arg // NO_MATCH_#_arg //
                             NO_MATCH_#_opt"
 
-    TAG_NEW_1_arg "NO-OP // ::chroma/-git-verify-correct-branch-name"
+    TAG_NEW_1_arg "NO-OP // :::chroma/-git-verify-correct-branch-name"
 
-    TAG_1_arg "NO-OP // ::chroma/-git-verify-tag-name"
+    TAG_1_arg "NO-OP // :::chroma/-git-verify-tag-name"
 
     "TAG_D_0_opt^" "
                 (-d)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
              || -d:add
                             <<>> TAG_#_arg // NO_MATCH_#_opt
              || -d:del
                             <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg"
 
-    "TAG_#_arg" "NO-OP // ::chroma/-git-verify-tag-name"
+    "TAG_#_arg" "NO-OP // :::chroma/-git-verify-tag-name"
 
     "TAG_L_0_opt^" "
                 (-l)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
              || -l:add
                             <<>> TAG_L_0_opt // TAG_PAT_#_arg // NO_MATCH_#_opt
              || -l:del
@@ -540,16 +540,16 @@ fsh__git__chroma__def=(
     "TAG_L_0_opt" "
                 (-n|--contains|--no-contains|--points-at|--column=|--sort=|--format=|
                  --color=)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
              || (--column|--no-column|--create-reflog|--merged|--no-merged|--color|-i)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    "TAG_PAT_#_arg" "NO-OP // ::chroma/main-chroma-std-verify-pattern"
+    "TAG_PAT_#_arg" "NO-OP // :::chroma/main-chroma-std-verify-pattern"
 
     "TAG_V_0_opt^" "
                 (-v)
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
              || -v:add
                             <<>> TAG_V_0_opt // TAG_#_arg // NO_MATCH_#_opt
              || -v:del
@@ -557,8 +557,8 @@ fsh__git__chroma__def=(
 
     "TAG_V_0_opt" "
                 --format=
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-action
-                            <<>> NO-OP // ::chroma/main-chroma-std-aopt-ARG-action"
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                            <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action"
 
     ##
     ## All remaining subcommands
@@ -566,13 +566,13 @@ fsh__git__chroma__def=(
     ## {{{
 
     "subcmd:*" "CATCH_ALL_#_opt"
-    "CATCH_ALL_#_opt" "* <<>> NO-OP // ::chroma/main-chroma-std-aopt-SEMI-action"
+    "CATCH_ALL_#_opt" "* <<>> NO-OP // :::chroma/main-chroma-std-aopt-SEMI-action"
 
     ## }}}
 )
 
 # Called after entering just "git" on the command line
-chroma/-git-first-call() {
+:chroma/-git-first-call() {
     # Called for the first time - new command
     # FAST_HIGHLIGHT is used because it survives between calls, and
     # allows to use a single global hash only, instead of multiple
@@ -592,20 +592,20 @@ chroma/-git-first-call() {
     return 1
 }
 
-chroma/-git-check-if-alias() {
+:chroma/-git-check-if-alias() {
     local _wrd="$1"
     local -a _result
 
     typeset -ga fsh__chroma__git__aliases
     _result=( ${(M)fsh__chroma__git__aliases[@]:#${_wrd}[[:space:]]##*} )
-    chroma/main-chroma-print "Got is-alias-_result: $_result"
+    :chroma/main-chroma-print "Got is-alias-_result: $_result"
     [[ -n "$_result" ]] && \
 	FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]="${${${_result#* }## ##}%% *}"
 }
 
 # A hook that returns the list of git's
 # available subcommands in $reply
-chroma/-git-get-subcommands() {
+:chroma/-git-get-subcommands() {
     local __svalue
     integer __ivalue
     LANG=C -fast-run-command "git help -a" chroma-${FAST_HIGHLIGHT[chroma-current]}-subcmd-list "" $(( 15 * 60 ))
@@ -636,7 +636,7 @@ chroma/-git-get-subcommands() {
 }
 
 # A generic handler
-chroma/-git-verify-remote() {
+:chroma/-git-verify-remote() {
     local _wrd="$4"
     -fast-run-git-command "git remote" "chroma-git-remotes-$PWD" "" $(( 2 * 60 ))
     [[ -n ${__lines_list[(r)$_wrd]} ]] && {
@@ -647,7 +647,7 @@ chroma/-git-verify-remote() {
 }
 
 # A generic handler - checks if given ref is correct
-chroma/-git-verify-ref() {
+:chroma/-git-verify-ref() {
     local _wrd="$4"
     _wrd="${_wrd%%:*}"
     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-refs-$PWD" "refs/heads" $(( 2 * 60 ))
@@ -657,15 +657,15 @@ chroma/-git-verify-ref() {
 }
 
 # A generic handler - checks if given remote or group is correct
-chroma/-git-verify-remote-or-group() {
-    chroma/-git-verify-remote "$@" && return 0
+:chroma/-git-verify-remote-or-group() {
+    :chroma/-git-verify-remote "$@" && return 0
     # The check for a group is to follow below
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
 }
 
 # A generic handler - checks whether the file exists
-chroma/-git-verify-file() {
+:chroma/-git-verify-file() {
     local _wrd="$4"
 
     [[ -f "$_wrd" ]] && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
@@ -673,14 +673,14 @@ chroma/-git-verify-file() {
 }
 
 # A generic handler - checks whether the file exists
-chroma/-git-verify-file-or-dir() {
+:chroma/-git-verify-file-or-dir() {
     local _wrd="$4"
 
     [[ -f "$_wrd" || -d "$_wrd" ]] && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
 }
 
-chroma/-git-verify-branch() {
+:chroma/-git-verify-branch() {
     local _wrd="$4"
     -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches-$PWD" "refs/heads" $(( 2 * 60 ))
     [[ -n ${__lines_list[(r)$_wrd]} ]] && \
@@ -688,7 +688,7 @@ chroma/-git-verify-branch() {
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
 }
 
-chroma/-git-verify-also-unfetched-ref() {
+:chroma/-git-verify-also-unfetched-ref() {
     local _wrd="$4"
     -fast-run-git-command "git config --get checkout.defaultRemote" \
                             "chroma-git-defaultRemote-$PWD" "" $(( 2 * 60 ))
@@ -702,26 +702,26 @@ chroma/-git-verify-also-unfetched-ref() {
 }
 
 # A generic handler
-chroma/-git-file-or-ubranch-or-commit-verify() {
-    chroma/-git-verify-commit "$@" && return
-    chroma/-git-verify-file "$@" && return
-    chroma/-git-verify-also-unfetched-ref "$@"
+:chroma/-git-file-or-ubranch-or-commit-verify() {
+    :chroma/-git-verify-commit "$@" && return
+    :chroma/-git-verify-file "$@" && return
+    :chroma/-git-verify-also-unfetched-ref "$@"
 }
 
 # A generic handler
-chroma/-git-file-or-dir-or-ubranch-or-commit-verify() {
-    chroma/-git-verify-commit "$@" && return
-    chroma/-git-verify-file-or-dir "$@" && return
-    chroma/-git-verify-also-unfetched-ref "$@"
+:chroma/-git-file-or-dir-or-ubranch-or-commit-verify() {
+    :chroma/-git-verify-commit "$@" && return
+    :chroma/-git-verify-file-or-dir "$@" && return
+    :chroma/-git-verify-also-unfetched-ref "$@"
 }
 
 # A generic handler
-chroma/-git-verify-correct-branch-name() {
+:chroma/-git-verify-correct-branch-name() {
     local _wrd="$4"
-    chroma/-git-verify-commit "$@" && \
+    :chroma/-git-verify-commit "$@" && \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 0; }
 
-    chroma/-git-verify-remote "$@" && \
+    :chroma/-git-verify-remote "$@" && \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 0; }
 
     [[ "$_wrd" != ./* && "$_wrd" != *..* && "$_wrd" != *[~\^\ $'\t']* &&
@@ -731,7 +731,7 @@ chroma/-git-verify-correct-branch-name() {
 }
 
 # A generic handler that checks if given commit reference is correct
-chroma/-git-verify-commit() {
+:chroma/-git-verify-commit() {
     local _wrd="$4"
     __lines_list=()
     -fast-run-git-command "git rev-parse --verify --quiet \"$_wrd\"" "chroma-git-commits-$PWD-$_wrd" "" $(( 1.5 * 60 ))
@@ -745,28 +745,28 @@ chroma/-git-verify-commit() {
 
 # A generic handler that checks if given commit reference
 # is correct or if it's a file that exists
-chroma/-git-verify-commit-or-file() {
-    chroma/-git-verify-commit "$@" && return
-    chroma/-git-verify-file "$@"
+:chroma/-git-verify-commit-or-file() {
+    :chroma/-git-verify-commit "$@" && return
+    :chroma/-git-verify-file "$@"
 }
 
 # A generic handler that checks if given commit reference
 # is correct or if it's a file or directives that exists
-chroma/-git-verify-commit-or-file-or-dir() {
-    chroma/-git-verify-commit "$@" && return
-    chroma/-git-verify-file-or-dir "$@"
+:chroma/-git-verify-commit-or-file-or-dir() {
+    :chroma/-git-verify-commit "$@" && return
+    :chroma/-git-verify-file-or-dir "$@"
 }
 
 # A generic handler that checks if given revision range
 # is correct or if a file of that name exists
-chroma/-git-verify-rev-range-or-file() {
+:chroma/-git-verify-rev-range-or-file() {
     local _wrd="$4"
 
-    chroma/-git-verify-commit "$@" && return 0
+    :chroma/-git-verify-commit "$@" && return 0
 
     if [[ "$_wrd" = *..* ]]; then
         (( FAST_HIGHLIGHT[chroma-git-reset-etc-saw-file] )) && {
-            chroma/-git-verify-file "$@" && return 0
+            :chroma/-git-verify-file "$@" && return 0
             __style=${FAST_THEME_NAME}unknown-token
             return 1
         }
@@ -775,14 +775,14 @@ chroma/-git-verify-rev-range-or-file() {
         return 0
     fi
 
-    chroma/-git-verify-file "$@" && \
+    :chroma/-git-verify-file "$@" && \
         { FAST_HIGHLIGHT[chroma-git-reset-etc-saw-file]=1; return 0; }
 
     __style=""
     return 1
 }
 
-chroma/-git-verify-tag-name() {
+:chroma/-git-verify-tag-name() {
     local _wrd="$4"
     -fast-run-git-command "git tag" "chroma-git-tags-$PWD" "" $(( 2*60 ))
     [[ -n ${__lines_list[(r)$_wrd]} ]] && \
@@ -791,13 +791,13 @@ chroma/-git-verify-tag-name() {
 }
 
 # A handler for the commit's -m/--message options.Currently
-# does the same what chroma/main-chroma-std-aopt-action does
-chroma/-git-commit-msg-opt-action() {
-    chroma/main-chroma-std-aopt-action "$@"
+# does the same what :chroma/main-chroma-std-aopt-action does
+:chroma/-git-commit-msg-opt-action() {
+    :chroma/main-chroma-std-aopt-action "$@"
 }
 
 # A handler for the commit's -m/--message options' argument
-chroma/-git-commit-msg-opt-ARG-action() {
+:chroma/-git-commit-msg-opt-ARG-action() {
     integer _start="$2" _end="$3"
     local _scmd="$1" _wrd="$4"
 
@@ -836,9 +836,9 @@ chroma/-git-commit-msg-opt-ARG-action() {
 
 # A RESET handler
 # TODO: differentiate tree-ish from commit
-chroma/-git-RESET-verify-commit-or-file() {
-    chroma/-git-verify-commit "$@" && {
-        chroma/-git-verify-file "$@" && {
+:chroma/-git-RESET-verify-commit-or-file() {
+    :chroma/-git-verify-commit "$@" && {
+        :chroma/-git-verify-file "$@" && {
             # TODO: with -p/--patch, the <paths> are optional,
             # and this argument will be taken as a commit in a
             # specific circumstances
@@ -857,7 +857,7 @@ chroma/-git-RESET-verify-commit-or-file() {
         return 0
     }
 
-    chroma/-git-verify-file "$@" && \
+    :chroma/-git-verify-file "$@" && \
         { FAST_HIGHLIGHT[chroma-git-reset-etc-saw-file]=1; return 0; }
 
     return 1

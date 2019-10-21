@@ -228,7 +228,7 @@ _zsh_highlight_bind_widgets()
 
   # Override ZLE widgets to make them invoke _zsh_highlight.
   local -U widgets_to_bind
-  widgets_to_bind=(${${(k)widgets}:#(.*|run-help|which-command|beep|set-local-history|yank|yank-pop)})
+  widgets_to_bind=(${${(k)widgets}:#(.*|run-help|which-command|beep|set-local-history|yank)})
 
   # Always wrap special zle-line-finish widget. This is needed to decide if the
   # current line ends and special highlighting logic needs to be applied.
@@ -315,15 +315,15 @@ zmodload zsh/system 2>/dev/null
 
 autoload -Uz -- is-at-least fast-theme fast-read-ini-file -fast-run-git-command -fast-make-targets \
                 -fast-run-command -fast-zts-read-all
-autoload -Uz -- chroma/-git.ch chroma/-hub.ch chroma/-lab.ch chroma/-example.ch \
-                chroma/-grep.ch chroma/-perl.ch chroma/-make.ch chroma/-awk.ch \
-                chroma/-vim.ch chroma/-source.ch chroma/-sh.ch chroma/-docker.ch \
-                chroma/-autoload.ch chroma/-ssh.ch chroma/-scp.ch chroma/-which.ch \
-                chroma/-printf.ch chroma/-ruby.ch chroma/-whatis.ch chroma/-alias.ch \
-                chroma/-subcommand.ch chroma/-autorandr.ch chroma/-nmcli.ch \
-                chroma/-fast-theme.ch chroma/-node.ch chroma/-fpath_peq.ch \
-                chroma/-precommand.ch chroma/-subversion.ch chroma/-ionice.ch \
-                chroma/-nice.ch chroma/main-chroma.ch chroma/-ogit.ch chroma/-zplugin.ch
+autoload -Uz -- :chroma/-git.ch :chroma/-hub.ch :chroma/-lab.ch :chroma/-example.ch \
+                :chroma/-grep.ch :chroma/-perl.ch :chroma/-make.ch :chroma/-awk.ch \
+                :chroma/-vim.ch :chroma/-source.ch :chroma/-sh.ch :chroma/-docker.ch \
+                :chroma/-autoload.ch :chroma/-ssh.ch :chroma/-scp.ch :chroma/-which.ch \
+                :chroma/-printf.ch :chroma/-ruby.ch :chroma/-whatis.ch :chroma/-alias.ch \
+                :chroma/-subcommand.ch :chroma/-autorandr.ch :chroma/-nmcli.ch \
+                :chroma/-fast-theme.ch :chroma/-node.ch :chroma/-fpath_peq.ch \
+                :chroma/-precommand.ch :chroma/-subversion.ch :chroma/-ionice.ch \
+                :chroma/-nice.ch :chroma/main-chroma.ch :chroma/-ogit.ch :chroma/-zplugin.ch
 
 source "${0:h}/fast-highlight"
 source "${0:h}/fast-string-highlight"

@@ -17,7 +17,7 @@ fsh__zplugin__chroma__def=(
 
     subcmd:NULL "NULL_0_opt"
     NULL_0_opt "(-help|--help|-h)
-                   <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     "subcommands" "(help|man|self-update|cd|times|zstatus|load|light|unload|snippet|ls|ice|<ice|specification>|update|status|report|delete|loaded|list|cd|create|edit|glance|stress|changes|recently|clist|completions|cdisable|cname|cenable|cname|creinstall|cuninstall|csearch|compinit|dtrace|dstart|dstop|dunload|dreport|dclear|compile|uncompile|compiled|cdlist|cdreplay|cdclear|srv|recall|env-whitelist|bindkeys|module)"
 
@@ -35,7 +35,7 @@ fsh__zplugin__chroma__def=(
 
     subcmd:ice "ICE_#_arg // NO_MATCH_#_opt"
 
-    "ICE_#_arg" "NO-OP // ::chroma/-zplugin-check-ice-mod"
+    "ICE_#_arg" "NO-OP // :::chroma/-zplugin-check-ice-mod"
 
     ## }}}
 
@@ -48,9 +48,9 @@ fsh__zplugin__chroma__def=(
                     NO_MATCH_#_arg"
 
     SNIPPET_0_opt "(-f|--command)
-                        <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    SNIPPET_1_arg "NO-OP // ::chroma/-zplugin-verify-snippet"
+    SNIPPET_1_arg "NO-OP // :::chroma/-zplugin-verify-snippet"
 
     ## }}}
 
@@ -62,9 +62,9 @@ fsh__zplugin__chroma__def=(
     "subcmd:(load|light|compile|stress|edit|glance|recall|status|cd|changes)"
         "LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
 
-    LOAD_2_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
 
     ## }}}
 
@@ -78,11 +78,11 @@ fsh__zplugin__chroma__def=(
 
     UPDATE_0_opt "
             (--all|-r|--reset)
-                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
 
-    LOAD_2_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
 
     ## }}}
 
@@ -95,7 +95,7 @@ fsh__zplugin__chroma__def=(
                   NO_MATCH_#_arg"
 
     LIGHT_0_opt "-b
-                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     ## }}}
 
@@ -107,9 +107,9 @@ fsh__zplugin__chroma__def=(
     subcmd:(unload|report) "UNLOAD_1_arg // UNLOAD_2_arg // NO_MATCH_#_opt //
                   NO_MATCH_#_arg"
 
-    UNLOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-loaded-plugin"
+    UNLOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-loaded-plugin"
 
-    UNLOAD_2_arg "NO-OP // ::chroma/-zplugin-verify-loaded-plugin"
+    UNLOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-loaded-plugin"
 
     ## }}}
 
@@ -123,11 +123,11 @@ fsh__zplugin__chroma__def=(
 
     DELETE_0_opt "
             (--all|--clean)
-                    <<>> NO-OP // ::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    LOAD_1_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
 
-    LOAD_2_arg "NO-OP // ::chroma/-zplugin-verify-plugin"
+    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
 
     ## }}}
 
@@ -138,7 +138,7 @@ fsh__zplugin__chroma__def=(
 
     subcmd:cenable "COMPLETION_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    COMPLETION_1_arg "NO-OP // ::chroma/-zplugin-verify-disabled-completion"
+    COMPLETION_1_arg "NO-OP // :::chroma/-zplugin-verify-disabled-completion"
 
     ## }}}
 
@@ -149,7 +149,7 @@ fsh__zplugin__chroma__def=(
 
     subcmd:cdisable "DISCOMPLETION_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    DISCOMPLETION_1_arg "NO-OP // ::chroma/-zplugin-verify-completion"
+    DISCOMPLETION_1_arg "NO-OP // :::chroma/-zplugin-verify-completion"
 
     ## }}}
 
@@ -161,7 +161,7 @@ fsh__zplugin__chroma__def=(
 
     subcmd:uncompile "UNCOMPILE_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    UNCOMPILE_1_arg "NO-OP // ::chroma/-zplugin-verify-compiled-plugin"
+    UNCOMPILE_1_arg "NO-OP // :::chroma/-zplugin-verify-compiled-plugin"
 
     ## }}}
 
@@ -171,17 +171,17 @@ fsh__zplugin__chroma__def=(
     ## {{{
 
     "subcmd:*" "CATCH_ALL_#_opt"
-    "CATCH_ALL_#_opt" "* <<>> NO-OP // ::chroma/main-chroma-std-aopt-SEMI-action"
+    "CATCH_ALL_#_opt" "* <<>> NO-OP // :::chroma/main-chroma-std-aopt-SEMI-action"
 
     ## }}}
 )
 
-#chroma/-zplugin-first-call() {
+#:chroma/-zplugin-first-call() {
     # This is being done in the proper place - in -fast-highlight-process
     #FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]=0
 #}
 
-chroma/-zplugin-verify-plugin() {
+:chroma/-zplugin-verify-plugin() {
     local _scmd="$1" _wrd="$4"
 
     [[ -d "$_wrd" ]] && \
@@ -200,7 +200,7 @@ chroma/-zplugin-verify-plugin() {
     return 0
 }
 
-chroma/-zplugin-verify-loaded-plugin() {
+:chroma/-zplugin-verify-loaded-plugin() {
     local _scmd="$1" _wrd="$4"
     typeset -a plugins absolute1 absolute2 absolute3 normal
     plugins=( "${ZPLG_REGISTERED_PLUGINS[@]:#_local/zplugin}" )
@@ -220,7 +220,7 @@ chroma/-zplugin-verify-loaded-plugin() {
     return 0
 }
 
-chroma/-zplugin-verify-completion() {
+:chroma/-zplugin-verify-completion() {
     local _scmd="$1" _wrd="$4"
     # Find enabled completions
     typeset -a completions
@@ -234,7 +234,7 @@ chroma/-zplugin-verify-completion() {
     return 0
 }
 
-chroma/-zplugin-verify-disabled-completion() {
+:chroma/-zplugin-verify-disabled-completion() {
     local _scmd="$1" _wrd="$4"
     # Find enabled completions
     typeset -a completions
@@ -247,7 +247,7 @@ chroma/-zplugin-verify-disabled-completion() {
     return 0
 }
 
-chroma/-zplugin-verify-compiled-plugin() {
+:chroma/-zplugin-verify-compiled-plugin() {
     local _scmd="$1" _wrd="$4"
 
     typeset -a plugins
@@ -269,7 +269,7 @@ chroma/-zplugin-verify-compiled-plugin() {
         return 1
 }
 
-chroma/-zplugin-verify-snippet() {
+:chroma/-zplugin-verify-snippet() {
     local _scmd="$1" url="$4" dirname local_dir
     url="${${url#"${url%%[! $'\t']*}"}%/}"
     id_as="${FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]:-${ZPLG_ICE[id-as]:-$url}}"
@@ -293,7 +293,7 @@ chroma/-zplugin-verify-snippet() {
     }
 }
 
-chroma/-zplugin-check-ice-mod() {
+:chroma/-zplugin-check-ice-mod() {
     local _scmd="$1" _wrd="$4"
     [[ "$_wrd" = (svn(\'|\")*|svn) ]] && \
         FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]=1
