@@ -130,7 +130,14 @@ chroma/main-create-OPTION-hash.ch() {
 
         chroma/main-chroma-print -l -- "Processing an ||-part - got <<>>-split: _________" "${${__sp[@]}[@]/(#s)/-\\t}" "_________"
         __e="${__sp[1]}"
-        __s=( "${(@)${(@s:|:)${${__e#\(}%\)(:add|:del|)}}//(#e)/${${(M)__e##\(*\)(:add|:del)}:+${(M)__e%(:add|:del)}}}" )
+        local __e1=${${__e#\(}%\)(:add|:del|)}
+        local __e2=${(M)__e##\(*\)(:add|:del)}
+        # Split on | with the ( and ) and :add/:del stripped and then append
+        # the :add or :del depending on what's on the input line
+        __s=()
+        for __ in ${(@s:|:)__e1}; do
+            __s+=( $__${__e2:+${(M)__e%(:add|:del)}} )
+        done
         [[ ${#__s} -eq 1 && -z "${__s[1]}" ]] && __s=()
         __s=( "${__s[@]//((#s)[[:space:]]##|[[:space:]]##(#e))/}" )
         shift __sp
