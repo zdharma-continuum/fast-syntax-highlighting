@@ -1,13 +1,13 @@
 # Copyright (c) 2018 Sebastian Gniazdowski
 #
 # $1 - path to the ini file to parse
-# $2 - name of output hash
-# $3 - prefix for keys in the hash
+# $2 - name of output hash (INI by default)
+# $3 - prefix for keys in the hash (can be empty)
 #
 # Writes to given hash under keys built in following way: ${3}<section>_field.
 # Values are values from ini file.
 
-local __ini_file="$1" __out_hash="$2" __key_prefix="$3"
+local __ini_file="$1" __out_hash="${2:-INI}" __key_prefix="$3"
 local IFS='' __line __cur_section="void" __access_string
 local -a match mbegin mend
 
