@@ -103,4 +103,22 @@ reply=()
     assert "$reply[6]" same_as ""
 }
 
+@test 'local var1; (( var + var1 + $var + $var1 + 123 ))' {
+    reply=()
+    PREBUFFER=""
+    BUFFER='local var1; (( var + var1 + $var + $var1 + 123 ))'
+    evl -fast-highlight-process "\$PREBUFFER" "\$BUFFER" 0
+
+    # Should actually be `reserved-word', but the type -w call returns `builtin'…
+    assert "$reply[1]" same_as "0 5 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}builtin]}"
+    assert "$reply[2]" same_as "12 14 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}"
+    assert "$reply[3]" same_as "15 18 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}"
+    assert "$reply[4]" same_as "21 25 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathvar]}"
+    assert "$reply[5]" same_as "28 32 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}matherr]}"
+    assert "$reply[6]" same_as "35 40 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}back-or-dollar-double-quoted-argument]}"
+    assert "$reply[7]" same_as "43 46 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]}"
+    assert "$reply[8]" same_as "47 49 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}"
+    assert "$reply[9]" same_as ""
+}
+
 # vim:ft=zsh:sw=4:sts=4:et
