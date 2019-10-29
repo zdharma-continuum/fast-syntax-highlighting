@@ -606,7 +606,7 @@ typeset -ga ZLAST_COMMANDS
      if (( __arg_type == 1 )); then
       __style=${FAST_THEME_NAME}precommand
       [[ $__arg = "command" || $__arg = "exec" ]] && (( next_word = next_word | 64 ))
-     elif [[ $__arg = "sudo" ]]; then
+     elif [[ $__arg = (sudo|doas) ]]; then
       __style=${FAST_THEME_NAME}precommand
       (( next_word = (next_word & ~2) | 4 | 1 ))
      else
