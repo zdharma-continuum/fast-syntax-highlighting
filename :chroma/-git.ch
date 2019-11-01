@@ -314,7 +314,7 @@ fsh__git__chroma__def=(
                 (-b|-B|--orphan)
                         <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
              || (-b|-B|--orphan):del
-                        <<>> FILE_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg // FILE_#_arg
+                        <<>> FILE_OR_DIR_OR_BRANCH_OR_COMMIT_1_arg // FILE_#_arg // FILE_#_arg
              || (-b|-B|--orphan):add
                         <<>> NEW_BRANCH_1_arg // COMMIT_2_arg // NO_MATCH_#_arg"
 
