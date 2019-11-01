@@ -54,9 +54,10 @@ And add the following to your `zshrc` file.
 source ~/path/to/fsh/fast-syntax-highlighting.plugin.zsh
 ```
 
-### [Zplugin](https://github.com/psprint/zplugin) (Recommended)
+### Zplugin
 
 Add the following to your `zshrc` file.
+
 ```zsh
 zplugin light zdharma/fast-syntax-highlighting
 ```
@@ -82,6 +83,7 @@ zgen load zdharma/fast-syntax-highlighting
 ### Oh-My-Zsh
 
 Clone the Repository.
+
 ```
 git clone https://github.com/zdharma/fast-syntax-highlighting.git \
   ~/.oh-my-zsh/custom/plugins/fast-syntax-highlighting
