@@ -118,6 +118,8 @@ local MATCH; integer MBEGIN MEND
     print -r -- "-s/--show      - get and display the theme currently being set"
     print -r -- "-p/--palette   - just print all 256 colors and exit (useful when creating a theme)"
     print -r -- "-w/--workdir   - cd into \$FAST_WORK_DIR (if not set, then into the plugin directory)"
+    print -r -- "-v/--verbose   - more messages during operation"
+    print -r -- "-q/--quiet     - no default messages"
     print -r -- ""
     print -r -- "The option --copy-shipped-theme allows easy copying of one of the 6 shipped"
     print -r -- "themes into given destination path. Normal use means changing directory to"
