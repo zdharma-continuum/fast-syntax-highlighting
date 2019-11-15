@@ -91,6 +91,7 @@ _zsh_highlight()
           -fast-highlight-string-process "$PREBUFFER" "$BUFFER"
       }
       region_highlight=( $reply )
+      FAST_HIGHLIGHT[region_highlight_cache]="${(j: :)${(q)region_highlight[@]}}"
   else
       local char="${BUFFER[CURSOR+1]}"
       if [[ "$char" = ["{([])}"] || "${FAST_HIGHLIGHT[prev_char]}" = ["{([])}"] ]]; then
@@ -100,6 +101,29 @@ _zsh_highlight()
               -fast-highlight-string-process "$PREBUFFER" "$BUFFER"
               region_highlight=( $reply )
           }
+          FAST_HIGHLIGHT[region_highlight_cache]="${(j: :)${(q)region_highlight[@]}}"
+      fi
+
+      local -a rh_cache_copy
+      rh_cache_copy=( "${(@z)FAST_HIGHLIGHT[region_highlight_cache]}" )
+      integer rhcount=${#region_highlight} \
+              chcount=${#rh_cache_copy}
+      # If there are more than 2 entries of difference
+      # - to ignore the change done by zsh-autosuggestions
+      if (( rhcount - chcount > 2 ))
+      then
+          region_highlight=( "${(Q)rh_cache_copy[@]}" )
+
+      # If there is no difference in the # of entries, but...
+      # (again, to skip the +1 change applied by zsh-autosuggestions)
+      elif (( rhcount == chcount ))
+      then
+          # ... the contents is different
+          if [[ ${FAST_HIGHLIGHT[region_highlight_cache]} != \
+                ${(j: :)${(q)region_highlight[@]}} ]]
+          then
+              region_highlight=( "${(Q)rh_cache_copy[@]}" )
+          fi
       fi
   fi
 
