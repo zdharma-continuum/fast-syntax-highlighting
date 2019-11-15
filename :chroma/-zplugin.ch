@@ -301,7 +301,9 @@ fsh__zplugin__chroma__def=(
         FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]="${match[4]}${match[6]}${match[7]}"
 
     # Copy from zplugin-autoload.zsh / -zplg-recall
-    local -a ice_order nval_ices
+    local -a ice_order nval_ices ext_val_ices
+    ext_val_ices=( ${(@)${(@Ms.|.)ZPLG_EXTS[ice-mods]:#*\'\'*}//\'\'/} )
+
     ice_order=(
         svn proto from teleid bindmap cloneopts id-as depth if wait load
         unload blockf pick bpick src as ver silent lucid notify mv cp
@@ -327,7 +329,7 @@ fsh__zplugin__chroma__def=(
             svn
     )
 
-    if [[ "$_wrd" = (#b)(${(~j:|:)${ice_order[@]:#(${(~j:|:)nval_ices[@]})}})(*) ]]; then
+    if [[ "$_wrd" = (#b)(${(~j:|:)${ice_order[@]:#(${(~j:|:)nval_ices[@]:#(${(~j:|:)ext_val_ices[@]})})}})(*) ]]; then
         reply+=("$(( __start )) $(( __start+${mend[1]} )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-hyphen-option]}")
         reply+=("$(( __start+${mbegin[2]} )) $(( __end )) ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}optarg-string]}")
         -fast-highlight-string
