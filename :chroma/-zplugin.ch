@@ -24,8 +24,8 @@ fsh__zplugin__chroma__def=(
     ## }}}
 
     # Generic actions
-    NO_MATCH_#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
-    NO_MATCH_#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    NO_MATCH_\#_opt "* <<>> __style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
+    NO_MATCH_\#_arg "__style=\${FAST_THEME_NAME}incorrect-subtle // NO-OP"
 
 
     ##
@@ -104,7 +104,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    subcmd:(unload|report) "UNLOAD_1_arg // UNLOAD_2_arg // NO_MATCH_#_opt //
+    subcmd:"(unload|report)" "UNLOAD_1_arg // UNLOAD_2_arg // NO_MATCH_#_opt //
                   NO_MATCH_#_arg"
 
     UNLOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-loaded-plugin"
