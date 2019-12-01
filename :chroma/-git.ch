@@ -302,6 +302,27 @@ fsh__git__chroma__def=(
     ## }}}
 
     ##
+    ## ADD
+    ##
+    ## {{{
+
+    subcmd:add "ADD_0_opt // FILE_OR_DIR_#_arg // NO_MATCH_#_opt"
+
+    ADD_0_opt "
+                --chmod=
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
+             || (-v|--verbose|-f|--force|-i|--interactive|-n|--dry-run|
+                 -p|--patch|-e|--edit|--all|--no-all|--ignore-removal|
+                 --no-ignore-removal|-u|--update|-N|--intent-to-add|
+                 --refresh|--ignore-errors|--ignore-missing|--renormalize)
+                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+
+    FILE_OR_DIR_#_arg "NO-OP // :::chroma/-git-verify-file-or-dir"
+
+    ## }}}
+
+    ##
     ## CHECKOUT
     ##
     ## {{{
