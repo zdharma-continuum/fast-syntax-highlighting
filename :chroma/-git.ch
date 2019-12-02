@@ -313,9 +313,10 @@ fsh__git__chroma__def=(
                         <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
                         <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action
              || (-v|--verbose|-f|--force|-i|--interactive|-n|--dry-run|
-                 -p|--patch|-e|--edit|--all|--no-all|--ignore-removal|
-                 --no-ignore-removal|-u|--update|-N|--intent-to-add|
-                 --refresh|--ignore-errors|--ignore-missing|--renormalize)
+                 -p|--patch|-e|--edit|--all|--no-all|-A|--all|--no-all|
+                 --ignore-removal|--no-ignore-removal|-u|--update|-N|
+                 --intent-to-add|--refresh|--ignore-errors|--ignore-missing|
+                 --renormalize|--no-warn-embedded-repo)
                         <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     FILE_OR_DIR_#_arg "NO-OP // :::chroma/-git-verify-file-or-dir"
