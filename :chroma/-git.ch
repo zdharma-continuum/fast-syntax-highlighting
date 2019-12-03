@@ -722,9 +722,10 @@ fsh__git__chroma__def=(
 
 # A generic handler - checks whether the file exists
 :chroma/-git-verify-file-or-dir() {
-    integer _start="$2" _end="$3" __pos __start __end
+    integer _start="$2" _end="$3" __pos __start __end retval
     local _wrd="$4" bg
 
+    __style=
     [[ -f $_wrd || -d $_wrd ]] && {
         (( __start=_start, __end=_end, __start >= 0 )) && \
             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
@@ -734,6 +735,7 @@ fsh__git__chroma__def=(
         (( __start=_start, __end=_end, __start >= 0 )) && \
             reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
         bg=${(M)FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]%bg=*}
+        retval=1
     }
 
     [[ -n ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}path_pathseparator]} && \
@@ -752,6 +754,7 @@ fsh__git__chroma__def=(
                 }
             }
         }
+    return $retval
 }
 
 :chroma/-git-verify-branch() {
