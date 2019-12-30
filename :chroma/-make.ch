@@ -38,6 +38,10 @@ local -a __lines_list reply2
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
 
+    if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
+    fi
+
     if [[ "$__wrd" = -* || "$__wrd" = *=* ]]; then
         [[ "$__wrd" = *=* ]] && {
             __style=${FAST_THEME_NAME}variable
