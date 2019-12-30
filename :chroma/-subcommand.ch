@@ -7,6 +7,8 @@ local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-subcommand]=""
     return 1
+elif (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+    return 1
 elif [[ "$2" = -* ]]; then
     return 1
 elif [[ -z "${FAST_HIGHLIGHT[chroma-subcommand]}" ]]; then
