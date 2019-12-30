@@ -12,6 +12,10 @@ if (( __first_call )); then
 fi
 [[ "$__arg_type" = 3 ]] && return 2
 
+if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+    return 1
+fi
+
 if [[ "$__wrd" != -* ]] && (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
     -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 5 * 60 ))
     # Grep for line: alias.{user-entered-subcmd}[[:space:]], and remove alias. prefix
