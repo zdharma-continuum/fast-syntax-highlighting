@@ -20,6 +20,8 @@ if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-nmcli-subcommand-a]=""
     FAST_HIGHLIGHT[chroma-nmcli-subcommand-b]=""
     return 1
+elif (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
 elif [[ "$2" = -* ]]; then
     return 1
 elif [[ -z ${FAST_HIGHLIGHT[chroma-nmcli-subcommand-a]} ]]; then
