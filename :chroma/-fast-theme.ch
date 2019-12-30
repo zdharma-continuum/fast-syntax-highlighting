@@ -8,6 +8,8 @@ local __style
 if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-fast-theme-first]=0
     return 1
+elif (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
 elif (( ${FAST_HIGHLIGHT[chroma-fast-theme-first]} )) || [[ $__wrd = -* ]]; then
     return 1
 else
