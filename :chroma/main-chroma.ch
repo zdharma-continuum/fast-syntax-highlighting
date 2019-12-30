@@ -404,7 +404,7 @@ else
         :chroma/main-process-token.ch "${${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}:-NULL}" "$__wrd"
     else
         # If at e.g. '>' or destination/source spec (of the redirection)
-        if (( in_redirection > 0 )); then
+        if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
             return 1
         elif (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-got-subcommand] == 0 )); then
             __the_hash_name="fsh__chroma__main__${${FAST_HIGHLIGHT[chroma-current]//[^a-zA-Z0-9_]/_}//(#b)([\#\^])/${map[${match[1]}]}}"
