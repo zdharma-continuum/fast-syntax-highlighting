@@ -60,7 +60,7 @@ else
         return 1
     else
         # If at e.g. '>' or destination/source spec (of the redirection)
-        if (( in_redirection > 0 )); then
+        if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
             return 1
         # If at main git option taking argument in a separate word (-C and -c)
         elif (( FAST_HIGHLIGHT[chroma-git-option-with-argument-active] > 0 && \
