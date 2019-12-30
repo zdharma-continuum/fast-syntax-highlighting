@@ -27,6 +27,10 @@ integer __idx1 __idx2
 } || {
     # Following call, i.e. not the first one.
 
+    if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
+    fi
+
     # Check if chroma should end – test if token is of type
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
