@@ -34,6 +34,9 @@ local -a __results __deserialized __noshsplit
     __style=${FAST_THEME_NAME}command
 
 } || {
+    if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
+    fi
     (( FAST_HIGHLIGHT[chroma-autoload-counter-all] += 1, __idx2 = FAST_HIGHLIGHT[chroma-autoload-counter-all] ))
 
     # Following call, i.e. not the first one.
