@@ -7,6 +7,8 @@ local __style
 
 if (( __first_call )); then
     FAST_HIGHLIGHT[chroma-node-file]=1
+elif (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+    return 1
 elif [[ "$__wrd" = -- ]]; then
     FAST_HIGHLIGHT[chroma-node-file]=2
 elif (( FAST_HIGHLIGHT[chroma-node-file] != 2 )) && [[ "$__wrd" = -* ]]; then
