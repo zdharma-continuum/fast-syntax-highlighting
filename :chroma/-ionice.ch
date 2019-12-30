@@ -60,6 +60,9 @@ local -a match mbegin mend
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
 
+    if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
+    fi
 
     if (( FAST_HIGHLIGHT[ionice-option-argument] )); then
         (( FAST_HIGHLIGHT[ionice-option-argument] = 0 ))
