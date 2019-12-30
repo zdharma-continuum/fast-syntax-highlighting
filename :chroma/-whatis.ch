@@ -78,6 +78,10 @@ fi
 
 [[ "$__arg_type" = 3 ]] && return 2
 
+if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+    return 1
+fi
+
 if (( __first_call )) || [[ "$__wrd" = -* ]]; then
     return 1
 elif (( ! FAST_HIGHLIGHT[whatis_chroma_type] )); then
