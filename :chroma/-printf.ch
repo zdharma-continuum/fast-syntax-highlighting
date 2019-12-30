@@ -30,6 +30,9 @@ integer __idx1 __idx2
     return 1
 # Following call (not first one).
 } || {
+    if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
+    fi
     (( FAST_HIGHLIGHT[chroma-printf-counter-all] += 1, __idx2 = FAST_HIGHLIGHT[chroma-printf-counter-all] ))
 
     # Check if chroma should end – test if token is of type
