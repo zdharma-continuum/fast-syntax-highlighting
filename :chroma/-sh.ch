@@ -30,6 +30,10 @@ local -a __lines_list
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
 
+    if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
+    fi
+
     __wrd="${${${(Q)__wrd}#[\"\']}%[\"\']}"
     if [[ "$__wrd" = -* && "$__wrd" != -*c* ]]; then
         __style=${FAST_THEME_NAME}${${${__wrd:#--*}:+single-hyphen-option}:-double-hyphen-option}
