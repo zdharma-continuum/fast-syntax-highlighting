@@ -38,6 +38,10 @@ local -a __results
     # "starts new command", if so pass-through – chroma ends
     [[ "$__arg_type" = 3 ]] && return 2
 
+    if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
+        return 1
+    fi
+
     if [[ "$__wrd" = -* ]]; then
         # Detected option, add style for it.
         [[ "$__wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \
