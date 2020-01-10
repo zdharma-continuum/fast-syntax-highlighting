@@ -61,6 +61,7 @@ integer __idx1 __idx2
             # Pass-through to the big-loop outside
             return 1
         fi
+        FAST_HIGHLIGHT[chrome-ruby-got-eswitch]=0
     fi
 }
 
