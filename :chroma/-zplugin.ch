@@ -77,7 +77,7 @@ fsh__zplugin__chroma__def=(
                    NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     UPDATE_0_opt "
-            (--all|-r|--reset)
+            (--all|-r|--reset|-q|--quiet)
                     <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
@@ -122,7 +122,7 @@ fsh__zplugin__chroma__def=(
         "DELETE_0_opt // LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     DELETE_0_opt "
-            (--all|--clean)
+            (--all|--clean|-y|--yes|-q|--quiet)
                     <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
