@@ -80,9 +80,9 @@ fsh__zplugin__chroma__def=(
             (--all|-r|--reset|-q|--quiet)
                     <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
+    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
 
-    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
+    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
 
     ## }}}
 
@@ -125,9 +125,9 @@ fsh__zplugin__chroma__def=(
             (--all|--clean|-y|--yes|-q|--quiet)
                     <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
-    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
+    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
 
-    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
+    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
 
     ## }}}
 
@@ -198,6 +198,12 @@ fsh__zplugin__chroma__def=(
         return 1
         #__style=${FAST_THEME_NAME}incorrect-subtle
     return 0
+}
+
+:chroma/-zplugin-verify-plugin-or-snippet() {
+    :chroma/-zplugin-verify-plugin "$1" "" "" "$4" || \
+        :chroma/-zplugin-verify-snippet "$1" "" "" "$4"
+    return $?
 }
 
 :chroma/-zplugin-verify-loaded-plugin() {
