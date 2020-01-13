@@ -59,7 +59,7 @@ fsh__zplugin__chroma__def=(
     ##
     ## {{{
 
-    "subcmd:(load|light|compile|stress|edit|glance|recall|status|cd|changes)"
+    "subcmd:load"
         "LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin"
@@ -69,20 +69,30 @@ fsh__zplugin__chroma__def=(
     ## }}}
 
     ##
+    ## `compile|uncompile|stress|edit|glance|recall|status|cd|changes`
+    ##
+    ## {{{
+    
+    "subcmd:(compile|uncompile|stress|edit|glance|recall|status|cd|changes)"
+        "PLGSNP_1_arg // PLGSNP_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+
+    PLGSNP_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
+
+    PLGSNP_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
+
+    ## }}}
+
+    ##
     ## `update'
     ##
     ## {{{
 
-    subcmd:update "UPDATE_0_opt // LOAD_1_arg // LOAD_2_arg //
+    subcmd:update "UPDATE_0_opt // PLGSNP_1_arg // PLGSNP_2_arg //
                    NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     UPDATE_0_opt "
             (--all|-r|--reset|-q|--quiet)
                     <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
-
-    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
-
-    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
 
     ## }}}
 
@@ -119,15 +129,11 @@ fsh__zplugin__chroma__def=(
     ## {{{
 
     "subcmd:delete"
-        "DELETE_0_opt // LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
+        "DELETE_0_opt // PLGSNP_1_arg // PLGSNP_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     DELETE_0_opt "
             (--all|--clean|-y|--yes|-q|--quiet)
                     <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
-
-    LOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
-
-    LOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-plugin-or-snippet"
 
     ## }}}
 
