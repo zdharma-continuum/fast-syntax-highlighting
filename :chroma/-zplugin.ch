@@ -110,16 +110,32 @@ fsh__zplugin__chroma__def=(
     ## }}}
 
     ##
-    ## `unload|report'
+    ## `unload'
     ##
     ## {{{
 
-    subcmd:"(unload|report)" "UNLOAD_1_arg // UNLOAD_2_arg // NO_MATCH_#_opt //
+    subcmd:unload "UNLOAD_0_opt // UNLOAD_1_arg // UNLOAD_2_arg // NO_MATCH_#_opt //
                   NO_MATCH_#_arg"
+
+    UNLOAD_0_opt "-q
+                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     UNLOAD_1_arg "NO-OP // :::chroma/-zplugin-verify-loaded-plugin"
 
     UNLOAD_2_arg "NO-OP // :::chroma/-zplugin-verify-loaded-plugin"
+
+    ## }}}
+
+    ##
+    ## `report'
+    ##
+    ## {{{
+
+    subcmd:report "REPORT_0_opt // UNLOAD_1_arg // UNLOAD_2_arg // NO_MATCH_#_opt //
+                  NO_MATCH_#_arg"
+
+    REPORT_0_opt "--all
+                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     ## }}}
 
