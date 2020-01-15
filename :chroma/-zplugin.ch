@@ -338,7 +338,9 @@ fsh__zplugin__chroma__def=(
         atinit atclone atload atpull nocd run-atpull has cloneonly make
         service trackbinds multisrc compile nocompile nocompletions
         reset-prompt wrap-track reset sh \!sh bash \!bash ksh \!ksh csh
-        \!csh aliases countdown
+        \!csh aliases countdown ps-on-unload ps-on-update trigger-load
+        light-mode is-snippet atdelete pack git verbose on-update-of
+        subscribe param
         # Include all additional ices – after
         # stripping them from the possible: ''
         ${(@s.|.)${ZPLG_EXTS[ice-mods]//\'\'/}}
@@ -346,7 +348,7 @@ fsh__zplugin__chroma__def=(
     nval_ices=(
             blockf silent lucid trackbinds cloneonly nocd run-atpull
             nocompletions sh \!sh bash \!bash ksh \!ksh csh \!csh
-            aliases countdown
+            aliases countdown light-mode is-snippet git verbose
 
             # Include only those additional ices,
             # don't have the '' in their name, i.e.
