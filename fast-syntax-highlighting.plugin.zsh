@@ -48,8 +48,9 @@ typeset -g FAST_WORK_DIR
 : ${FAST_WORK_DIR:=$FAST_BASE_DIR}
 FAST_WORK_DIR=${~FAST_WORK_DIR}
 
-if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$FAST_BASE_DIR]}" != $FAST_BASE_DIR ]]; then
-    fpath+=( "$FAST_BASE_DIR" )
+if [[ ${zsh_loaded_plugins[-1]} != */fast-syntax-highlighting && -z ${fpath[(r)${0:h}]} ]]
+then
+    fpath+=( "${0:h}" )
 fi
 
 if [[ "$FAST_WORK_DIR" = /usr/* || ( "$FAST_WORK_DIR" = /opt/* && ! -w "$FAST_WORK_DIR" ) ]]; then
