@@ -79,7 +79,7 @@ else
 
             # Check if the command is an alias - we want to highlight the
             # aliased command just like the target command of the alias
-            -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 10 * 60 ))
+            .fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 10 * 60 ))
             # Grep for line: alias.{user-entered-subcmd}[[:space:]], and remove alias. prefix
             __lines_list=( ${${(M)__lines_list[@]:#alias.${__wrd}[[:space:]]##*}#alias.} )
 
@@ -95,7 +95,7 @@ else
             fi
             if (( __start_pos >= 0 )); then
                 # if subcommand exists
-                LANG=C -fast-run-command "git help -a" chroma-git-subcmd-list "" $(( 10 * 60 ))
+                LANG=C .fast-run-command "git help -a" chroma-git-subcmd-list "" $(( 10 * 60 ))
                 # (s: :) will split on every space, but because the expression
                 # isn't double-quoted, the empty elements will be eradicated
                 # Some further knowledge-base: s-flag is special, it skips
@@ -144,10 +144,10 @@ else
                 if [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]]; then
                     (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                     if (( __idx1 == 2 )); then
-                        -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                        .fast-run-git-command "git remote" "chroma-git-remotes" ""
                     else
                         __wrd="${__wrd%%:*}"
-                        -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
+                        .fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
                     fi
                     # if remote/ref exists
                     if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
@@ -173,7 +173,7 @@ else
                 fi
             elif (( ${FAST_HIGHLIGHT[chroma-git-fetch-multiple]} )) \
                 && [[ "$__wrd" != -* || "${FAST_HIGHLIGHT[chrome-git-occurred-double-hyphen]}" -eq 1 ]]; then
-                -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                .fast-run-git-command "git remote" "chroma-git-remotes" ""
                 if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
                     __style=${FAST_THEME_NAME}correct-subtle
                 fi
@@ -283,12 +283,12 @@ else
                         __style=${FAST_THEME_NAME}incorrect-subtle
                     fi
                 elif [[ "$__idx1" = 3 && "$FAST_HIGHLIGHT[chroma-git-remote-subcommand]" = "add" ]]; then
-                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                    .fast-run-git-command "git remote" "chroma-git-remotes" ""
                     if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
                         __style=${FAST_THEME_NAME}incorrect-subtle
                     fi
                 elif [[ "$__idx1" = 3 && -n "$FAST_HIGHLIGHT[chroma-git-remote-subcommand]" ]]; then
-                    -fast-run-git-command "git remote" "chroma-git-remotes" ""
+                    .fast-run-git-command "git remote" "chroma-git-remotes" ""
                     if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
                         __style=${FAST_THEME_NAME}correct-subtle
                     else
@@ -305,7 +305,7 @@ else
                     FAST_HIGHLIGHT[chroma-git-branch-change]=1
                     return 1
                 elif [[ "$__wrd" != -* ]]; then
-                    -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
+                    .fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
                     if [[ -n ${__lines_list[(r)$__wrd]} ]]; then
                         __style=${FAST_THEME_NAME}correct-subtle
                     elif (( FAST_HIGHLIGHT[chroma-git-branch-change] )); then
@@ -328,8 +328,8 @@ else
                     if [[ "$__wrd" != -* ]]; then
                         (( FAST_HIGHLIGHT[chroma-git-counter] += 1, __idx1 = FAST_HIGHLIGHT[chroma-git-counter] ))
                         if [[ ${FAST_HIGHLIGHT[chroma-git-counter]} -eq 2 ]]; then
-                            -fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
-                            -fast-run-git-command "+git tag" "chroma-git-tags" ""
+                            .fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches" "refs/heads"
+                            .fast-run-git-command "+git tag" "chroma-git-tags" ""
                             [[ -n ${__lines_list[(r)$__wrd]} ]] && __style=${FAST_THEME_NAME}incorrect-subtle
                         elif [[ ${FAST_HIGHLIGHT[chroma-git-counter]} -eq 3 ]]; then
                         fi
@@ -346,7 +346,7 @@ else
                             return 1;
                             ;;
                         (3)
-                            -fast-run-git-command "git tag" "chroma-git-tags" ""
+                            .fast-run-git-command "git tag" "chroma-git-tags" ""
                             [[ -n ${__lines_list[(r)$__wrd]} ]] && \
                                 __style=${FAST_THEME_NAME}correct-subtle || \
                                 __style=${FAST_THEME_NAME}incorrect-subtle

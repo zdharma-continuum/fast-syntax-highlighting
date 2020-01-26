@@ -73,7 +73,7 @@ local -a __lines_list reply2
                 __wrd="${(Q)__wrd}"
 
                 if [[ -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}" ]] && \
-                        -fast-make-targets < "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}"
+                        .fast-make-targets < "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}"
                 then
                     if [[ "${reply2[(r)$__wrd]}" ]]; then
                         (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")

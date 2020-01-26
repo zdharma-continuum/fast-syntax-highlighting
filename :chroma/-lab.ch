@@ -17,7 +17,7 @@ if (( in_redirection > 0 || this_word & 128 )) || [[ $__wrd == "<<<" ]]; then
 fi
 
 if [[ "$__wrd" != -* ]] && (( FAST_HIGHLIGHT[chroma-git-got-subcommand] == 0 )); then
-    -fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 5 * 60 ))
+    .fast-run-command "git config --get-regexp 'alias.*'" chroma-git-alias-list "" $(( 5 * 60 ))
     # Grep for line: alias.{user-entered-subcmd}[[:space:]], and remove alias. prefix
     __lines_list=( ${${(M)__lines_list[@]:#alias.${__wrd}[[:space:]]##*}#alias.} )
 

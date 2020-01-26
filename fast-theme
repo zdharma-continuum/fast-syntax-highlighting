@@ -234,13 +234,13 @@ if [[ "$1" = */* || "$1" = (XDG|LOCAL|HOME|OPT):* ]]; then
     [[ ! -r "$1" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
 
     THEME_NAME="${1:t:r}"
-    fast-read-ini-file "$1" out ""
+    .fast-read-ini-file "$1" out ""
 else
     [[ ! -f "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
     [[ ! -r "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
 
     THEME_NAME="$1"
-    fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
+    .fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
 fi
 
 [[ -z "$OPT_SECONDARY" ]] && { [[ "$THEME_NAME" = *"overlay"* ]] && local outfile="theme_overlay.zsh" || local outfile="current_theme.zsh"; } || local outfile="secondary_theme.zsh"

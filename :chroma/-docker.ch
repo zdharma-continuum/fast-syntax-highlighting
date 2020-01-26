@@ -61,7 +61,7 @@ local -a __lines_list
                     if (( __idx1 == 2 )); then
                         __style=${FAST_THEME_NAME}subcommand
                     elif (( __idx1 == 3 )); then
-                        -fast-run-command "docker images -q" chroma-docker-list ""
+                        .fast-run-command "docker images -q" chroma-docker-list ""
                         [[ -n "${__lines_list[(r)$__wrd]}" ]] && {
                             (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && \
                                 reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
