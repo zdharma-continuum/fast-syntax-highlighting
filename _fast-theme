@@ -26,6 +26,12 @@ arguments=(
 typeset -a themes
 themes=( "$FAST_WORK_DIR"/themes/*.ini(:t:r) )
 
+if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/fsh ]] {
+    typeset -a themes2
+    themes2=( "${XDG_CONFIG_HOME:-$HOME/.config}"/fsh/*.ini(:t:r) )
+    themes+=( XDG:${^themes2[@]} )
+}
+
 _wanted themes expl "Themes" \
     compadd "$@" -a - themes && ret=0
 _arguments -s $arguments && ret=0
