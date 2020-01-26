@@ -18,7 +18,7 @@ local THEFD check __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 
     local THEFD="$1" input check=2 nl=$'\n' __wrd __style
 
-    -fast-zts-read-all "$THEFD" input
+    .fast-zts-read-all "$THEFD" input
 
     zle -F "$THEFD"
     exec {THEFD}<&-
