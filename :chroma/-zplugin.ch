@@ -210,7 +210,7 @@ fsh__zplugin__chroma__def=(
         { __style=${FAST_THEME_NAME}correct-subtle; return 0; }
 
     typeset -a plugins
-    plugins=( "${ZPLGM[PLUGINS_DIR]}"/*(N:t) )
+    plugins=( "${ZINIT[PLUGINS_DIR]}"/*(N:t) )
     plugins=( "${plugins[@]//---//}" )
     plugins=( "${plugins[@]:#_local/zplugin}" )
     plugins=( "${plugins[@]:#custom}" )
@@ -231,7 +231,7 @@ fsh__zplugin__chroma__def=(
 :chroma/-zplugin-verify-loaded-plugin() {
     local _scmd="$1" _wrd="$4"
     typeset -a plugins absolute1 absolute2 absolute3 normal
-    plugins=( "${ZPLG_REGISTERED_PLUGINS[@]:#_local/zplugin}" )
+    plugins=( "${ZINIT_REGISTERED_PLUGINS[@]:#_local/zplugin}" )
     normal=( "${plugins[@]:#%*}" )
     absolute1=( "${(M)plugins[@]:#%*}" )
     absolute1=( "${absolute1[@]/\%\/\//%/}" )
@@ -252,7 +252,7 @@ fsh__zplugin__chroma__def=(
     local _scmd="$1" _wrd="$4"
     # Find enabled completions
     typeset -a completions
-    completions=( "${ZPLGM[COMPLETIONS_DIR]}"/_*(N:t) )
+    completions=( "${ZINIT[COMPLETIONS_DIR]}"/_*(N:t) )
     completions=( "${completions[@]#_}" )
 
     [[ -n "${completions[(r)${_wrd#_}]}" ]] && \
@@ -266,7 +266,7 @@ fsh__zplugin__chroma__def=(
     local _scmd="$1" _wrd="$4"
     # Find enabled completions
     typeset -a completions
-    completions=( "${ZPLGM[COMPLETIONS_DIR]}"/[^_]*(N:t) )
+    completions=( "${ZINIT[COMPLETIONS_DIR]}"/[^_]*(N:t) )
 
     [[ -n "${completions[(r)${_wrd#_}]}" ]] && \
         __style=${FAST_THEME_NAME}correct-subtle || \
@@ -279,7 +279,7 @@ fsh__zplugin__chroma__def=(
     local _scmd="$1" _wrd="$4"
 
     typeset -a plugins
-    plugins=( "${ZPLGM[PLUGINS_DIR]}"/*(N) )
+    plugins=( "${ZINIT[PLUGINS_DIR]}"/*(N) )
 
     typeset -a show_plugins p matches
     for p in "${plugins[@]}"; do
@@ -300,15 +300,15 @@ fsh__zplugin__chroma__def=(
 :chroma/-zplugin-verify-snippet() {
     local _scmd="$1" url="$4" dirname local_dir
     url="${${url#"${url%%[! $'\t']*}"}%/}"
-    id_as="${FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]:-${ZPLG_ICE[id-as]:-$url}}"
+    id_as="${FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]:-${ZINIT_ICE[id-as]:-$url}}"
 
     filename="${${id_as%%\?*}:t}"
     dirname="${${id_as%%\?*}:t}"
     local_dir="${${${id_as%%\?*}:h}/:\/\//--}"
     [[ "$local_dir" = "." ]] && local_dir="" || local_dir="${${${${${local_dir#/}//\//--}//=/--EQ--}//\?/--QM--}//\&/--AMP--}"
-    local_dir="${ZPLGM[SNIPPETS_DIR]}${local_dir:+/$local_dir}"
+    local_dir="${ZINIT[SNIPPETS_DIR]}${local_dir:+/$local_dir}"
 
-    (( ${+ZPLG_ICE[svn]} || ${FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]} )) && {
+    (( ${+ZINIT_ICE[svn]} || ${FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]} )) && {
         # TODO: handle the SVN path's specifics
         [[ -d "$local_dir/$dirname" ]] && \
             { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
@@ -330,7 +330,7 @@ fsh__zplugin__chroma__def=(
 
     # Copy from zplugin-autoload.zsh / -zplg-recall
     local -a ice_order nval_ices ext_val_ices
-    ext_val_ices=( ${(@)${(@Ms.|.)ZPLG_EXTS[ice-mods]:#*\'\'*}//\'\'/} )
+    ext_val_ices=( ${(@)${(@Ms.|.)ZINIT_EXTS[ice-mods]:#*\'\'*}//\'\'/} )
 
     ice_order=(
         svn proto from teleid bindmap cloneopts id-as depth if wait load
@@ -343,7 +343,7 @@ fsh__zplugin__chroma__def=(
         subscribe param
         # Include all additional ices – after
         # stripping them from the possible: ''
-        ${(@s.|.)${ZPLG_EXTS[ice-mods]//\'\'/}}
+        ${(@s.|.)${ZINIT_EXTS[ice-mods]//\'\'/}}
     )
     nval_ices=(
             blockf silent lucid trackbinds cloneonly nocd run-atpull
@@ -353,7 +353,7 @@ fsh__zplugin__chroma__def=(
             # Include only those additional ices,
             # don't have the '' in their name, i.e.
             # aren't designed to hold value
-            ${(@)${(@s.|.)ZPLG_EXTS[ice-mods]}:#*\'\'*}
+            ${(@)${(@s.|.)ZINIT_EXTS[ice-mods]}:#*\'\'*}
 
             # Must be last
             svn
