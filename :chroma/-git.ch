@@ -559,7 +559,7 @@ fsh__git__chroma__def=(
              || -l:del
                             <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg"
 
-    "TAG_L_0_opt" "
+    TAG_L_0_opt "
                 (-n|--contains|--no-contains|--points-at|--column=|--sort=|--format=|
                  --color=)
                             <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
@@ -577,7 +577,7 @@ fsh__git__chroma__def=(
              || -v:del
                             <<>> TAG_0_opt // TAG_NEW_1_arg // COMMIT_2_arg"
 
-    "TAG_V_0_opt" "
+    TAG_V_0_opt "
                 --format=
                             <<>> NO-OP // :::chroma/main-chroma-std-aopt-action
                             <<>> NO-OP // :::chroma/main-chroma-std-aopt-ARG-action"
