@@ -759,10 +759,14 @@ fsh__git__chroma__def=(
 
 :chroma/-git-verify-branch() {
     local _wrd="$4"
-    .fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-branches-$PWD" "refs/heads" $(( 2 * 60 ))
-    [[ -n ${__lines_list[(r)$_wrd]} ]] && \
-        { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
-        { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
+    .fast-run-git-command "git for-each-ref --format='%(refname:short)'" "chroma-git-branches-$PWD" "refs/heads" 10
+    if [[ -n ${__lines_list[(r)$_wrd]} ]] {
+        __style=${FAST_THEME_NAME}correct-subtle; return 0
+    } elif [[ -n ${__lines_list[(r)origin/$_wrd]} ]] {
+        __style=${FAST_THEME_NAME}correct-subtle; return 0
+    } else {
+        __style=${FAST_THEME_NAME}incorrect-subtle; return 1
+    }
 }
 
 :chroma/-git-verify-also-unfetched-ref() {
@@ -782,6 +786,7 @@ fsh__git__chroma__def=(
 :chroma/-git-file-or-ubranch-or-commit-verify() {
     :chroma/-git-verify-commit "$@" && return
     :chroma/-git-verify-file "$@" && return
+    :chroma/-git-verify-branch "$@" && return
     :chroma/-git-verify-also-unfetched-ref "$@"
 }
 
@@ -789,6 +794,7 @@ fsh__git__chroma__def=(
 :chroma/-git-file-or-dir-or-ubranch-or-commit-verify() {
     :chroma/-git-verify-commit "$@" && return
     :chroma/-git-verify-file-or-dir "$@" && return
+    :chroma/-git-verify-branch "$@" && return
     :chroma/-git-verify-also-unfetched-ref "$@"
 }
 
