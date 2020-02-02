@@ -660,7 +660,7 @@ fsh__git__chroma__def=(
 # A generic handler
 :chroma/-git-verify-remote() {
     local _wrd="$4"
-    .fast-run-git-command "git remote" "chroma-git-remotes-$PWD" "" $(( 2 * 60 ))
+    .fast-run-git-command "git remote" "chroma-git-remotes-$PWD" "" 10
     [[ -n ${__lines_list[(r)$_wrd]} ]] && {
         __style=${FAST_THEME_NAME}correct-subtle; return 0
     } || {
@@ -672,7 +672,7 @@ fsh__git__chroma__def=(
 :chroma/-git-verify-ref() {
     local _wrd="$4"
     _wrd="${_wrd%%:*}"
-    .fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-refs-$PWD" "refs/heads" $(( 2 * 60 ))
+    .fast-run-git-command "git for-each-ref --format='%(refname:short)' refs/heads" "chroma-git-refs-$PWD" "refs/heads" 10
     [[ -n ${__lines_list[(r)$_wrd]} ]] && \
         { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
@@ -768,11 +768,11 @@ fsh__git__chroma__def=(
 :chroma/-git-verify-also-unfetched-ref() {
     local _wrd="$4"
     .fast-run-git-command "git config --get checkout.defaultRemote" \
-                            "chroma-git-defaultRemote-$PWD" "" $(( 2 * 60 ))
+                            "chroma-git-defaultRemote-$PWD" "" 10
     local remote="${__lines_list[1]:-origin}"
     .fast-run-git-command "git rev-list --count --no-walk
                             --glob=\"refs/remotes/$remote/$_wrd\"" \
-                                "chroma-git-unfetched-ref-$PWD" "" $(( 2 * 60 ))
+                                "chroma-git-unfetched-ref-$PWD" "" 10
 
     (( __lines_list[1] )) && { __style=${FAST_THEME_NAME}correct-subtle; return 0; } || \
         { __style=${FAST_THEME_NAME}incorrect-subtle; return 1; }
