@@ -239,7 +239,7 @@ FAST_HIGHLIGHT+=(
   chroma-systemctl     :chroma/-subcommand.ch
   chroma-asciinema     :chroma/-subcommand.ch
   chroma-ipfs          :chroma/-subcommand.ch
-  chroma-zplugin       :chroma/main-chroma.ch%zplugin
+  chroma-zinit       :chroma/main-chroma.ch%zinit
   chroma-aspell        :chroma/-subcommand.ch
   chroma-bspc          :chroma/-subcommand.ch
   chroma-cryptsetup    :chroma/-subcommand.ch
@@ -434,9 +434,9 @@ typeset -ga ZLAST_COMMANDS
   FAST_HIGHLIGHT[chroma-autoload-elements]=""
   # Restart FPATH elements gathering
   FAST_HIGHLIGHT[chroma-fpath_peq-elements]=""
-  # Restart svn zplugin's ICE gathering
-  FAST_HIGHLIGHT[chroma-zplugin-ice-elements-svn]=0
-  FAST_HIGHLIGHT[chroma-zplugin-ice-elements-id-as]=""
+  # Restart svn zinit's ICE gathering
+  FAST_HIGHLIGHT[chroma-zinit-ice-elements-svn]=0
+  FAST_HIGHLIGHT[chroma-zinit-ice-elements-id-as]=""
 
   [[ -n $ZCALC_ACTIVE ]] && {
     _start_pos=0; _end_pos=__len; __arg=$__buf
