@@ -427,6 +427,13 @@ else
             __arg="${__arg//\`/x}"
             __wrd="${(Q)__wrd}"
 
+            local __tmp_def_name="fsh__${__chroma_name}__chroma__def[subcommands-blacklist]"
+            if [[ ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]} = \
+                (${(~j:|:)${(@s:,:)${(PA)__tmp_def_name}}})
+            ]] {
+                return 1
+            }
+
             :chroma/main-chroma-print "Incrementing the COUNTER-ARG ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]} -> $(( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] + 1 ))"
             (( FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg] += 1 ))
             :chroma/main-chroma-print "ARGUMENT ${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-counter-arg]}"
