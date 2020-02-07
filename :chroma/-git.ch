@@ -32,6 +32,8 @@ fsh__git__chroma__def=(
 
     "subcmd-hook" ":chroma/-git-check-if-alias"
 
+    "subcommands-blacklist" "mv,other"
+
     ## }}}
 
     ##
