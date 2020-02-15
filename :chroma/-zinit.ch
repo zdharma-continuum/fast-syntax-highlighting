@@ -340,7 +340,7 @@ fsh__zinit__chroma__def=(
         reset-prompt wrap-track reset sh \!sh bash \!bash ksh \!ksh csh
         \!csh aliases countdown ps-on-unload ps-on-update trigger-load
         light-mode is-snippet atdelete pack git verbose on-update-of
-        subscribe param
+        subscribe param extract
         # Include all additional ices – after
         # stripping them from the possible: ''
         ${(@s.|.)${ZINIT_EXTS[ice-mods]//\'\'/}}
