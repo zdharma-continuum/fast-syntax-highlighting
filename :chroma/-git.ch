@@ -819,8 +819,9 @@ fsh__git__chroma__def=(
 :chroma/-git-verify-commit() {
     local _wrd="$4"
     __lines_list=()
-    .fast-run-git-command "git rev-parse --verify --quiet \"$_wrd\"" "chroma-git-commits-$PWD-$_wrd" "" $(( 1.5 * 60 ))
-    if (( ${#__lines_list} )); then
+    .fast-run-git-command --status "git rev-parse --verify --quiet \"$_wrd\"" \
+                        "chroma-git-commits-$PWD-$_wrd" "" $(( 1.5 * 60 ))
+    if (( __lines_list[1] == 0 )); then
         __style=${FAST_THEME_NAME}correct-subtle
         return 0
     fi
