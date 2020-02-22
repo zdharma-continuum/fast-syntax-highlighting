@@ -212,11 +212,7 @@ _zsh_highlight_cursor_moved()
 # $1 is name of widget to call
 _zsh_highlight_call_widget()
 {
-  integer ret
-  builtin zle "$@"
-  ret=$?
-  _zsh_highlight
-  return $ret
+  builtin zle "$@" && _zsh_highlight
 }
 
 # Rebind all ZLE widgets to make them invoke _zsh_highlights.
