@@ -72,7 +72,9 @@ _zsh_highlight()
     return $ret
   fi
 
-  setopt localoptions warncreateglobal noksharrays noshwordsplit extendedglob typesetsilent nokshglob
+  emulate -LR zsh
+  setopt extendedglob warncreateglobal typesetsilent noshortloops
+
   local REPLY # don't leak $REPLY into global scope
   local -a reply
 
