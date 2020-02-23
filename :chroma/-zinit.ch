@@ -91,7 +91,7 @@ fsh__zinit__chroma__def=(
                    NO_MATCH_#_opt // NO_MATCH_#_arg"
 
     UPDATE_0_opt "
-            (--all|-r|--reset|-q|--quiet)
+            (--all|-r|--reset|-q|--quiet|-p|--parallel)
                     <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
 
     ## }}}
