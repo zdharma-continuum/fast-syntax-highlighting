@@ -54,7 +54,7 @@ And add the following to your `zshrc` file.
 source ~/path/to/fsh/fast-syntax-highlighting.plugin.zsh
 ```
 
-### Zplugin
+### Zinit
 
 Add the following to your `zshrc` file.
 
