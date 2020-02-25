@@ -59,7 +59,23 @@ source ~/path/to/fsh/fast-syntax-highlighting.plugin.zsh
 Add the following to your `zshrc` file.
 
 ```zsh
-zplugin light zdharma/fast-syntax-highlighting
+zinit light zdharma/fast-syntax-highlighting
+```
+
+Here's an example of how to load the plugin together with a few other popular
+ones with the use of
+[Turbo](https://zdharma.org/zinit/wiki/INTRODUCTION/#turbo_mode_zsh_62_53),
+i.e.: speeding up the Zsh startup by loading the plugin right after the first
+prompt, in background:
+
+```zsh
+zinit wait lucid for \
+ atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+    zdharma/fast-syntax-highlighting \
+ blockf \
+    zsh-users/zsh-completions \
+ atload"!_zsh_autosuggest_start" \
+    zsh-users/zsh-autosuggestions
 ```
 
 ### Antigen
@@ -75,7 +91,7 @@ antigen bundle zdharma/fast-syntax-highlighting
 Add the following to your `.zshrc` file in the same place you're doing
 your other `zgen load` calls in.
 
-```
+```zsh
 zgen load zdharma/fast-syntax-highlighting
 ```
 
@@ -84,7 +100,7 @@ zgen load zdharma/fast-syntax-highlighting
 
 Clone the Repository.
 
-```
+```zsh
 git clone https://github.com/zdharma/fast-syntax-highlighting.git \
   ~ZSH_CUSTOM/plugins/fast-syntax-highlighting
 ```
