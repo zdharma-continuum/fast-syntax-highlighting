@@ -451,7 +451,7 @@ typeset -ga ZLAST_COMMANDS
 
     # Initialize $next_word to its default value?
     (( in_redirection = in_redirection > 0 ? in_redirection - 1 : in_redirection ));
-    (( next_word = (in_redirection == 0) ? 2 : next_word )) # else Stall $next_word.
+    (( next_word = (in_redirection == 0) ? 2 : next_word )) # else keep $next_word
     (( next_word = next_word | (this_word & (BIT_case_code|8192)) ))
 
     # If we have a good delimiting construct just ending, and '{'
@@ -524,39 +524,19 @@ typeset -ga ZLAST_COMMANDS
     fi
 
     # Redirection?
-    [[ $__arg == (<0-9>|)(\<|\>)* && $__arg != (\<|\>)$'\x28'* && $__arg != "<<<" ]] && \
+    [[ $__arg == (<0-9>##|)(\<|\>)* && $__arg != (\<|\>)$'\x28'* && $__arg != "<<<" ]] && \
       in_redirection=2
 
-    # Special-case the first word after 'sudo'.
-    if (( ! in_redirection )); then
-      (( this_word & 4 )) && [[ $__arg != -* ]] && (( this_word = this_word ^ 4 ))
-
-      # Parse the sudo command line
-      if (( this_word & 4 )); then
-        case $__arg in
-          # Flag that requires an argument
-          '-'[Cgprtu])
-                       (( this_word = this_word & ~1 ))
-                       (( next_word = 8 | (this_word & BIT_case_code) ))
-                       ;;
-          # This prevents misbehavior with sudo -u -otherargument
-          '-'*)
-                       (( this_word = this_word & ~1 ))
-                       (( next_word = next_word | 1 | 4 ))
-                       ;;
-        esac
-      elif (( this_word & 8 )); then
-        (( next_word = next_word | 4 | 1 ))
-      elif (( this_word & 64 )); then
-        [[ $__arg = -[pvV-]## && $active_command = "command" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
-        [[ $__arg = -[cla-]## && $active_command = "exec" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
-        [[ $__arg = \{[a-zA-Z_][a-zA-Z0-9_]#\} && $active_command = "exec" ]] && {
-          # Highlight {descriptor} passed to exec
-          (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
-          (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}exec-descriptor]}")
-          already_added=1
-        }
-      fi
+  # Special-case the first word after 'sudo'.
+  if (( ! in_redirection && this_word & 64 )); then
+      [[ $__arg = -[pvV-]## && $active_command = "command" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
+      [[ $__arg = -[cla-]## && $active_command = "exec" ]] && (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
+      [[ $__arg = \{[a-zA-Z_][a-zA-Z0-9_]#\} && $active_command = "exec" ]] && {
+        # Highlight {descriptor} passed to exec
+        (( this_word = (this_word & ~1) | 2, next_word = (next_word | 65) & ~2 ))
+        (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}exec-descriptor]}")
+        already_added=1
+      }
    fi
 
    (( this_word & 8192 )) && {
