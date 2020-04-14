@@ -17,7 +17,7 @@ fsh__zinit__chroma__def=(
 
     subcmd:NULL "NULL_0_opt"
     NULL_0_opt "(-help|--help|-h)
-                   <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+                   <<>> NO-OP // ::→chroma/main-chroma-std-aopt-action"
 
     "subcommands" "(help|man|self-update|cd|times|zstatus|load|light|unload|snippet|ls|ice|<ice|specification>|update|status|report|delete|loaded|list|cd|create|edit|glance|stress|changes|recently|clist|completions|cdisable|cname|cenable|cname|creinstall|cuninstall|csearch|compinit|dtrace|dstart|dstop|dunload|dreport|dclear|compile|uncompile|compiled|cdlist|cdreplay|cdclear|srv|recall|env-whitelist|bindkeys|module)"
 
@@ -35,7 +35,7 @@ fsh__zinit__chroma__def=(
 
     subcmd:ice "ICE_#_arg // NO_MATCH_#_opt"
 
-    "ICE_#_arg" "NO-OP // :::chroma/-zinit-check-ice-mod"
+    "ICE_#_arg" "NO-OP // ::→chroma/-zinit-check-ice-mod"
 
     ## }}}
 
@@ -48,9 +48,9 @@ fsh__zinit__chroma__def=(
                     NO_MATCH_#_arg"
 
     SNIPPET_0_opt "(-f|--command)
-                        <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+                        <<>> NO-OP // ::→chroma/main-chroma-std-aopt-action"
 
-    SNIPPET_1_arg "NO-OP // :::chroma/-zinit-verify-snippet"
+    SNIPPET_1_arg "NO-OP // ::→chroma/-zinit-verify-snippet"
 
     ## }}}
 
@@ -62,9 +62,9 @@ fsh__zinit__chroma__def=(
     "subcmd:load"
         "LOAD_1_arg // LOAD_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    LOAD_1_arg "NO-OP // :::chroma/-zinit-verify-plugin"
+    LOAD_1_arg "NO-OP // ::→chroma/-zinit-verify-plugin"
 
-    LOAD_2_arg "NO-OP // :::chroma/-zinit-verify-plugin"
+    LOAD_2_arg "NO-OP // ::→chroma/-zinit-verify-plugin"
 
     ## }}}
 
@@ -76,9 +76,9 @@ fsh__zinit__chroma__def=(
     "subcmd:(compile|uncompile|stress|edit|glance|recall|status|cd|changes)"
         "PLGSNP_1_arg // PLGSNP_2_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    PLGSNP_1_arg "NO-OP // :::chroma/-zinit-verify-plugin-or-snippet"
+    PLGSNP_1_arg "NO-OP // ::→chroma/-zinit-verify-plugin-or-snippet"
 
-    PLGSNP_2_arg "NO-OP // :::chroma/-zinit-verify-plugin-or-snippet"
+    PLGSNP_2_arg "NO-OP // ::→chroma/-zinit-verify-plugin-or-snippet"
 
     ## }}}
 
@@ -92,7 +92,7 @@ fsh__zinit__chroma__def=(
 
     UPDATE_0_opt "
             (--all|-r|--reset|-q|--quiet|-p|--parallel)
-                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // ::→chroma/main-chroma-std-aopt-action"
 
     ## }}}
 
@@ -105,7 +105,7 @@ fsh__zinit__chroma__def=(
                   NO_MATCH_#_arg"
 
     LIGHT_0_opt "-b
-                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // ::→chroma/main-chroma-std-aopt-action"
 
     ## }}}
 
@@ -118,11 +118,11 @@ fsh__zinit__chroma__def=(
                   NO_MATCH_#_arg"
 
     UNLOAD_0_opt "-q
-                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // ::→chroma/main-chroma-std-aopt-action"
 
-    UNLOAD_1_arg "NO-OP // :::chroma/-zinit-verify-loaded-plugin"
+    UNLOAD_1_arg "NO-OP // ::→chroma/-zinit-verify-loaded-plugin"
 
-    UNLOAD_2_arg "NO-OP // :::chroma/-zinit-verify-loaded-plugin"
+    UNLOAD_2_arg "NO-OP // ::→chroma/-zinit-verify-loaded-plugin"
 
     ## }}}
 
@@ -135,7 +135,7 @@ fsh__zinit__chroma__def=(
                   NO_MATCH_#_arg"
 
     REPORT_0_opt "--all
-                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // ::→chroma/main-chroma-std-aopt-action"
 
     ## }}}
 
@@ -149,7 +149,7 @@ fsh__zinit__chroma__def=(
 
     DELETE_0_opt "
             (--all|--clean|-y|--yes|-q|--quiet)
-                    <<>> NO-OP // :::chroma/main-chroma-std-aopt-action"
+                    <<>> NO-OP // ::→chroma/main-chroma-std-aopt-action"
 
     ## }}}
 
@@ -160,7 +160,7 @@ fsh__zinit__chroma__def=(
 
     subcmd:cenable "COMPLETION_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    COMPLETION_1_arg "NO-OP // :::chroma/-zinit-verify-disabled-completion"
+    COMPLETION_1_arg "NO-OP // ::→chroma/-zinit-verify-disabled-completion"
 
     ## }}}
 
@@ -171,7 +171,7 @@ fsh__zinit__chroma__def=(
 
     subcmd:cdisable "DISCOMPLETION_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    DISCOMPLETION_1_arg "NO-OP // :::chroma/-zinit-verify-completion"
+    DISCOMPLETION_1_arg "NO-OP // ::→chroma/-zinit-verify-completion"
 
     ## }}}
 
@@ -183,7 +183,7 @@ fsh__zinit__chroma__def=(
 
     subcmd:uncompile "UNCOMPILE_1_arg // NO_MATCH_#_opt // NO_MATCH_#_arg"
 
-    UNCOMPILE_1_arg "NO-OP // :::chroma/-zinit-verify-compiled-plugin"
+    UNCOMPILE_1_arg "NO-OP // ::→chroma/-zinit-verify-compiled-plugin"
 
     ## }}}
 
@@ -193,17 +193,17 @@ fsh__zinit__chroma__def=(
     ## {{{
 
     "subcmd:*" "CATCH_ALL_#_opt"
-    "CATCH_ALL_#_opt" "* <<>> NO-OP // :::chroma/main-chroma-std-aopt-SEMI-action"
+    "CATCH_ALL_#_opt" "* <<>> NO-OP // ::→chroma/main-chroma-std-aopt-SEMI-action"
 
     ## }}}
 )
 
-#:chroma/-zinit-first-call() {
+#→chroma/-zinit-first-call() {
     # This is being done in the proper place - in -fast-highlight-process
     #FAST_HIGHLIGHT[chroma-zinit-ice-elements-svn]=0
 #}
 
-:chroma/-zinit-verify-plugin() {
+→chroma/-zinit-verify-plugin() {
     local _scmd="$1" _wrd="$4"
 
     [[ -d "$_wrd" ]] && \
@@ -222,13 +222,13 @@ fsh__zinit__chroma__def=(
     return 0
 }
 
-:chroma/-zinit-verify-plugin-or-snippet() {
-    :chroma/-zinit-verify-plugin "$1" "" "" "$4" || \
-        :chroma/-zinit-verify-snippet "$1" "" "" "$4"
+→chroma/-zinit-verify-plugin-or-snippet() {
+    →chroma/-zinit-verify-plugin "$1" "" "" "$4" || \
+        →chroma/-zinit-verify-snippet "$1" "" "" "$4"
     return $?
 }
 
-:chroma/-zinit-verify-loaded-plugin() {
+→chroma/-zinit-verify-loaded-plugin() {
     local _scmd="$1" _wrd="$4"
     typeset -a plugins absolute1 absolute2 absolute3 normal
     plugins=( "${ZINIT_REGISTERED_PLUGINS[@]:#_local/zinit}" )
@@ -248,7 +248,7 @@ fsh__zinit__chroma__def=(
     return 0
 }
 
-:chroma/-zinit-verify-completion() {
+→chroma/-zinit-verify-completion() {
     local _scmd="$1" _wrd="$4"
     # Find enabled completions
     typeset -a completions
@@ -262,7 +262,7 @@ fsh__zinit__chroma__def=(
     return 0
 }
 
-:chroma/-zinit-verify-disabled-completion() {
+→chroma/-zinit-verify-disabled-completion() {
     local _scmd="$1" _wrd="$4"
     # Find enabled completions
     typeset -a completions
@@ -275,7 +275,7 @@ fsh__zinit__chroma__def=(
     return 0
 }
 
-:chroma/-zinit-verify-compiled-plugin() {
+→chroma/-zinit-verify-compiled-plugin() {
     local _scmd="$1" _wrd="$4"
 
     typeset -a plugins
@@ -297,7 +297,7 @@ fsh__zinit__chroma__def=(
         return 1
 }
 
-:chroma/-zinit-verify-snippet() {
+→chroma/-zinit-verify-snippet() {
     local _scmd="$1" url="$4" dirname local_dir
     url="${${url#"${url%%[! $'\t']*}"}%/}"
     id_as="${FAST_HIGHLIGHT[chroma-zinit-ice-elements-id-as]:-${ZINIT_ICE[id-as]:-$url}}"
@@ -321,7 +321,7 @@ fsh__zinit__chroma__def=(
     }
 }
 
-:chroma/-zinit-check-ice-mod() {
+→chroma/-zinit-check-ice-mod() {
     local _scmd="$1" _wrd="$4"
     [[ "$_wrd" = (svn(\'|\")*|svn) ]] && \
         FAST_HIGHLIGHT[chroma-zinit-ice-elements-svn]=1
