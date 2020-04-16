@@ -5,7 +5,7 @@
 
 local -a TARGETS
 
-_make-expandVars() {
+.make-expandVars() {
     local open close var val front='' rest=$1
 
     while [[ $rest == (#b)[^$]#($)* ]]; do
@@ -71,7 +71,7 @@ _make-expandVars() {
 }
 
 
-_make-parseMakefile () {
+.make-parseMakefile () {
     local input var val target dep TAB=$'\t' tmp IFS=
 
     while read input
@@ -80,7 +80,7 @@ _make-parseMakefile () {
             # TARGET: dependencies
             # TARGET1 TARGET2 TARGET3: dependencies
             ([[*?[:alnum:]$][^$TAB:=%]#:[^=]*)
-            target=$(_make-expandVars ${input%%:*})
+            target=$(.make-expandVars ${input%%:*})
             TARGETS+=( ${(z)target} )
             ;;
         esac
@@ -88,7 +88,7 @@ _make-parseMakefile () {
 }
 
 if [[ -z "${FAST_HIGHLIGHT[chroma-make-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[chroma-make-cache-born-at] )) -gt 7 ]]; then
-    _make-parseMakefile
+    .make-parseMakefile
     FAST_HIGHLIGHT[chroma-make-cache-born-at]="$EPOCHSECONDS"
     FAST_HIGHLIGHT[chroma-make-cache]="${(j:;:)TARGETS}"
 fi
