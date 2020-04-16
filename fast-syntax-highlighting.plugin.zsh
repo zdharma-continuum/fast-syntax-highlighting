@@ -370,4 +370,5 @@ if [[ ! -e $FAST_BASE_DIR/secondary_theme.zsh ]] {
             https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/share/fast_theme.zsh \
             &>/dev/null
     }
+    touch "$FAST_BASE_DIR/secondary_theme.zsh"
 }
