@@ -107,7 +107,7 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[incorrect-subtle]:=fg=red}
 : ${FAST_HIGHLIGHT_STYLES[subtle-separator]:=fg=green}
 : ${FAST_HIGHLIGHT_STYLES[subtle-bg]:=bg=18}
-: ${FAST_HIGHLIGHT_STYLES[secondary]:=}
+: ${FAST_HIGHLIGHT_STYLES[secondary]:=free}
 fi
 
 # This can overwrite some of *_STYLES fields

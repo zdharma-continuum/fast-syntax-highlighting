@@ -359,3 +359,15 @@ unset __fsyh_theme
 alias fsh-alias=fast-theme
 
 -fast-highlight-fill-option-variables
+
+if [[ ! -e $FAST_BASE_DIR/secondary_theme.zsh ]] {
+    if { type curl &>/dev/null } {
+        curl -fsSL -o "$FAST_BASE_DIR/secondary_theme" \
+            https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/share/fast_theme.zsh \
+            &>/dev/null
+    } elif { type wget &>/dev/null } {
+        wget -O "$FAST_BASE_DIR/secondary_theme" \
+            https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/share/fast_theme.zsh \
+            &>/dev/null
+    }
+}
