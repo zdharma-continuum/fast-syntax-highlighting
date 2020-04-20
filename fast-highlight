@@ -211,6 +211,8 @@ FAST_HIGHLIGHT+=(
   chroma--             →chroma/-precommand.ch
   chroma-xargs         →chroma/-precommand.ch
   chroma-nohup         →chroma/-precommand.ch
+  chroma-strace        →chroma/-precommand.ch
+  chroma-ltrace        →chroma/-precommand.ch
 
   chroma-hg            →chroma/-subcommand.ch
   chroma-cvs           →chroma/-subcommand.ch
