@@ -360,15 +360,15 @@ alias fsh-alias=fast-theme
 
 -fast-highlight-fill-option-variables
 
-if [[ ! -e $FAST_BASE_DIR/secondary_theme.zsh ]] {
+if [[ ! -e $FAST_WORK_DIR/secondary_theme.zsh ]] {
     if { type curl &>/dev/null } {
-        curl -fsSL -o "$FAST_BASE_DIR/secondary_theme.zsh" \
+        curl -fsSL -o "$FAST_WORK_DIR/secondary_theme.zsh" \
             https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/share/free_theme.zsh \
             &>/dev/null
     } elif { type wget &>/dev/null } {
-        wget -O "$FAST_BASE_DIR/secondary_theme.zsh" \
+        wget -O "$FAST_WORK_DIR/secondary_theme.zsh" \
             https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/share/free_theme.zsh \
             &>/dev/null
     }
-    touch "$FAST_BASE_DIR/secondary_theme.zsh"
+    touch "$FAST_WORK_DIR/secondary_theme.zsh"
 }
