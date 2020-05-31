@@ -15,18 +15,18 @@ function -fast-highlight-string-process {
 
     pair_map=( "(" ")" "{" "}" "[" "]" )
 
-    while [[ $_mybuf = (#b)[^"{}()[]\\\"'"]#((["({[]})\"'"])|[\\](*))(*) ]]; do
-        [[ -n ${match[3]} ]] && {
-            __idx+=${mbegin[1]}
+    while [[ $_mybuf = (#b)([^"{}()[]\\\"'"]#)((["({[]})\"'"])|[\\](*))(*) ]]; do
+        if [[ -n ${match[4]} ]] {
+            __idx+=${mbegin[2]}
 
-            [[ $__quoting = \' ]] && _mybuf=${match[3]} || { _mybuf=${match[3]:1}; (( ++ __idx )); }
-        } || {
-            __idx+=${mbegin[1]}
+            [[ $__quoting = \' ]] && _mybuf=${match[4]} || { _mybuf=${match[4]:1}; (( ++ __idx )); }
+        } else {
+            __idx+=${mbegin[2]}
             [[ -z $__quoting && -z ${_FAST_COMPLEX_BRACKETS[(r)$((__idx-${#PREBUFFER}-1))]} ]] && {
-                if [[ ${match[1]} = ["({["] ]]; then
+                if [[ ${match[2]} = ["({["] ]]; then
                     pos_to_level[$__idx]=$(( ++__level ))
                     level_to_pos[$__level]=$__idx
-                elif [[ ${match[1]} = ["]})"] ]]; then
+                elif [[ ${match[2]} = ["]})"] ]]; then
                     if (( __level > 0 )); then
                         __pair_idx=${level_to_pos[$__level]}
                         pos_to_level[$__idx]=$(( __level -- ))
@@ -40,10 +40,21 @@ function -fast-highlight-string-process {
                 fi
             }
 
-            [[ ${match[1]} = \" && $__quoting != \' ]] && { [[ $__quoting = '"' ]] && __quoting="" || __quoting='"'; }
-            [[ ${match[1]} = \' && $__quoting != \" ]] && { [[ $__quoting = "'" ]] && __quoting="" || __quoting="'"; }
-
-            _mybuf=${match[4]}
+            if [[ ${match[2]} = \" && $__quoting != \' ]] {
+                [[ $__quoting = '"' ]] && __quoting="" || __quoting='"';
+            }
+            if [[ ${match[2]} = \' && $__quoting != \" ]] {
+                if [[ $__quoting = ("'"|"$'") ]] {
+                    __quoting=""
+                } else {
+                    if [[ $match[1] = *\$ ]] {
+                        __quoting="\$'";
+                    } else {
+                        __quoting="'";
+                    }
+                }
+            }
+            _mybuf=${match[5]}
         }
     done
 
