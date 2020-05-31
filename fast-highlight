@@ -366,7 +366,7 @@ typeset -ga ZLAST_COMMANDS
 -fast-highlight-process()
 {
   emulate -L zsh
-  setopt extendedglob bareglobqual nonomatch noksharrays typesetsilent
+  setopt extendedglob bareglobqual nonomatch typesetsilent
 
   [[ $CONTEXT == "select" ]] && return 0
 
