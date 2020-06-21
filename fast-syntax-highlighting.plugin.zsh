@@ -372,3 +372,8 @@ if [[ ! -e $FAST_WORK_DIR/secondary_theme.zsh ]] {
     }
     touch "$FAST_WORK_DIR/secondary_theme.zsh"
 }
+
+if [[ $(uname -a) = (#i)*darwin* ]] {
+    typeset -gA FAST_HIGHLIGHT
+    FAST_HIGHLIGHT[chroma-man]=
+}
