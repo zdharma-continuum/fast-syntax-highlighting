@@ -635,11 +635,13 @@ typeset -ga ZLAST_COMMANDS
                         [[ $__arg = "[[" ]] && __style=${FAST_THEME_NAME}double-sq-bracket || __style=${FAST_THEME_NAME}reserved-word
                         if [[ $__arg == $'\x7b' ]]; then # Y - '{'
                           braces_stack='Y'$braces_stack
+
                         elif [[ $__arg == $'\x7d' && $braces_stack = Y* ]]; then # Y - '}'
                           # We're at command word, so no need to check right_brace_is_recognised_everywhere
                           braces_stack=${braces_stack#Y}
                           __style=${FAST_THEME_NAME}reserved-word
                           (( next_word = next_word | 16 ))
+
                         elif [[ $__arg == "[[" ]]; then  # A - [[
                           braces_stack='A'$braces_stack
 
@@ -647,14 +649,17 @@ typeset -ga ZLAST_COMMANDS
                           _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN + 1 )) )
                         elif [[ $__arg == "for" ]]; then
                           (( next_word = next_word | 32 )) # BIT_for
+
                         elif [[ $__arg == "case" ]]; then
                           (( next_word = BIT_case_preamble ))
+
                         elif [[ $__arg = (typeset|declare|local|float|integer|export|readonly) ]]; then
                           braces_stack='T'$braces_stack
                         fi
                         ;;
         'suffix alias') __style=${FAST_THEME_NAME}suffix-alias;;
         'global alias') __style=${FAST_THEME_NAME}global-alias;;
+
         alias)
                           if [[ $__arg = ?*'='* ]]; then
                             # The so called (by old code) "insane_alias"
@@ -665,6 +670,7 @@ typeset -ga ZLAST_COMMANDS
                             [[ ${__FAST_HIGHLIGHT_TOKEN_TYPES[$alias_target]} = "1" && $__arg_type != "1" ]] && __FAST_HIGHLIGHT_TOKEN_TYPES[$__arg]="1"
                           fi
                         ;;
+
         builtin)        [[ $__arg = "[" ]] && {
                           __style=${FAST_THEME_NAME}single-sq-bracket
                           _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) )
@@ -673,12 +679,17 @@ typeset -ga ZLAST_COMMANDS
                         [[ $__arg = (typeset|declare|local|float|integer|export|readonly) ]] && braces_stack='T'$braces_stack
                         [[ $__arg = eval ]] && (( next_word = next_word | 256 ))
                         ;;
+
         function)       __style=${FAST_THEME_NAME}function;;
+
         command)        __style=${FAST_THEME_NAME}command;;
+
         hashed)         __style=${FAST_THEME_NAME}hashed-command;;
+
         dirpath)        __style=${FAST_THEME_NAME}path-to-dir;;
+
         none)           # Assign?
-                        if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( $braces_stack = T* && ${__arg_type} != 3 ) ]]; then
+                        if [[ $__arg == [a-zA-Z_][a-zA-Z0-9_]#(|\[[^\]]#\])(|[^\]]#\])(|[+])=* || $__arg == [0-9]##(|[+])=* || ( $braces_stack = T* && ${__arg_type} != 3 ) ]] {
                           __style=${FAST_THEME_NAME}assign
                           FAST_ASSIGNS_SEEN[${__arg%%=*}]=1
 
@@ -722,15 +733,19 @@ typeset -ga ZLAST_COMMANDS
                                 } || -fast-highlight-string;
                                 (( _start_pos = _start_pos - itmp + 1, 1 > 0 ))
                             }
-                        elif [[ $__arg = ${histchars[1]}* && -n ${__arg[2]} ]]; then
+
+                        } elif [[ $__arg = ${histchars[1]}* && -n ${__arg[2]} ]] {
                           __style=${FAST_THEME_NAME}history-expansion
-                        elif [[ $__arg == ${histchars[2]}* ]]; then
+
+                        } elif [[ $__arg == ${histchars[2]}* ]] {
                           __style=${FAST_THEME_NAME}history-expansion
-                        elif (( __arg_type == 3 )); then
+
+                        } elif (( __arg_type == 3 )) {
                           # This highlights empty commands (semicolon follows nothing) as an error.
                           # Zsh accepts them, though.
                           (( this_word & 3 )) && __style=${FAST_THEME_NAME}commandseparator
-                        elif [[ $__arg[1,2] == '((' ]]; then
+
+                        } elif [[ $__arg[1,2] == '((' ]] {
                           # Arithmetic evaluation.
                           #
                           # Note: prior to zsh-5.1.1-52-g4bed2cf (workers/36669), the ${(z)...}
@@ -758,25 +773,41 @@ typeset -ga ZLAST_COMMANDS
                             # Counting complex brackets (for brackets-highlighter): 7. )) for as-command ((
                             _FAST_COMPLEX_BRACKETS+=( $__start $(( __start + 1 )) )
                           }
-                        elif [[ $__arg == '()' ]]; then
+
+                        } elif [[ $__arg == '()' ]] {
                           _FAST_COMPLEX_BRACKETS+=( $(( _start_pos-__PBUFLEN )) $(( _start_pos-__PBUFLEN + 1 )) )
                           # anonymous function
                           __style=${FAST_THEME_NAME}reserved-word
-                        elif [[ $__arg == $'\x28' ]]; then
+                        } elif [[ $__arg == $'\x28' ]] {
                           # subshell '(', stack: letter 'R'
                           __style=${FAST_THEME_NAME}reserved-word
                           braces_stack='R'$braces_stack
-                        elif [[ $__arg == $'\x29' ]]; then
+
+                        } elif [[ $__arg == $'\x29' ]] {
                           # ')', stack: letter 'R' for subshell
                           [[ $braces_stack = R* ]] && { braces_stack=${braces_stack#R}; __style=${FAST_THEME_NAME}reserved-word; }
-                        elif (( this_word & 14 )); then
+
+                        } elif (( this_word & 14 )) {
                           __style=${FAST_THEME_NAME}default
-                        elif [[ $__arg = (';;'|';&'|';|') ]] && (( this_word & BIT_case_code )); then
+
+                        } elif [[ $__arg = (';;'|';&'|';|') ]] && (( this_word & BIT_case_code )) {
                           (( next_word = (next_word | BIT_case_item) & ~(BIT_case_code+3) ))
                           __style=${FAST_THEME_NAME}default
-                        elif [[ $__arg = \$\([^\(]* ]]; then
+
+                        } elif [[ $__arg = \$\([^\(]* ]] {
                           already_added=1
-                        fi
+                        } elif [[ $__arg = (#b)*'#'(([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])|([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F]))* || $__arg = (#b)*'rgb('(([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)))* ]] {
+                          if [[ -n $match[2] ]]; then
+                            if [[ $match[2] = ?? || $match[3] = ?? || $match[4] = ?? ]]; then 
+                              (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#${(l:2::0:)match[2]}${(l:2::0:)match[3]}${(l:2::0:)match[4]}")
+                            else
+                              (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#$match[2]$match[3]$match[4]")
+                            fi
+                          else
+                            (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#$match[5]$match[6]$match[7]")
+                          fi
+                          already_added=1
+                        }
                         ;;
         *)
                         # ADD
