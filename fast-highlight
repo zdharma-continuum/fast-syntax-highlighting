@@ -268,7 +268,7 @@ FAST_HIGHLIGHT+=(
   #chroma-vim          →chroma/-vim.ch
 )
 
-if [[ $OSTYPE == (#i)darwin* ]] {
+if [[ $OSTYPE == darwin* ]] {
   noglob unset FAST_HIGHLIGHT[chroma-man] FAST_HIGHLIGHT[chroma-whatis]
 }
 
