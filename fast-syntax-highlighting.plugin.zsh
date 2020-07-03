@@ -53,7 +53,7 @@ then
     fpath+=( "${0:h}" )
 fi
 
-if [[ $FAST_WORK_DIR = (/usr|/opt)/* && ! -w $FAST_WORK_DIR ]]; then
+if [[ ! -w $FAST_WORK_DIR ]]; then
     FAST_WORK_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/fsh"
     command mkdir -p "$FAST_WORK_DIR"
 fi
