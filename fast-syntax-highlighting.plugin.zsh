@@ -209,6 +209,17 @@ _zsh_highlight_cursor_moved()
 # Setup functions
 # -------------------------------------------------------------------------------------------------
 
+autoload -U add-zle-hook-widget
+autoload -Uz is-at-least
+
+# Apply syntax highlighting on init. Fixes the issue
+# where coming back from push-line loses highlighting
+if is-at-least 5.8.0.2; then
+  if [[ -o zle ]]; then
+    add-zle-hook-widget zle-line-init _zsh_highlight
+  fi
+fi
+
 # Helper for _zsh_highlight_bind_widgets
 # $1 is name of widget to call
 _zsh_highlight_call_widget()
@@ -221,10 +232,6 @@ _zsh_highlight_call_widget()
 }
 
 # Rebind all ZLE widgets to make them invoke _zsh_highlights.
-autoload -U add-zle-hook-widget
-if [[ -o zle ]]; then
-  add-zle-hook-widget zle-line-init _zsh_highlight
-fi
 _zsh_highlight_bind_widgets()
 {
   setopt localoptions noksharrays
