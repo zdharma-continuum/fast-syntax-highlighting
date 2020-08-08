@@ -144,7 +144,6 @@ _zsh_highlight()
 
   } always {
     typeset -g _ZSH_HIGHLIGHT_PRIOR_BUFFER="$BUFFER"
-    typeset -g _ZSH_HIGHLIGHT_PRIOR_RACTIVE="$REGION_ACTIVE"
     typeset -gi _ZSH_HIGHLIGHT_PRIOR_CURSOR=$CURSOR
   }
 }
@@ -210,6 +209,9 @@ _zsh_highlight_cursor_moved()
 # Setup functions
 # -------------------------------------------------------------------------------------------------
 
+autoload -U add-zle-hook-widget
+autoload -Uz is-at-least
+
 # Helper for _zsh_highlight_bind_widgets
 # $1 is name of widget to call
 _zsh_highlight_call_widget()
@@ -246,6 +248,16 @@ _zsh_highlight_bind_widgets()
   # Always wrap special zle-isearch-update widget to be notified of updates in isearch.
   # This is needed because we need to disable highlighting in that case.
   widgets_to_bind+=(zle-isearch-update)
+
+  # Apply syntax highlighting on init. Fixes the issue
+  # where coming back from push-line loses highlighting
+  if is-at-least 5.4; then
+    if [[ -o zle ]]; then
+      add-zle-hook-widget zle-line-init _zsh_highlight
+    fi
+  else
+    widgets_to_bind+=(zle-line-init)
+  fi
 
   local cur_widget
   for cur_widget in $widgets_to_bind; do
