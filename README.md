@@ -102,7 +102,7 @@ Clone the Repository.
 
 ```zsh
 git clone https://github.com/zdharma/fast-syntax-highlighting.git \
-  ~ZSH_CUSTOM/plugins/fast-syntax-highlighting
+  ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
 ```
 
 And add `fast-syntax-highlighting` to your plugin list.
