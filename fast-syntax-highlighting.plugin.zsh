@@ -44,10 +44,13 @@ typeset -ga _FAST_MAIN_CACHE
 # are complex, i.e. e.g. part of "[[" in [[ ... ]]
 typeset -ga _FAST_COMPLEX_BRACKETS
 
-typeset -g FAST_WORK_DIR
+typeset -g FAST_WORK_DIR=${FAST_WORK_DIR:-${XDG_CACHE_HOME:-~/.cache}/fast-syntax-highlighting}
 : ${FAST_WORK_DIR:=$FAST_BASE_DIR}
+# Expand any tilde in the (supposed) path.
 FAST_WORK_DIR=${~FAST_WORK_DIR}
 
+# Last (currently, possibly) loaded plugin isn't "fast-syntax-highlighting"?
+# And FPATH isn't containing plugin dir?
 if [[ ${zsh_loaded_plugins[-1]} != */fast-syntax-highlighting && -z ${fpath[(r)${0:h}]} ]]
 then
     fpath+=( "${0:h}" )
