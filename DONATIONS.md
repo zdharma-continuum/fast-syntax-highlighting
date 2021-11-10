@@ -22,13 +22,13 @@ features, sometimes many days in a row.
 
 ## 2018-08-14, received $30
 
- * **Project**: **[Zplugin](https://github.com/zdharma/zplugin)**
+ * **Project**: **[Zplugin](https://github.com/zdharma-continuum/zinit)**
  * **Goal**: Create a binary Zsh module with one Zplugin optimization and optionally some
    other features.
  * **Status**: The job is done.
 
 Thanks to this donation I have finally started to code **[binary Zplugin module](
-https://github.com/zdharma/zplugin#quick-start-module-only)**, which is a big step onward
+https://github.com/zdharma-continuum/zinit#quick-start-module-only)**, which is a big step onward
 in evolution of Zplugin. I've implemented and published the module with 3 complete
 features: 1) `load` optimization, 2) autocompilation of scripts, 3) profiling of script
 load times.
