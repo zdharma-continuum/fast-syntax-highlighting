@@ -33,7 +33,8 @@ typeset -g FAST_WORK_DIR
 : ${FAST_WORK_DIR:=$FAST_BASE_DIR}
 FAST_WORK_DIR=${~FAST_WORK_DIR}
 () {
-  emulate -L zsh -o extendedglob
+  emulate -L zsh
+  setopt EXTENDED_GLOB
   local -A map
   map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
         "LOCAL:"  "/usr/local/share/fsh/"
