@@ -16,7 +16,6 @@ Feature rich syntax highlighting for Zsh.
 - [Installation](#installation)
 - [Features](#features)
 - [Performance](#performance)
-- [IRC Channel](#irc-channel)
 
 ### Other Contents
 
