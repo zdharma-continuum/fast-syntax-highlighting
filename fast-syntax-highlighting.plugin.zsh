@@ -381,4 +381,4 @@ if [[ $(uname -a) = (#i)*darwin* ]] {
     FAST_HIGHLIGHT[chroma-man]=
 }
 
-[[ $COLORTERM == (24bit|truecolor) || ${terminfo[colors]} -eq 16777216 ]] || zmodload zsh/nearcolor &>/dev/null || :
+[[ $COLORTERM == (24bit|truecolor) || ${terminfo[colors]} -eq 16777216 ]] || zmodload zsh/nearcolor &>/dev/null || true
