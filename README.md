@@ -1,4 +1,4 @@
-# Fast Syntax Highlighting (F-Sy-H)
+# Fast Syntax Highlighting (F-Sy-H) [![Gitter][gitter-image]][gitter-link]
 
 Feature rich syntax highlighting for Zsh.
 
@@ -276,10 +276,5 @@ Performance differences can be observed in this Asciinema recording, where a `10
   </a>
 </div>
 
-## IRC Channel
-
-Channel `#zinit@freenode` is a support place for all author's projects. Connect to:
-[chat.freenode.net:6697](ircs://chat.freenode.net:6697/%23zinit) (SSL) or [chat.freenode.net:6667](irc://chat.freenode.net:6667/%23zinit)
-and join #zinit.
-
-Following is a quick access via Webchat [![IRC](https://kiwiirc.com/buttons/chat.freenode.net/zinit.png)](https://kiwiirc.com/client/chat.freenode.net:+6697/#zinit)
+[gitter-image]: https://badges.gitter.im/zdharma-continuum/community.svg
+[gitter-link]: https://gitter.im/zdharma-continuum/community
