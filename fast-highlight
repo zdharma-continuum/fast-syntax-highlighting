@@ -33,7 +33,10 @@ typeset -g FAST_WORK_DIR
 : ${FAST_WORK_DIR:=$FAST_BASE_DIR}
 FAST_WORK_DIR=${~FAST_WORK_DIR}
 () {
-  emulate -L zsh -o extendedglob
+  # We must not use emulate -o if we want to keep compatibility with Zsh < v.5.0
+  # See https://github.com/zdharma-continuum/fast-syntax-highlighting/pull/7
+  emulate -L zsh
+  setopt extendedglob 
   local -A map
   map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
         "LOCAL:"  "/usr/local/share/fsh/"
