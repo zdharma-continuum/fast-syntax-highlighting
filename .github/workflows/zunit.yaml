@@ -1,0 +1,30 @@
+name: zunit
+on: [push, pull_request]
+jobs:
+  zunit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt install -y zsh
+
+          mkdir bin
+          curl -L https://raw.githubusercontent.com/molovo/revolver/master/revolver > bin/revolver
+          curl -L https://raw.githubusercontent.com/molovo/color/master/color.zsh > bin/color
+
+          git clone https://github.com/zunit-zsh/zunit.git zunit.git
+          cd zunit.git
+          ./build.zsh
+          cd ..
+          mv ./zunit.git/zunit bin
+
+          chmod u+x bin/{color,revolver,zunit}
+
+      - name: Unit tests
+        run: |
+          export PATH="$PWD/bin:$PATH"
+          zunit
