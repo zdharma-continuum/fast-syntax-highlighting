@@ -13,11 +13,12 @@ jobs:
           sudo apt install -y zsh
 
           mkdir bin
-          curl -L https://raw.githubusercontent.com/molovo/revolver/master/revolver > bin/revolver
-          curl -L https://raw.githubusercontent.com/molovo/color/master/color.zsh > bin/color
+          curl -fsSL https://raw.githubusercontent.com/molovo/revolver/v0.2.4/revolver > bin/revolver
+          curl -fsSL https://raw.githubusercontent.com/molovo/color/d8f91ab5fcfceb623ae45d3333ad0e543775549c/color.zsh > bin/color
 
           git clone https://github.com/zunit-zsh/zunit.git zunit.git
           cd zunit.git
+          git checkout b86c006f62db138a119e9be3a4b41e28876889b2
           ./build.zsh
           cd ..
           mv ./zunit.git/zunit bin
