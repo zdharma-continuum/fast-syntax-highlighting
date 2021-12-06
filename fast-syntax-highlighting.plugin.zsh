@@ -51,10 +51,9 @@ FAST_WORK_DIR=${~FAST_WORK_DIR}
 
 # Last (currently, possibly) loaded plugin isn't "fast-syntax-highlighting"?
 # And FPATH isn't containing plugin dir?
-if [[ ${zsh_loaded_plugins[-1]} != */fast-syntax-highlighting && -z ${fpath[(r)${0:h}]} ]]
-then
-    fpath+=( "${0:h}" )
-fi
+if [[ $PMSPEC != *f* ]] {
+  fpath+=( "${0:h}/functions" )
+}
 
 if [[ ! -w $FAST_WORK_DIR ]]; then
     FAST_WORK_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/fsh"
