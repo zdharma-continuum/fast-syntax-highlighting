@@ -25,7 +25,7 @@ setopt extended_glob warn_create_global typeset_silent
 
 local __first_call="$1" __wrd="$2" __start_pos="$3" __end_pos="$4"
 local __style check_port=0 host_start_offset host_style user_style possible_host
-local -a match mbegin mend completions_user completions_host
+local -a match mbegin mend completions_users completions_host
 
 # First call, i.e. command starts, i.e. "grep" token etc.
 (( __first_call )) && {
@@ -70,9 +70,12 @@ local -a match mbegin mend completions_user completions_host
                                 # Zstyle clobbers reply for sure
                                 zstyle -a ":completion:*:users" users completions_users
                             }
-                            (( ! $#completions_users )) && completions_users=(${(k)userdirs})
                             if (( $#completions_users )); then
                                 [[ $match[2] = ${~${:-(${(j:|:)completions_users})}} ]] \
+                                    && user_style=${FAST_THEME_NAME}correct-subtle \
+                                    || user_style=${FAST_THEME_NAME}incorrect-subtle
+                            elif (( $#userdirs )); then
+                                [[ -n $userdirs[$match[2]] ]] \
                                     && user_style=${FAST_THEME_NAME}correct-subtle \
                                     || user_style=${FAST_THEME_NAME}incorrect-subtle
                             fi
