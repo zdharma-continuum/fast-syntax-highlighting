@@ -241,7 +241,7 @@ Highlighting that is specific for a given command.
   />
 </div>
 
-The [chromas](https://github.com/zdharma-continuum/fast-syntax-highlighting/tree/master/chroma)
+The [chromas](https://github.com/zdharma-continuum/fast-syntax-highlighting/tree/master/→chroma)
 that are enabled by default can be found
 [here](https://github.com/zdharma-continuum/fast-syntax-highlighting/blob/master/fast-highlight#L166).
 
