@@ -1,0 +1,98 @@
+# -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
+# Almost all code borrowed from Zshell's _make function
+#
+# Copyright (c) 2018 Sebastian Gniazdowski
+
+local -a TARGETS
+
+.make-expandVars() {
+    local open close var val front='' rest=$1
+
+    while [[ $rest == (#b)[^$]#($)* ]]; do
+        front=$front${rest[1,$mbegin[1]-1]}
+        rest=${rest[$mbegin[1],-1]}
+
+        case $rest[2] in
+            ($)           # '$$'. may not appear in target and variable's value
+                front=$front\$\$
+                rest=${rest[3,-1]}
+                continue
+                ;;
+                (\()          # Variable of the form $(foobar)
+                open='('
+                close=')'
+                ;;
+            ({)           # ${foobar}
+                open='{'
+                close='}'
+                ;;
+            ([[:alpha:]]) # $foobar. This is exactly $(f)oobar.
+                open=''
+                close=''
+                var=$rest[2]
+                ;;
+            (*)           # bad parameter name
+                print -- $front$rest
+                return 1
+                ;;
+        esac
+
+        if [[ -n $open ]]; then
+            if [[ $rest == \$$open(#b)([[:alnum:]_]##)(#B)$close* ]]; then
+                var=$match
+            else  # unmatched () or {}, or bad parameter name
+                print -- $front$rest
+                return 1
+            fi
+        fi
+
+        val=''
+        if [[ -n ${VAR_ARGS[(i)$var]} ]]; then
+            val=${VAR_ARGS[$var]}
+        else
+            if [[ -n $opt_args[(I)(-e|--environment-overrides)] ]]; then
+                if [[ $parameters[$var] == scalar-export* ]]; then
+                    val=${(P)var}
+                elif [[ -n ${VARIABLES[(i)$var]} ]]; then
+                    val=${VARIABLES[$var]}
+                fi
+            else
+                if [[ -n ${VARIABLES[(i)$var]} ]]; then
+                    val=${VARIABLES[$var]}
+                elif [[ $parameters[$var] == scalar-export* ]]; then
+                    val=${(P)var}
+                fi
+            fi
+        fi
+        rest=${rest//\$$open$var$close/$val}
+    done
+
+    print -- ${front}${rest}
+}
+
+
+.make-parseMakefile () {
+    local input var val target dep TAB=$'\t' tmp IFS=
+
+    while read input
+    do
+        case "$input " in
+            # TARGET: dependencies
+            # TARGET1 TARGET2 TARGET3: dependencies
+            ([[*?[:alnum:]$][^$TAB:=%]#:[^=]*)
+            target=$(.make-expandVars ${input%%:*})
+            TARGETS+=( ${(z)target} )
+            ;;
+        esac
+    done
+}
+
+if [[ -z "${FAST_HIGHLIGHT[chroma-make-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[chroma-make-cache-born-at] )) -gt 7 ]]; then
+    .make-parseMakefile
+    FAST_HIGHLIGHT[chroma-make-cache-born-at]="$EPOCHSECONDS"
+    FAST_HIGHLIGHT[chroma-make-cache]="${(j:;:)TARGETS}"
+fi
+
+reply2=( "${(s:;:)FAST_HIGHLIGHT[chroma-make-cache]}" )
+
+# vim:ft=zsh:et

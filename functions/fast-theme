@@ -1,0 +1,385 @@
+# -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
+# Copyright (c) 2018 Sebastian Gniazdowski
+# Copyright (c) 2018, 2019 Philippe Troin (F-i-f on GitHub)
+#
+# Theme support using ini-files.
+#
+
+zmodload zsh/zutil 2>/dev/null
+
+emulate -LR zsh
+setopt extendedglob typesetsilent warncreateglobal
+autoload colors; colors
+
+typeset -g FAST_WORK_DIR
+: ${FAST_WORK_DIR:=$FAST_BASE_DIR}
+FAST_WORK_DIR=${~FAST_WORK_DIR}
+
+local -A map
+map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
+      "LOCAL:"  "/usr/local/share/fsh/"
+      "HOME:"   "$HOME/.fsh/"
+      "OPT:"    "/opt/local/share/fsh/"
+)
+
+FAST_WORK_DIR=${${FAST_WORK_DIR/(#m)(#s)(XDG|LOCAL|HOME|OPT):(#c0,1)/${map[${MATCH%:}:]}}%/}
+
+local OPT_HELP OPT_VERBOSE OPT_QUIET OPT_RESET OPT_LIST OPT_TEST OPT_SECONDARY OPT_SHOW OPT_COPY OPT_OV_RESET
+local OPT_PALETTE OPT_CDWD OPT_XCHG OPT_OV_XCHG
+local -A opthash
+zparseopts -E -D -A opthash h -help v -verbose q -quiet r -reset l -list t -test -secondary \
+            s -show -copy-shipped-theme: R -ov-reset p -palette w -workdir \
+            x -xchg y -ov-xchg || \
+                { echo "Improper options given, see help (-h/--help)"; return 1; }
+
+(( ${+opthash[-h]} + ${+opthash[--help]} ))    && OPT_HELP="-h"
+(( ${+opthash[-v]} + ${+opthash[--verbose]} )) && OPT_VERBOSE="-v"
+(( ${+opthash[-q]} + ${+opthash[--quiet]} ))   && OPT_QUIET="-q"
+(( ${+opthash[-r]} + ${+opthash[--reset]} ))   && OPT_RESET="-r"
+(( ${+opthash[-l]} + ${+opthash[--list]} ))    && OPT_LIST="-l"
+(( ${+opthash[-t]} + ${+opthash[--test]} ))    && OPT_TEST="-t"
+(( ${+opthash[--secondary]} ))                 && OPT_SECONDARY="--secondary"
+(( ${+opthash[-s]} + ${+opthash[--show]} ))    && OPT_SHOW="-s"
+(( ${+opthash[--copy-shipped-theme]} ))        && OPT_COPY="${opthash[--copy-shipped-theme]}"
+(( ${+opthash[-R]} + ${+opthash[--ov-reset]} )) && OPT_OV_RESET="-R"
+(( ${+opthash[-p]} + ${+opthash[--palette]} )) && OPT_PALETTE="-p"
+(( ${+opthash[-w]} + ${+opthash[--workdir]} )) && OPT_CDWD="-w"
+(( ${+opthash[-x]} + ${+opthash[--xchg]} ))    && OPT_XCHG="-x"
+(( ${+opthash[-y]} + ${+opthash[--ov-xchg]} )) && OPT_OV_XCHG="-y"
+
+local -a match mbegin mend
+local MATCH; integer MBEGIN MEND
+
+[[ -n "$OPT_CDWD" ]] && {
+    builtin cd $FAST_WORK_DIR
+    return 0
+}
+
+[[ -n "$OPT_PALETTE" ]] && {
+    local n
+    local -a __colors
+    for n in {000..255}
+    do
+        __colors+=("%F{$n}$n%f")
+    done
+    print -cP $__colors
+    return
+}
+
+[[ -n "$OPT_SHOW" ]] && {
+    print -r -- "Currently active theme: ${fg_bold[yellow]}$FAST_THEME_NAME$reset_color"
+    ( source "$FAST_WORK_DIR"/current_theme.zsh 2>/dev/null && print "Main theme (loaded at startup of a session): ${fg_bold[yellow]}$FAST_THEME_NAME$reset_color" || print "No main theme is set"; )
+    return 0
+}
+
+[[ -n "$OPT_COPY" ]] && {
+    [[ ! -f "$FAST_BASE_DIR"/themes/"${OPT_COPY%.ini}.ini" ]] && { print "Theme \`$OPT_COPY' doesn't exist in FSH plugin dir ($FAST_BASE_DIR/themes)"; return 1; }
+    [[ ! -r "$FAST_BASE_DIR"/themes/"${OPT_COPY%.ini}.ini" ]] && { print "Theme \`$OPT_COPY' isn't readable in FSH plugin dir ($FAST_BASE_DIR/themes)"; return 1; }
+    [[ -n "$1" ]] && {
+        [[ ! -e "$1" && ! -e ${1:h} ]] && { print "Destination path doesn't exist, aborting"; return 1; }
+    }
+    command cp -vf "$FAST_BASE_DIR"/themes/"${OPT_COPY%.ini}.ini" "${${1:-.}%.ini}.ini" || return 1
+    return 0
+}
+
+[[ -n "$OPT_RESET" ]] && { command rm -f "$FAST_WORK_DIR"/{current_theme.zsh,secondary_theme.zsh}; [[ -z "$OPT_QUIET" ]] && print "Reset done (no theme is now set, restart is required)"; return 0; }
+
+[[ -n "$OPT_OV_RESET" ]] && { command rm -f "$FAST_WORK_DIR"/theme_overlay.zsh; [[ -z "$OPT_QUIET" ]] && print "Overlay-reset done, it is inactive (restart is required)"; return 0; }
+
+[[ -n "$OPT_LIST" ]] && {
+    [[ -z "$OPT_QUIET" ]] && print -r -- "Available themes:"
+    print -rl -- "$FAST_BASE_DIR"/themes/*.ini(:t:r)
+    return 0
+}
+
+[[ -n "$OPT_HELP" ]] && {
+    print -r -- "Usage: fast-theme [-h/--help] [-v/--verbose] [-q/--quiet] [-t/--test] <theme-name|theme-path>"
+    print -r -- "       fast-theme [-r/--reset] [-l/--list] [-s/--show] [-p/--palette] [-w/--workdir]"
+    print -r -- "       fast-theme --copy-shipped-theme {theme-name} [destination-path]"
+    print -r -- ""
+    print -r -- "Default action (after providing <theme-name> or <theme-path>) is to switch"
+    print -r -- "current session and any future sessions to the new theme. Using <theme-path>,"
+    print -r -- "i.e.: a path to an ini file means using custom, own theme. The path can use an"
+    print -r -- "\"XDG:\" shorthand (e.g.: \"XDG:mytheme\") that will point to ~/.config/fsh/<theme>.ini"
+    print -r -- "(or \$XDG_CONFIG_HOME/fsh/<theme>.ini in general if the variable is set in the"
+    print -r -- "environment). If the INI file pointed in the path is \"*overlay*\", then it is"
+    print -r -- "not a full theme, but an additional theme-snippet that overwrites only selected" 
+    print -r -- "styles of the main theme."
+    print -r -- ""
+    print -r -- "Other path-shorthands:"
+    print -r -- "LOCAL: = /usr/local/share/fsh/"
+    print -r -- "HOME: = $HOME/.fsh/"
+    print -r -- "OPT: = /opt/local/share/fsh/"
+    print -r -- ""
+    print -r -- "-r/--reset     - unset any theme, use default highlighting (requires restart)"
+    print -r -- "-R/--ov-reset  - unset overlay, use styles only from main-theme (requires restart)"
+    print -r -- "-l/--list      - list names of available themes"
+    print -r -- "-t/--test      - show test block of code after switching theme"
+    print -r -- "-s/--show      - get and display the theme currently being set"
+    print -r -- "-p/--palette   - just print all 256 colors and exit (useful when creating a theme)"
+    print -r -- "-w/--workdir   - cd into \$FAST_WORK_DIR (if not set, then into the plugin directory)"
+    print -r -- "-v/--verbose   - more messages during operation"
+    print -r -- "-q/--quiet     - no default messages"
+    print -r -- ""
+    print -r -- "The option --copy-shipped-theme allows easy copying of one of the 6 shipped"
+    print -r -- "themes into given destination path. Normal use means changing directory to"
+    print -r -- "e.g.: ~/.config/fsh, and then issuing e.g.: \`fast-theme --copy-shipped-theme"
+    print -r -- "clean mytheme', to obtain a template for own new theme."
+    return 0
+}
+
+[[ -z "$1" ]] && { print -u2 "Provide a theme (its name or path to its file) to switch to, aborting (see -h/--help)"; return 1; }
+
+# FAST_HIGHLIGHT_STYLES key onto ini-file key
+map=(
+    default                     "-"
+    unknown-token               "-"
+    reserved-word               "-"
+    subcommand                  "- reserved-word"
+    alias                       "- command builtin"
+    suffix-alias                "- alias command builtin"
+    builtin                     "-"
+    function                    "- builtin command"
+    command                     "-"
+    precommand                  "- command"
+    commandseparator            "-"
+    hashed-command              "- command"
+    path                        "-"
+    path_pathseparator          "pathseparator"
+    globbing                    "- back-or-dollar-double-quoted-argument" # fallback: variable in string "text $var text"
+    globbing-ext                "- double-quoted-argument" # fallback: the string "abc..."
+    history-expansion           "-"
+    single-hyphen-option        "- single-quoted-argument"
+    double-hyphen-option        "- double-quoted-argument"
+    back-quoted-argument        "-"
+    single-quoted-argument      "-"
+    double-quoted-argument      "-"
+    dollar-quoted-argument      "-"
+    back-or-dollar-double-quoted-argument   "- back-dollar-quoted-argument"
+    back-dollar-quoted-argument             "- back-or-dollar-double-quoted-argument"
+    assign                      "- reserved-word"
+    redirection                 "- reserved-word"
+    comment                     "-"
+    variable                    "-"
+    mathvar                     "- forvar variable"
+    mathnum                     "- fornum"
+    matherr                     "- incorrect-subtle"
+    assign-array-bracket        "-"
+    for-loop-variable           "forvar mathvar variable"
+    for-loop-number             "fornum mathnum"
+    for-loop-operator           "foroper reserved-word"
+    for-loop-separator          "forsep commandseparator"
+    exec-descriptor             "- reserved-word"
+    here-string-tri             "-"
+    here-string-text            "- subtle-bg"
+    here-string-var             "- back-or-dollar-double-quoted-argument"
+    secondary                   "-"
+    recursive-base              "- default"
+    case-input                  "- variable"
+    case-parentheses            "- reserved-word"
+    case-condition              "- correct-subtle"
+    correct-subtle              "-"
+    incorrect-subtle            "-"
+    subtle-separator            "- commandseparator"
+    subtle-bg                   "- correct-subtle"
+    path-to-dir                 "- path"
+    paired-bracket              "- subtle-bg correct-subtle"
+    bracket-level-1             "-"
+    bracket-level-2             "-"
+    bracket-level-3             "-"
+    global-alias                "- alias suffix-alias"
+    single-sq-bracket           "-"
+    double-sq-bracket           "-"
+    double-paren                "-"
+    optarg-string               "- double-quoted-argument"
+    optarg-number               "- mathnum"
+)
+
+# In which order to generate entries
+local -a order
+order=( 
+    default unknown-token reserved-word alias suffix-alias builtin function command precommand 
+    commandseparator hashed-command path path_pathseparator globbing globbing-ext history-expansion
+    single-hyphen-option double-hyphen-option back-quoted-argument single-quoted-argument 
+    double-quoted-argument dollar-quoted-argument back-or-dollar-double-quoted-argument 
+    back-dollar-quoted-argument assign redirection comment variable mathvar 
+    mathnum matherr assign-array-bracket for-loop-variable for-loop-number for-loop-operator
+    for-loop-separator exec-descriptor here-string-tri here-string-text here-string-var secondary
+    case-input case-parentheses case-condition correct-subtle incorrect-subtle subtle-separator subtle-bg
+    path-to-dir paired-bracket bracket-level-1 bracket-level-2 bracket-level-3
+    global-alias subcommand single-sq-bracket double-sq-bracket double-paren
+    optarg-string optarg-number recursive-base
+)
+
+[[ -n "$OPT_VERBOSE" ]] && print "Number of styles available for customization: ${#order}"
+
+# Named colors
+local -a color
+color=( red green blue yellow cyan magenta black white default )
+
+#
+# Execution starts here
+#
+
+local -A out
+local THEME_NAME THEME_PATH="$1"
+if [[ "$1" = */* || "$1" = (XDG|LOCAL|HOME|OPT):* ]]; then
+    1="${${1/(#s)XDG:/${${XDG_CONFIG_HOME:-$HOME/.config}%/}/fsh/}%.ini}.ini"
+    1="${${1/(#s)LOCAL://usr/local/share/fsh/}%.ini}.ini"
+    1="${${1/(#s)HOME:/$HOME/.fsh/}%.ini}.ini"
+    1="${${1/(#s)OPT://opt/local/share/fsh/}%.ini}.ini"
+    1=${~1} # allow user to quote ~
+
+    [[ ! -f "$1" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
+    [[ ! -r "$1" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
+
+    THEME_NAME="${1:t:r}"
+    .fast-read-ini-file "$1" out ""
+else
+    [[ ! -f "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "No such theme \`$1', aborting"; return 1; }
+    [[ ! -r "$FAST_BASE_DIR/themes/$1.ini" ]] && { print -u2 "Theme \`$1' unreadable, aborting"; return 1; }
+
+    THEME_NAME="$1"
+    .fast-read-ini-file "$FAST_BASE_DIR/themes/$1.ini" out ""
+fi
+
+[[ -z "$OPT_SECONDARY" ]] && { [[ "$THEME_NAME" = *"overlay"* ]] && local outfile="theme_overlay.zsh" || local outfile="current_theme.zsh"; } || local outfile="secondary_theme.zsh"
+[[ -z "$OPT_XCHG" && -z "$OPT_OV_XCHG" ]] && command rm -f "$FAST_WORK_DIR"/"$outfile"
+
+# Set a zstyle and a parameter to carry theme name
+if [[ -z "$OPT_SECONDARY" && -z "$OPT_XCHG" && -z "$OPT_OV_XCHG" ]]; then
+    [[ "$THEME_NAME" != *"overlay"* ]] && {
+        print -r -- 'zstyle :plugin:fast-syntax-highlighting theme "'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
+        print -r -- 'typeset -g FAST_THEME_NAME="'"$THEME_NAME"'"' >>! "$FAST_WORK_DIR"/"$outfile"
+        zstyle :plugin:fast-syntax-highlighting theme "$THEME_NAME"
+        typeset -g FAST_THEME_NAME="$THEME_NAME"
+    }
+elif [[ -z "$OPT_XCHG" && -z "$OPT_OV_XCHG" ]]; then
+    local FAST_THEME_NAME="$THEME_NAME"
+fi
+
+# Store from which file the theme or overlay is being loaded
+[[ "$THEME_NAME" != *"overlay" && -z "$OPT_OV_XCHG" ]] && FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}-path]="$THEME_PATH" || FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}-ov-path]="$THEME_PATH"
+
+# Generate current_theme.zsh or secondary_theme.zsh, traversing ini-file associative array
+local k kk
+local inikey inival result result2 first_val isbg
+integer ov_counter=0 first
+for k in "${order[@]}"; do
+    first=1
+    for kk in ${(s. .)map[$k]} default; do
+        [[ "$kk" = "-" ]] && kk="$k"
+        (( first )) && first_val="$kk"
+        inikey="${out[(i)<*>_${kk}]}"
+        [[ -n "$inikey" ]] && {
+            (( !first )) && [[ -z "$OPT_QUIET" ]] && {
+                [[ $kk = default ]] && {
+                    [[ "$THEME_NAME" != *"overlay"* ]] && print "Missing style: $first_val"
+                } || print "For style $first_val, went for fallback style $kk"
+            }
+            break
+        }
+        first=0
+        [[ "$THEME_NAME" = *"overlay"* ]] && break
+    done
+
+    # ORIG: Clear orig-style when loading a new theme, not overlay
+    [[ -z "$OPT_OV_XCHG" ]] && unset "FAST_HIGHLIGHT_STYLES[orig-style-$k]"
+    # ORIG: Restore orig-style when loading a new overlay
+    [[ -n "$OPT_OV_XCHG" && -n "${FAST_HIGHLIGHT_STYLES[orig-style-$k]}" ]] && { FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="${FAST_HIGHLIGHT_STYLES[orig-style-$k]}"; unset "FAST_HIGHLIGHT_STYLES[orig-style-$k]"; }
+    # Set only the keys provided in theme
+    [[ -z "$inikey" ]] && { [[ -z "$OPT_QUIET" && "$THEME_NAME" != *"overlay"* ]] && print "Missing style $first_val"; continue; }
+
+    inival="${out[$inikey]}"
+    if [[ "$k" = "secondary" && -z "$OPT_SECONDARY" && -n "$inival" ]]; then
+        fast-theme -q --secondary "$inival"
+    fi
+
+    result=""
+    if [[ $k = secondary ]]; then
+        result="$inival"
+    else
+        for kk in ${(s:,:)inival}
+        do
+            if [[ $kk = (none|(no-|)(bold|blink|conceal|reverse|standout|underline)) ]]; then
+                result+="${result:+,}$kk"
+            else
+                isbg=0
+                if [[ $kk = bg:* ]]; then
+                    isbg=1
+                    kk=${kk#bg:}
+                fi
+                if [[ $kk = (${(~j:|:)color}) || $kk = [0-9]## || $kk = \#[0-9a-fA-F](#c6,6) ]]; then
+                    result+="${result:+,}"
+                    (( isbg )) && result+="bg=" || result+="fg="
+                    result+="$kk"
+                else
+                    print "cannot parse style $k: unknown color or style element $kk"
+                fi
+            fi
+        done
+    fi
+
+    if [[ "$THEME_NAME" = *"overlay"* || -n "$OPT_OV_XCHG" ]]; then
+        (( ++ ov_counter ))
+        [[ -z "$OPT_XCHG$OPT_OV_XCHG" ]] && print -r -- ': ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}'"$k"']::='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
+        # ORIG: Save original value of the overwritten style
+        FAST_HIGHLIGHT_STYLES[orig-style-$k]=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]}
+        # Overwrite theme's style
+        FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
+    else
+        [[ -z "$OPT_XCHG$OPT_OV_XCHG" ]] && print -r -- ': ${FAST_HIGHLIGHT_STYLES['"${FAST_THEME_NAME}$k"']:='"$result"'}' >>! "$FAST_WORK_DIR"/"$outfile"
+        FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}$k]="$result"
+    fi
+done
+
+# This can overwrite some of *_STYLES fields
+# Re-apply overlay on top of the theme we switched to
+[[ "$THEME_NAME" != *"overlay"* ]] && [[ -r "$FAST_WORK_DIR"/theme_overlay.zsh ]] && source "$FAST_WORK_DIR"/theme_overlay.zsh
+
+zcompile $FAST_WORK_DIR/$outfile 2>/dev/null
+
+[[ -z "$OPT_QUIET" ]] && {
+    if [[ "$THEME_NAME" != *"overlay"* ]]; then
+        print "Switched to theme \`$THEME_NAME' (current session, and future sessions)" || \
+    else
+        print "Processed the overlay ($ov_counter keys found), it is now active (for current session, and future sessions)"
+    fi
+}
+
+[[ -n "$OPT_TEST" ]] && {
+    print -zr '
+# Subshell, assignments, math-mode
+echo $(cat /etc/hosts |& grep -i "hello337")
+local param1="text ${+variable[test]} text ${var} text"; typeset param2='"'"'other $variable'"'"'
+math=$(( 10 + HISTSIZ + HISTSIZE + $SAVEHIST )) size=$(( 0 ))
+
+# Programming-like usage, bracket matching - through distinct colors; note the backslash quoting
+for (( ii = 1; ii <= size; ++ ii )); do
+    if [[ "${cmds[ii]} string" = "| string" ]]
+    then
+        sidx=${buffer[(in:ii:)\$\(?#[^\\\\]\)]} # find opening cmd-subst
+        (( sidx <= len + 100 )) && {
+            eidx=${buffer[(b:sidx:ii)[^\\\\]\)]} # find closing cmd-subst
+        }
+    fi
+done
+
+# Regular command-line usage
+repeat 0 {
+    zsh -i -c "cat /etc/shells* | grep -x --line-buffered -i '"'/bin/zsh'"'"
+    builtin exit $return_value
+    fast-theme -tq default
+    fsh-alias -tq default-X # alias '"'"'fsh-alias=fast-theme'"'"' works just like the previous line
+    command -v git | grep ".+git" && echo $'"'"'Git is installed'"'"'
+    git checkout -m --ours /etc/shells && git status-X
+    gem install asciidoctor
+    cat <<<$PATH | tr : \\n > /dev/null 2>/usr/local
+    man -a fopen fopen-X
+    CFLAGS="-g -Wall -O0" ./configure
+}
+'
+}
+
+return 0
+# vim:ft=zsh:et:sw=4:sts=4

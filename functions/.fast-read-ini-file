@@ -1,0 +1,30 @@
+# Copyright (c) 2018 Sebastian Gniazdowski
+#
+# $1 - path to the ini file to parse
+# $2 - name of output hash (INI by default)
+# $3 - prefix for keys in the hash (can be empty)
+#
+# Writes to given hash under keys built in following way: ${3}<section>_field.
+# Values are values from ini file.
+
+local __ini_file="$1" __out_hash="${2:-INI}" __key_prefix="$3"
+local IFS='' __line __cur_section="void" __access_string
+local -a match mbegin mend
+
+[[ ! -r "$__ini_file" ]] && { builtin print -r "fast-syntax-highlighting: an ini file is unreadable ($__ini_file)"; return 1; }
+
+while read -r -t 1 __line; do
+    if [[ "$__line" = [[:blank:]]#\;* ]]; then
+        continue
+    elif [[ "$__line" = (#b)[[:blank:]]#\[([^\]]##)\][[:blank:]]# ]]; then
+        __cur_section="${match[1]}"
+    elif [[ "$__line" = (#b)[[:blank:]]#([^[:blank:]=]##)[[:blank:]]#[=][[:blank:]]#(*) ]]; then
+        match[2]="${match[2]%"${match[2]##*[! $'\t']}"}" # remove trailing whitespace
+        __access_string="${__out_hash}[${__key_prefix}<$__cur_section>_${match[1]}]"
+        : "${(P)__access_string::=${match[2]}}"
+    fi
+done < "$__ini_file"
+
+return 0
+
+# vim:ft=zsh:sw=4:sts=4:et

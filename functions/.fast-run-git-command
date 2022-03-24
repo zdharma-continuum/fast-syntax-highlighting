@@ -1,0 +1,60 @@
+# -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
+# Copyright (c) 2018 Sebastian Gniazdowski
+#
+# It runs given command, which in general will be a git command,
+# automatically looking at cache first (a field named *-cache,
+# in FAST_HIGHLIGHT), which is valid for 5 seconds, and in case
+# of outdated or not existing cache, runs the command, splitting
+# on new-lines, first checking if PWD is inside git repository.
+#
+# FAST_HIGHLIGHT hash serves as container for variables that
+# prevents creating them in global scope. (P) flag is not used,
+# output array is fixed (__lines_list).
+#
+# $1 - the command, e.g. "git remote"; 2>/dev/null redirection is
+#      added automatically
+# $2 - FAST_HIGHLIGHT field name, e.g. "chroma-git-branches"; two
+#      additional fields will be used, $2-cache, $2-cache-born-at
+# $3 - what to remove from beginning of the lines returned by the
+#      command
+# $4 - cache validity time, default 5 (seconds)
+#
+# Output: array __lines_list, with output of the (git) command ran
+
+# User should not forget to define this array, the below code
+# will only ensure that it's array (can also define a global)
+typeset -ga __lines_list
+local -a __response
+
+if [[ $1 == --status ]] {
+    integer __status=1
+    shift
+}
+
+if [[ -z ${FAST_HIGHLIGHT[$2-cache]} || $(( EPOCHSECONDS - FAST_HIGHLIGHT[$2-cache-born-at] )) -gt ${4:-5} ]]; then
+    FAST_HIGHLIGHT[$2-cache-born-at]=$EPOCHSECONDS
+    if [[ "$(command git rev-parse --is-inside-work-tree 2>/dev/null)" = true ]]; then
+        __response=( ${${(f)"$(command ${(Qz)${1#+}} 2>/dev/null)"}#$3} )
+        integer retval=$?
+        if (( __status )) {
+            __response=( $retval )
+            __lines_list=( $retval )
+        } else {
+            [[ "$1" = "+"* ]] && \
+                __lines_list+=( "${__response[@]}" ) || \
+                __lines_list=( "${__response[@]}" )
+        }
+    else
+        __lines_list=()
+    fi
+    FAST_HIGHLIGHT[$2-cache]="${(j:;:)__response}"
+else
+    # Quoted (s:;:) flag without @ will skip empty elements. It
+    # still produces array output, interesingly. All this is for
+    # the trailing ";" above, to skip last, empty element.
+    [[ "$1" = "+"* ]] && \
+        __lines_list+=( "${(@s:;:)FAST_HIGHLIGHT[$2-cache]}" ) || \
+        __lines_list=( "${(@s:;:)FAST_HIGHLIGHT[$2-cache]}" )
+fi
+
+# vim:ft=zsh:et:sw=4
