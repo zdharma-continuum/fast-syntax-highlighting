@@ -36,7 +36,7 @@ FAST_WORK_DIR=${~FAST_WORK_DIR}
   # We must not use emulate -o if we want to keep compatibility with Zsh < v.5.0
   # See https://github.com/zdharma-continuum/fast-syntax-highlighting/pull/7
   emulate -L zsh
-  setopt extendedglob 
+  setopt extendedglob
   local -A map
   map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
         "LOCAL:"  "/usr/local/share/fsh/"
@@ -1148,9 +1148,9 @@ typeset -ga ZLAST_COMMANDS
         fi
       fi
     fi
-    if [[ $__arg = (#b)*'#'(([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])|([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F]))* || $__arg = (#b)*'rgb('(([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)))* ]]; then
+    if [[ $__arg = (#b)*'#'(([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])|([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F]))(|[^[:alnum:]]*) || $__arg = (#b)*'rgb('(([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)))* ]]; then
       if [[ -n $match[2] ]]; then
-        if [[ $match[2] = ?? || $match[3] = ?? || $match[4] = ?? ]]; then 
+        if [[ $match[2] = ?? || $match[3] = ?? || $match[4] = ?? ]]; then
           (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#${(l:2::0:)match[2]}${(l:2::0:)match[3]}${(l:2::0:)match[4]}")
         else
           (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#$match[2]$match[3]$match[4]")

@@ -1,0 +1,39 @@
+#compdef fast-theme
+
+#
+# Copyright (c) 2018 Sebastian Gniazdowski
+#
+# Completion for theme-switching function, fast-theme,
+# part of zdharma/fast-syntax-highlighting.
+#
+
+integer ret=1
+local -a arguments
+
+arguments=(
+  {-h,--help}'[display help text]'
+  {-l,--list}'[list available themes]'
+  {-r,--reset}'[unset any theme (revert to default highlighting)]'
+  {-R,--ov-reset}'[unset overlay, use styles only from main-theme (requires restart)]'
+  {-q,--quiet}'[no default messages]'
+  {-s,--show}'[get and display the theme currently being set]'
+  {-v,--verbose}'[more messages during operation]'
+  {-t,--test}'[test theme after setting it (show example code)]'
+  {-p,--palette}'[just print all 256 colors and exit (useful when creating a theme)]'
+  {-w,--workdir}'[cd into $FAST_WORK_DIR (if not set, then into the plugin directory)]'
+)
+
+typeset -a themes
+themes=( "$FAST_WORK_DIR"/themes/*.ini(:t:r) )
+
+if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/fsh ]] {
+    typeset -a themes2
+    themes2=( "${XDG_CONFIG_HOME:-$HOME/.config}"/fsh/*.ini(:t:r) )
+    themes+=( XDG:${^themes2[@]} )
+}
+
+_wanted themes expl "Themes" \
+    compadd "$@" -a - themes && ret=0
+_arguments -s $arguments && ret=0
+
+return $ret
