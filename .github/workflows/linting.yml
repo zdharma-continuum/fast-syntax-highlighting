@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install dependencies
+        run: |
+          brew install shellcheck shfmt zsh
+          pip3 install --user linkify-it-py mdformat mdformat-config mdformat-gfm mdformat-shfmt mdformat-tables mdformat-toc
+
+      - name: run mdformat
+        run: find . -name '*.md' -type f -print0 | xargs -0 -n1 -P4 python3 -m mdformat --check --wrap 120
+
+      - name: run shfmt
+        run: find . -name '*.sh' -type f -print0 | xargs -0 -n1 -P4 shfmt -bn -ci -d -i 2 -ln bash -s -sr
+
+      - name: run shellcheck
+        run: find . -name '*.sh' -type f -print0 | xargs -0 -n1 -P4 shellcheck
+
+      - name: "run zsh"
+        run: find . -name '*.zsh' -type f -print0 | xargs -0 -n1 -P4 zsh -n
+
+      - name: "run zcompile"
+        run: find . -name '*.zsh' -type f -exec zsh -fc "zcompile {}" \;

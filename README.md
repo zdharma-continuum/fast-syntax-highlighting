@@ -27,11 +27,9 @@ Feature rich syntax highlighting for Zsh.
 # News
 
 - 15-06-2019
-  - A new architecture for defining the highlighting for **specific commands**: it now
-    uses **abstract definitions** instead of **top-down, regular code**. The first effect
-    is the highlighting for the `git` command it is now **maximally faithful**, it
-    follows the `git` command almost completely.
-    [Screencast](https://asciinema.org/a/253411)
+  - A new architecture for defining the highlighting for **specific commands**: it now uses **abstract definitions**
+    instead of **top-down, regular code**. The first effect is the highlighting for the `git` command it is now
+    **maximally faithful**, it follows the `git` command almost completely. [Screencast](https://asciinema.org/a/253411)
 
 # Installation
 
@@ -57,11 +55,9 @@ Add the following to your `zshrc` file.
 zinit light zdharma-continuum/fast-syntax-highlighting
 ```
 
-Here's an example of how to load the plugin together with a few other popular
-ones with the use of
-[Turbo](https://zdharma-continuum.org/zinit/wiki/INTRODUCTION/#turbo_mode_zsh_62_53),
-i.e.: speeding up the Zsh startup by loading the plugin right after the first
-prompt, in background:
+Here's an example of how to load the plugin together with a few other popular ones with the use of
+[Turbo](https://zdharma-continuum.org/zinit/wiki/INTRODUCTION/#turbo_mode_zsh_62_53), i.e.: speeding up the Zsh startup
+by loading the plugin right after the first prompt, in background:
 
 ```zsh
 zinit wait lucid for \
@@ -83,8 +79,7 @@ antigen bundle zdharma-continuum/fast-syntax-highlighting
 
 ### Zgen
 
-Add the following to your `.zshrc` file in the same place you're doing
-your other `zgen load` calls in.
+Add the following to your `.zshrc` file in the same place you're doing your other `zgen load` calls in.
 
 ```zsh
 zgen load zdharma-continuum/fast-syntax-highlighting
@@ -241,8 +236,8 @@ Highlighting that is specific for a given command.
   />
 </div>
 
-The [chromas](https://github.com/zdharma-continuum/fast-syntax-highlighting/tree/master/→chroma)
-that are enabled by default can be found
+The [chromas](https://github.com/zdharma-continuum/fast-syntax-highlighting/tree/master/%E2%86%92chroma) that are
+enabled by default can be found
 [here](https://github.com/zdharma-continuum/fast-syntax-highlighting/blob/master/fast-highlight#L166).
 
 ### Math-mode highlighting
