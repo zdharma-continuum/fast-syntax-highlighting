@@ -318,7 +318,7 @@ add-zsh-hook preexec _zsh_highlight_preexec_hook 2>/dev/null || {
     print -r -- "$@" >>! /tmp/reply
 }
 
-ZSH_HIGHLIGHT_MAXLENGTH=10000
+typeset -g ZSH_HIGHLIGHT_MAXLENGTH=10000
 
 # Load zsh/parameter module if available
 zmodload zsh/parameter 2>/dev/null
