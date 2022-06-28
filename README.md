@@ -77,6 +77,15 @@ Add the following to your `zshrc` file.
 antigen bundle zdharma-continuum/fast-syntax-highlighting
 ```
 
+### Fig
+
+[Fig](https://fig.io) adds apps, shortcuts, and autocomplete to your existing terminal.
+
+Install `fast-syntax-highlighting` in just one click.
+
+<a href="https://fig.io/plugins/other/fast-syntax-highlighting_zdharma-continuum" target="_blank"><img src="https://fig.io/badges/install-with-fig.svg" /></a>
+
+
 ### Zgen
 
 Add the following to your `.zshrc` file in the same place you're doing your other `zgen load` calls in.
