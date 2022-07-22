@@ -36,7 +36,7 @@ FAST_WORK_DIR=${~FAST_WORK_DIR}
   # We must not use emulate -o if we want to keep compatibility with Zsh < v.5.0
   # See https://github.com/zdharma-continuum/fast-syntax-highlighting/pull/7
   emulate -L zsh
-  setopt extendedglob 
+  setopt extendedglob
   local -A map
   map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
         "LOCAL:"  "/usr/local/share/fsh/"
@@ -297,7 +297,7 @@ typeset -ga ZLAST_COMMANDS
   if zmodload -e zsh/parameter; then
     if (( $+aliases[(e)$1] )); then
       REPLY=alias
-    elif (( ${+galiases[(e)$1]} )); then
+    elif (( ${+galiases[(e)${(Q)1}]} )); then
       REPLY="global alias"
     elif (( $+functions[(e)$1] )); then
       REPLY=function
@@ -1064,7 +1064,7 @@ typeset -ga ZLAST_COMMANDS
                    __style=${FAST_THEME_NAME}commandseparator
                  elif (( in_redirection == 2 )); then
                    __style=${FAST_THEME_NAME}redirection
-                 elif (( ${+galiases[(e)$__arg]} )); then
+                 elif (( ${+galiases[(e)${(Q)__arg}]} )); then
                    __style=${FAST_THEME_NAME}global-alias
                  else
                    if [[ ${FAST_HIGHLIGHT[no_check_paths]} != 1 ]]; then
@@ -1150,7 +1150,7 @@ typeset -ga ZLAST_COMMANDS
     fi
     if [[ $__arg = (#b)*'#'(([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])|([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F]))(|[^[:alnum:]]*) || $__arg = (#b)*'rgb('(([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)))* ]]; then
       if [[ -n $match[2] ]]; then
-        if [[ $match[2] = ?? || $match[3] = ?? || $match[4] = ?? ]]; then 
+        if [[ $match[2] = ?? || $match[3] = ?? || $match[4] = ?? ]]; then
           (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#${(l:2::0:)match[2]}${(l:2::0:)match[3]}${(l:2::0:)match[4]}")
         else
           (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#$match[2]$match[3]$match[4]")
