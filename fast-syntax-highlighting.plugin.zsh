@@ -366,11 +366,11 @@ alias fsh-alias=fast-theme
 if [[ ! -e $FAST_WORK_DIR/secondary_theme.zsh ]] {
     if { type curl &>/dev/null } {
         curl -fsSL -o "$FAST_WORK_DIR/secondary_theme.zsh" \
-            https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/share/free_theme.zsh \
+            https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/share/free_theme.zsh \
             &>/dev/null
     } elif { type wget &>/dev/null } {
         wget -O "$FAST_WORK_DIR/secondary_theme.zsh" \
-            https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/share/free_theme.zsh \
+            https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/share/free_theme.zsh \
             &>/dev/null
     }
     touch "$FAST_WORK_DIR/secondary_theme.zsh"
