@@ -9,7 +9,7 @@ program arguments. See the introduction for an example (item #14).
 
 Global aliases are now supported:
 
-![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/global-alias.png)
+![image](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/global-alias.png)
 
 **2018-08-01**
 
@@ -35,7 +35,7 @@ If you have set theme before an update of styles (e.g. recent addition of bracke
 
 Ideal highlighting of brackets (pairing, etc.) – no quoting can disturb the result:
 
-![image](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/brackets.gif)
+![image](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/brackets.gif)
 
 `FAST_HIGHLIGHT[use_brackets]=1` to enable this feature (**2018-07-31**: not needed anymore, this highlighting is active
 by default).
@@ -69,14 +69,14 @@ FSH gained a new architecture – "chroma functions". They are similar to "compl
 [example chroma](https://github.com/zdharma/fast-syntax-highlighting/blob/master/chroma/-example.ch) if you would like
 to highlight a command.
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/git_chroma.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/git_chroma.png)
 
 **2018-06-01**
 
 Highlighting of command substitution (i.e. `$(...)`) with alternate theme – two themes at once! It was just white
 before:
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/cmdsubst.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/cmdsubst.png)
 
 To select which theme to use for `$(...)` set the key `secondary=` in
 [theme ini file](https://github.com/zdharma/fast-syntax-highlighting/blob/master/themes/free.ini#L7). All shipped themes
@@ -84,14 +84,14 @@ have this key set (only the `default` theme doesn't use second theme).
 
 Also added correct highlighting of descriptor-variables passed to `exec`:
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/execfd.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/execfd.png)
 
 **2018-05-30**
 
 For-loop is highlighted, it has separate settings in
 [theme file](https://github.com/zdharma/fast-syntax-highlighting/blob/master/themes/free.ini).
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/for-loop.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/for-loop.png)
 
 **2018-05-27**
 
@@ -113,18 +113,18 @@ FAST_BLIST_PATTERNS[/mount/disk2/*]=1
 
 Assign colorizing now spans to variables defined by `typeset`, `export`, `local`, etc.:
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/typeset.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/typeset.png)
 
 Also, `zcalc` has a separate math mode and specialized highlighting – no more light-red colors because of treating
 `zcalc` like a regular command-line:
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/zcalc.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/zcalc.png)
 
 **2018-05-22**
 
 Array assignments were still boring, so I throwed in bracked colorizing:
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/array-assign.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/array-assign.png)
 
 **2018-05-22**<a name="assign-update"></a>
 
@@ -134,7 +134,7 @@ Assignments are no more one-colour default-white. When used in assignment, highl
 - strings (double-quoted and single-quoted),
 - math-mode (`val=$(( ... ))`).
 
-![sshot](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/assign.png)
+![sshot](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/assign.png)
 
 **2018-01-06**
 
@@ -144,4 +144,4 @@ style names (fields of
 math-variable, number and empty variable (error): `mathvar`, `mathnum`, `matherr`. You can set them (like the animation
 below shows) to change colors.
 
-![animation](https://raw.githubusercontent.com/zdharma/fast-syntax-highlighting/master/images/math.gif)
+![animation](https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/images/math.gif)
