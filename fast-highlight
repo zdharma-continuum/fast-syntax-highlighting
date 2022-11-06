@@ -36,7 +36,7 @@ FAST_WORK_DIR=${~FAST_WORK_DIR}
   # We must not use emulate -o if we want to keep compatibility with Zsh < v.5.0
   # See https://github.com/zdharma-continuum/fast-syntax-highlighting/pull/7
   emulate -L zsh
-  setopt extendedglob 
+  setopt extendedglob
   local -A map
   map=( "XDG:"    "${XDG_CONFIG_HOME:-$HOME/.config}/fsh/"
         "LOCAL:"  "/usr/local/share/fsh/"
@@ -168,107 +168,107 @@ typeset -gA FAST_HIGHLIGHT
 : ${FAST_HIGHLIGHT[use_brackets]:=1}
 
 FAST_HIGHLIGHT+=(
-  chroma-fast-theme    →chroma/-fast-theme.ch
-  chroma-alias         →chroma/-alias.ch
-  chroma-autoload      →chroma/-autoload.ch
-  chroma-autorandr     →chroma/-autorandr.ch
-  chroma-docker        →chroma/-docker.ch
-  chroma-example       →chroma/-example.ch
-  chroma-ionice        →chroma/-ionice.ch
-  chroma-make          →chroma/-make.ch
-  chroma-nice          →chroma/-nice.ch
-  chroma-nmcli         →chroma/-nmcli.ch
-  chroma-node          →chroma/-node.ch
-  chroma-perl          →chroma/-perl.ch
-  chroma-printf        →chroma/-printf.ch
-  chroma-ruby          →chroma/-ruby.ch
-  chroma-scp           →chroma/-scp.ch
-  chroma-ssh           →chroma/-ssh.ch
+  chroma-fast-theme    -chroma/-fast-theme.ch
+  chroma-alias         -chroma/-alias.ch
+  chroma-autoload      -chroma/-autoload.ch
+  chroma-autorandr     -chroma/-autorandr.ch
+  chroma-docker        -chroma/-docker.ch
+  chroma-example       -chroma/-example.ch
+  chroma-ionice        -chroma/-ionice.ch
+  chroma-make          -chroma/-make.ch
+  chroma-nice          -chroma/-nice.ch
+  chroma-nmcli         -chroma/-nmcli.ch
+  chroma-node          -chroma/-node.ch
+  chroma-perl          -chroma/-perl.ch
+  chroma-printf        -chroma/-printf.ch
+  chroma-ruby          -chroma/-ruby.ch
+  chroma-scp           -chroma/-scp.ch
+  chroma-ssh           -chroma/-ssh.ch
 
-  chroma-git           →chroma/main-chroma.ch%git
-  chroma-hub           →chroma/-hub.ch
-  chroma-lab           →chroma/-lab.ch
-  chroma-svn           →chroma/-subversion.ch
-  chroma-svnadmin      →chroma/-subversion.ch
-  chroma-svndumpfilter →chroma/-subversion.ch
+  chroma-git           -chroma/main-chroma.ch%git
+  chroma-hub           -chroma/-hub.ch
+  chroma-lab           -chroma/-lab.ch
+  chroma-svn           -chroma/-subversion.ch
+  chroma-svnadmin      -chroma/-subversion.ch
+  chroma-svndumpfilter -chroma/-subversion.ch
 
-  chroma-egrep         →chroma/-grep.ch
-  chroma-fgrep         →chroma/-grep.ch
-  chroma-grep          →chroma/-grep.ch
+  chroma-egrep         -chroma/-grep.ch
+  chroma-fgrep         -chroma/-grep.ch
+  chroma-grep          -chroma/-grep.ch
 
-  chroma-awk           →chroma/-awk.ch
-  chroma-gawk          →chroma/-awk.ch
-  chroma-mawk          →chroma/-awk.ch
+  chroma-awk           -chroma/-awk.ch
+  chroma-gawk          -chroma/-awk.ch
+  chroma-mawk          -chroma/-awk.ch
 
-  chroma-source        →chroma/-source.ch
-  chroma-.             →chroma/-source.ch
+  chroma-source        -chroma/-source.ch
+  chroma-.             -chroma/-source.ch
 
-  chroma-bash          →chroma/-sh.ch
-  chroma-fish          →chroma/-sh.ch
-  chroma-sh            →chroma/-sh.ch
-  chroma-zsh           →chroma/-sh.ch
+  chroma-bash          -chroma/-sh.ch
+  chroma-fish          -chroma/-sh.ch
+  chroma-sh            -chroma/-sh.ch
+  chroma-zsh           -chroma/-sh.ch
 
-  chroma-whatis        →chroma/-whatis.ch
-  chroma-man           →chroma/-whatis.ch
+  chroma-whatis        -chroma/-whatis.ch
+  chroma-man           -chroma/-whatis.ch
 
-  chroma--             →chroma/-precommand.ch
-  chroma-xargs         →chroma/-precommand.ch
-  chroma-nohup         →chroma/-precommand.ch
-  chroma-strace        →chroma/-precommand.ch
-  chroma-ltrace        →chroma/-precommand.ch
+  chroma--             -chroma/-precommand.ch
+  chroma-xargs         -chroma/-precommand.ch
+  chroma-nohup         -chroma/-precommand.ch
+  chroma-strace        -chroma/-precommand.ch
+  chroma-ltrace        -chroma/-precommand.ch
 
-  chroma-hg            →chroma/-subcommand.ch
-  chroma-cvs           →chroma/-subcommand.ch
-  chroma-pip           →chroma/-subcommand.ch
-  chroma-pip2          →chroma/-subcommand.ch
-  chroma-pip3          →chroma/-subcommand.ch
-  chroma-gem           →chroma/-subcommand.ch
-  chroma-bundle        →chroma/-subcommand.ch
-  chroma-yard          →chroma/-subcommand.ch
-  chroma-cabal         →chroma/-subcommand.ch
-  chroma-npm           →chroma/-subcommand.ch
-  chroma-nvm           →chroma/-subcommand.ch
-  chroma-yarn          →chroma/-subcommand.ch
-  chroma-brew          →chroma/-subcommand.ch
-  chroma-port          →chroma/-subcommand.ch
-  chroma-yum           →chroma/-subcommand.ch
-  chroma-dnf           →chroma/-subcommand.ch
-  chroma-tmux          →chroma/-subcommand.ch
-  chroma-pass          →chroma/-subcommand.ch
-  chroma-aws           →chroma/-subcommand.ch
-  chroma-apt           →chroma/-subcommand.ch
-  chroma-apt-get       →chroma/-subcommand.ch
-  chroma-apt-cache     →chroma/-subcommand.ch
-  chroma-aptitude      →chroma/-subcommand.ch
-  chroma-keyctl        →chroma/-subcommand.ch
-  chroma-systemctl     →chroma/-subcommand.ch
-  chroma-asciinema     →chroma/-subcommand.ch
-  chroma-ipfs          →chroma/-subcommand.ch
-  chroma-zinit       →chroma/main-chroma.ch%zinit
-  chroma-aspell        →chroma/-subcommand.ch
-  chroma-bspc          →chroma/-subcommand.ch
-  chroma-cryptsetup    →chroma/-subcommand.ch
-  chroma-diskutil      →chroma/-subcommand.ch
-  chroma-exercism      →chroma/-subcommand.ch
-  chroma-gulp          →chroma/-subcommand.ch
-  chroma-i3-msg        →chroma/-subcommand.ch
-  chroma-openssl       →chroma/-subcommand.ch
-  chroma-solargraph    →chroma/-subcommand.ch
-  chroma-subliminal    →chroma/-subcommand.ch
-  chroma-svnadmin      →chroma/-subcommand.ch
-  chroma-travis        →chroma/-subcommand.ch
-  chroma-udisksctl     →chroma/-subcommand.ch
-  chroma-xdotool       →chroma/-subcommand.ch
-  chroma-zmanage       →chroma/-subcommand.ch
-  chroma-zsystem       →chroma/-subcommand.ch
-  chroma-zypper        →chroma/-subcommand.ch
+  chroma-hg            -chroma/-subcommand.ch
+  chroma-cvs           -chroma/-subcommand.ch
+  chroma-pip           -chroma/-subcommand.ch
+  chroma-pip2          -chroma/-subcommand.ch
+  chroma-pip3          -chroma/-subcommand.ch
+  chroma-gem           -chroma/-subcommand.ch
+  chroma-bundle        -chroma/-subcommand.ch
+  chroma-yard          -chroma/-subcommand.ch
+  chroma-cabal         -chroma/-subcommand.ch
+  chroma-npm           -chroma/-subcommand.ch
+  chroma-nvm           -chroma/-subcommand.ch
+  chroma-yarn          -chroma/-subcommand.ch
+  chroma-brew          -chroma/-subcommand.ch
+  chroma-port          -chroma/-subcommand.ch
+  chroma-yum           -chroma/-subcommand.ch
+  chroma-dnf           -chroma/-subcommand.ch
+  chroma-tmux          -chroma/-subcommand.ch
+  chroma-pass          -chroma/-subcommand.ch
+  chroma-aws           -chroma/-subcommand.ch
+  chroma-apt           -chroma/-subcommand.ch
+  chroma-apt-get       -chroma/-subcommand.ch
+  chroma-apt-cache     -chroma/-subcommand.ch
+  chroma-aptitude      -chroma/-subcommand.ch
+  chroma-keyctl        -chroma/-subcommand.ch
+  chroma-systemctl     -chroma/-subcommand.ch
+  chroma-asciinema     -chroma/-subcommand.ch
+  chroma-ipfs          -chroma/-subcommand.ch
+  chroma-zinit       -chroma/main-chroma.ch%zinit
+  chroma-aspell        -chroma/-subcommand.ch
+  chroma-bspc          -chroma/-subcommand.ch
+  chroma-cryptsetup    -chroma/-subcommand.ch
+  chroma-diskutil      -chroma/-subcommand.ch
+  chroma-exercism      -chroma/-subcommand.ch
+  chroma-gulp          -chroma/-subcommand.ch
+  chroma-i3-msg        -chroma/-subcommand.ch
+  chroma-openssl       -chroma/-subcommand.ch
+  chroma-solargraph    -chroma/-subcommand.ch
+  chroma-subliminal    -chroma/-subcommand.ch
+  chroma-svnadmin      -chroma/-subcommand.ch
+  chroma-travis        -chroma/-subcommand.ch
+  chroma-udisksctl     -chroma/-subcommand.ch
+  chroma-xdotool       -chroma/-subcommand.ch
+  chroma-zmanage       -chroma/-subcommand.ch
+  chroma-zsystem       -chroma/-subcommand.ch
+  chroma-zypper        -chroma/-subcommand.ch
 
-  chroma-fpath+=\(     →chroma/-fpath_peq.ch
-  chroma-fpath=\(      →chroma/-fpath_peq.ch
-  chroma-FPATH+=       →chroma/-fpath_peq.ch
-  chroma-FPATH=        →chroma/-fpath_peq.ch
-  #chroma-which        →chroma/-which.ch
-  #chroma-vim          →chroma/-vim.ch
+  chroma-fpath+=\(     -chroma/-fpath_peq.ch
+  chroma-fpath=\(      -chroma/-fpath_peq.ch
+  chroma-FPATH+=       -chroma/-fpath_peq.ch
+  chroma-FPATH=        -chroma/-fpath_peq.ch
+  #chroma-which        -chroma/-which.ch
+  #chroma-vim          -chroma/-vim.ch
 )
 
 if [[ $OSTYPE == darwin* ]] {
@@ -1150,7 +1150,7 @@ typeset -ga ZLAST_COMMANDS
     fi
     if [[ $__arg = (#b)*'#'(([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])|([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F]))(|[^[:alnum:]]*) || $__arg = (#b)*'rgb('(([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)),([0-9a-fA-F][0-9a-fA-F](#c0,1)))* ]]; then
       if [[ -n $match[2] ]]; then
-        if [[ $match[2] = ?? || $match[3] = ?? || $match[4] = ?? ]]; then 
+        if [[ $match[2] = ?? || $match[3] = ?? || $match[4] = ?? ]]; then
           (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#${(l:2::0:)match[2]}${(l:2::0:)match[3]}${(l:2::0:)match[4]}")
         else
           (( __start=_start_pos-__PBUFLEN, __end=_end_pos-__PBUFLEN, __start >= 0 )) && reply+=("$__start $__end bg=#$match[2]$match[3]$match[4]")
