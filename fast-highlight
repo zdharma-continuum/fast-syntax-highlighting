@@ -198,6 +198,7 @@ FAST_HIGHLIGHT+=(
 
   chroma-awk           →chroma/-awk.ch
   chroma-gawk          →chroma/-awk.ch
+  chroma-goawk         →chroma/-awk.ch
   chroma-mawk          →chroma/-awk.ch
 
   chroma-source        →chroma/-source.ch
