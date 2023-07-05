@@ -155,7 +155,7 @@ fsh__git__chroma__def=(
     subcmd:commit "COMMIT_#_opt // FILE_#_arg // NO_MATCH_#_opt"
 
     "COMMIT_#_opt" "
-              (-m|--message=|-am)
+              (-m|--message=|--message|-am)
                        <<>> NO-OP // ::→chroma/-git-commit-msg-opt-action
                        <<>> NO-OP // ::→chroma/-git-commit-msg-opt-ARG-action
            || (--help|-a|--all|-p|--patch|--reset-author|--short|--branch|
