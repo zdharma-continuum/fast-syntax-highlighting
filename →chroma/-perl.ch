@@ -2,8 +2,8 @@
 # Copyright (c) 2018 Sebastian Gniazdowski
 #
 # Chroma function for command `perl'. It highlights code passed to perl
-# with -e option - does syntax check by calling `perl -ce', then highlights
-# as correct or incorrect code.
+# with -e or -E option - does syntax check by calling `perl -ce' or `perl -cE',
+# then highlights as correct or incorrect code.
 #
 # $1 - 0 or 1, denoting if it's first call to the chroma, or following one
 # $2 - the current token, also accessible by $__arg from the above scope -
@@ -43,20 +43,30 @@ integer __idx1 __idx2
 
         if [[ "$__wrd" = "-e" || ("$__wrd" = -*e* && "$__wrd" != --*) ]]; then
             FAST_HIGHLIGHT[chrome-perl-got-eswitch]=1
+        elif [[ "$__wrd" = "-E" || ("$__wrd" = -*E* && "$__wrd" != --*) ]]; then
+            FAST_HIGHLIGHT[chrome-perl-got-eswitch]=2
         fi
     else
         __wrd="${__wrd//\`/x}"
         __arg="${__arg//\`/x}"
         __wrd="${(Q)__wrd}"
-        if (( FAST_HIGHLIGHT[chrome-perl-got-eswitch] == 1 )); then
-            FAST_HIGHLIGHT[chrome-perl-got-eswitch]=0
-            if perl -ce "$__wrd" >/dev/null 2>&1; then
-                # Add correct-subtle style
-                (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
-            else
-                # Add incorrect-subtle style
-                (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+
+        if (( FAST_HIGHLIGHT[chrome-perl-got-eswitch] )); then
+            if (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )); then
+                if (( FAST_HIGHLIGHT[chrome-perl-got-eswitch] == 1 )); then
+                    perl -ce "$__wrd" >/dev/null 2>&1
+                elif (( FAST_HIGHLIGHT[chrome-perl-got-eswitch] == 2 )); then
+                    perl -cE "$__wrd" >/dev/null 2>&1
+                fi && {
+                    # Add correct-subtle style
+                    reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
+                } || {
+                    # Add incorrect-subtle style
+                    reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}incorrect-subtle]}")
+                }
             fi
+
+            FAST_HIGHLIGHT[chrome-perl-got-eswitch]=0
         else
             # Pass-through to the big-loop outside
             return 1
