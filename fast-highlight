@@ -180,6 +180,7 @@ FAST_HIGHLIGHT+=(
   chroma-nmcli         →chroma/-nmcli.ch
   chroma-node          →chroma/-node.ch
   chroma-perl          →chroma/-perl.ch
+  chroma-podman        →chroma/-podman.ch
   chroma-printf        →chroma/-printf.ch
   chroma-ruby          →chroma/-ruby.ch
   chroma-scp           →chroma/-scp.ch

@@ -328,7 +328,7 @@ autoload -Uz -- is-at-least fast-theme .fast-read-ini-file .fast-run-git-command
                 .fast-make-targets .fast-run-command .fast-zts-read-all
 autoload -Uz -- →chroma/-git.ch →chroma/-hub.ch →chroma/-lab.ch →chroma/-example.ch \
                 →chroma/-grep.ch →chroma/-perl.ch →chroma/-make.ch →chroma/-awk.ch \
-                →chroma/-vim.ch →chroma/-source.ch →chroma/-sh.ch →chroma/-docker.ch \
+                →chroma/-vim.ch →chroma/-source.ch →chroma/-sh.ch →chroma/-docker.ch →chroma/-podman.ch \
                 →chroma/-autoload.ch →chroma/-ssh.ch →chroma/-scp.ch →chroma/-which.ch \
                 →chroma/-printf.ch →chroma/-ruby.ch →chroma/-whatis.ch →chroma/-alias.ch \
                 →chroma/-subcommand.ch →chroma/-autorandr.ch →chroma/-nmcli.ch \
