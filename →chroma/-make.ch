@@ -73,7 +73,6 @@ local -a __lines_list reply2
                 __wrd="${(Q)__wrd}"
 
                 if [[ -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}" ]] && \
-                       # .fast-make-targets < "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}"
                        make -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}" -pn | .fast-make-targets
                 then
                     if [[ "${reply2[(r)$__wrd]}" ]]; then
