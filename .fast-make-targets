@@ -18,7 +18,7 @@ local -a TARGETS
                 rest=${rest[3,-1]}
                 continue
                 ;;
-                (\()          # Variable of the form $(foobar)
+            (\()          # Variable of the form $(foobar)
                 open='('
                 close=')'
                 ;;
