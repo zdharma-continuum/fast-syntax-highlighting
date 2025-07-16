@@ -18,7 +18,7 @@ local -a TARGETS
                 rest=${rest[3,-1]}
                 continue
                 ;;
-                (\()          # Variable of the form $(foobar)
+            (\()          # Variable of the form $(foobar)
                 open='('
                 close=')'
                 ;;
@@ -87,10 +87,44 @@ local -a TARGETS
     done
 }
 
-if [[ -z "${FAST_HIGHLIGHT[chroma-make-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[chroma-make-cache-born-at] )) -gt 7 ]]; then
-    .make-parseMakefile
-    FAST_HIGHLIGHT[chroma-make-cache-born-at]="$EPOCHSECONDS"
-    FAST_HIGHLIGHT[chroma-make-cache]="${(j:;:)TARGETS}"
+# Cache generated parsing for 1sec per session or globally if configured, per Makefile path.
+if [[ -n "${FAST_HIGHLIGHT[chroma-make-cache-global]}" ]]; then
+    # Determine Makefile path.
+    # TODO: find a way to expand path and resolve alias - this cause deduplicated cache file.
+    local makefile_path
+    makefile_path=${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}
+
+    # If not absolute, resolve to absolute path
+    [[ $makefile_path != /* ]] && makefile_path="$PWD/$makefile_path"
+
+    # Generate a safe hash for the cache file name using sha1sum
+    local makefile_hash
+    makefile_hash=$(print -n -- "$makefile_path" | sha1sum | awk '{print $1}')
+
+    # Generate a sha1sum hash from the input variable
+    local input var val target dep TAB=$'\t' tmp IFS=
+    local input_hash
+    input_hash=$(print -n -- "$input" | sha1sum | awk '{print $1}')
+
+    # Generate the cache file path.
+    local cache_file
+    cache_file="/tmp/fast-highlight-make-cache-${makefile_hash}-${input_hash}"
+
+    if [[ ! -f $cache_file ]]; then
+        # Clean up old cache files.
+        rm -rf /tmp/fast-highlight-make-cache-${makefile_hash}-*
+        # Generate new cache file.
+        .make-parseMakefile "$input"
+        print -r -- "${(j:;:)TARGETS}" >| "$cache_file"
+    fi
+    FAST_HIGHLIGHT[chroma-make-cache]="$(<$cache_file)"
+    FAST_HIGHLIGHT[chroma-make-cache-born-at]="0"
+else
+    if [[ -z "${FAST_HIGHLIGHT[chroma-make-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[chroma-make-cache-born-at] )) -gt 7 ]]; then
+        .make-parseMakefile
+        FAST_HIGHLIGHT[chroma-make-cache-born-at]="$EPOCHSECONDS"
+        FAST_HIGHLIGHT[chroma-make-cache]="${(j:;:)TARGETS}"
+    fi
 fi
 
 reply2=( "${(s:;:)FAST_HIGHLIGHT[chroma-make-cache]}" )
