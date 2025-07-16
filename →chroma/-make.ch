@@ -72,9 +72,13 @@ local -a __lines_list reply2
                 __wrd="${__wrd//\`/x}"
                 __wrd="${(Q)__wrd}"
 
-                if [[ -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}" ]] && \
-                       make -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}" -Rrpq | awk '/^[a-zA-Z0-9][^$#\t=]*:/' | .fast-make-targets
-                then
+                if [[ -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}" ]];  then
+                    if [[ -n "${FAST_HIGHLIGHT[chroma-make-cache-global]}" ]]; then
+                         make -f "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}" -Rrpq | awk '/^[a-zA-Z0-9][^$#\t=]*:/' | .fast-make-targets
+                    else
+                        .fast-make-targets < "${FAST_HIGHLIGHT[chroma-make-custom-dir]%/}/${FAST_HIGHLIGHT[chroma-make-custom-file]}"
+                    fi
+
                     if [[ "${reply2[(r)$__wrd]}" ]]; then
                         (( __start=__start_pos-${#PREBUFFER}, __end=__end_pos-${#PREBUFFER}, __start >= 0 )) && reply+=("$__start $__end ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}correct-subtle]}")
                     else
