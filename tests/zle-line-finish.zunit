@@ -1,0 +1,10 @@
+#!/usr/bin/env zunit
+
+@test 'does not recursively wrap add-zle-hook-widget zle-line-finish dispatcher' {
+    run zsh ./tests/zle-line-finish-repro.zsh
+
+    assert "$state" same_as "success"
+    assert "$lines[1]" same_as "ok"
+}
+
+# vim:ft=zsh:sw=4:sts=4:et

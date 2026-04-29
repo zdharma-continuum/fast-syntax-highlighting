@@ -224,10 +224,18 @@ _zsh_highlight_call_widget()
   return $ret
 }
 
+_zsh_highlight_zle_line_finish()
+{
+  () {
+    local -h -r WIDGET=zle-line-finish
+    _zsh_highlight
+  }
+}
+
 # Rebind all ZLE widgets to make them invoke _zsh_highlights.
 _zsh_highlight_bind_widgets()
 {
-  setopt localoptions noksharrays
+  setopt localoptions noksharrays extendedglob
   local -F2 SECONDS
   local prefix=orig-s${SECONDS/./}-r$(( RANDOM % 1000 )) # unique each time, in case we're sourced more than once
 
@@ -239,12 +247,16 @@ _zsh_highlight_bind_widgets()
 
   # Override ZLE widgets to make them invoke _zsh_highlight.
   local -U widgets_to_bind
-  widgets_to_bind=(${${(k)widgets}:#(.*|run-help|which-command|beep|set-local-history|yank|zle-line-pre-redraw|zle-keymap-select)})
+  widgets_to_bind=(${${(k)widgets}:#(.*|run-help|which-command|beep|set-local-history|yank|zle-line-pre-redraw|zle-line-finish|zle-keymap-select)})
 
-  # Always wrap special zle-line-finish widget. This is needed to decide if the
-  # current line ends and special highlighting logic needs to be applied.
-  # E.g. remove cursor imprint, don't highlight partial paths, ...
-  widgets_to_bind+=(zle-line-finish)
+  # Always update on zle-line-finish. Prefer add-zle-hook-widget when available
+  # so we do not wrap its dispatcher and recursively call zle-line-finish.
+  autoload -Uz +X add-zle-hook-widget 2>/dev/null
+  if (( $+functions[add-zle-hook-widget] )) && [[ -o zle ]]; then
+    add-zle-hook-widget line-finish _zsh_highlight_zle_line_finish
+  else
+    widgets_to_bind+=(zle-line-finish)
+  fi
 
   # Always wrap special zle-isearch-update widget to be notified of updates in isearch.
   # This is needed because we need to disable highlighting in that case.
