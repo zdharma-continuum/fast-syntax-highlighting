@@ -3,6 +3,9 @@
     load "../fast-highlight"
     setopt interactive_comments
     -fast-highlight-fill-option-variables
+    # Chromas are autoloaded functions; the plugin file does this at startup.
+    fpath+=( "$PWD" )
+    autoload -Uz -- '→chroma/-ssh.ch'
 }
 
 @test 'ls /usr/bin' {
@@ -119,6 +122,27 @@ reply=()
     assert "$reply[7]" same_as "43 46 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}mathnum]}"
     assert "$reply[8]" same_as "47 49 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-paren]}"
     assert "$reply[9]" same_as ""
+}
+
+@test 'ssh -R 5037:localhost:5037 devbox' {
+    reply=()
+    PREBUFFER=""
+    BUFFER="ssh -R 5037:localhost:5037 devbox"
+    evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
+
+    # -R takes an argument, so the forward spec is not the hostname and its
+    # trailing :5037 is not a port passed to a hostspec.
+    assert "${FAST_HIGHLIGHT[chroma-ssh-message]}" same_as ""
+}
+
+@test 'ssh devbox:22' {
+    reply=()
+    PREBUFFER=""
+    BUFFER="ssh devbox:22"
+    evl -fast-highlight-process "$PREBUFFER" "$BUFFER" 0
+
+    # A port really passed in the hostspec is still reported.
+    assert "${FAST_HIGHLIGHT[chroma-ssh-message]}" same_as "Format of hostname incorrect, use -p to pass port number"
 }
 
 # vim:ft=zsh:sw=4:sts=4:et

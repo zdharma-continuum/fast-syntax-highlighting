@@ -51,7 +51,7 @@ local -a match mbegin mend completions_users completions_host
         # Detected option, add style for it.
         [[ "$__wrd" = --* ]] && __style=${FAST_THEME_NAME}double-hyphen-option || \
                                 __style=${FAST_THEME_NAME}single-hyphen-option
-        if [[ "$__wrd" = (-b|-c|-D|-E|-e|-F|-I|-i|-J|-L|-l|-m|-O|-o|-p|Q|R|-S|-W|-w) ]]; then
+        if [[ "$__wrd" = (-b|-c|-D|-E|-e|-F|-I|-i|-J|-L|-l|-m|-O|-o|-p|-Q|-R|-S|-W|-w) ]]; then
             FAST_HIGHLIGHT[chroma-ssh-skip-two]=1
         fi
     else
