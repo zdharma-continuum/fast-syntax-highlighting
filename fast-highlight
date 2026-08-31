@@ -83,6 +83,9 @@ zstyle :plugin:fast-syntax-highlighting theme default
 : ${FAST_HIGHLIGHT_STYLES[back-dollar-quoted-argument]:=fg=cyan}
 : ${FAST_HIGHLIGHT_STYLES[assign]:=none}
 : ${FAST_HIGHLIGHT_STYLES[redirection]:=none}
+: ${FAST_HIGHLIGHT_STYLES[here-document]:=fg=yellow}
+: ${FAST_HIGHLIGHT_STYLES[here-document-quoted]:=fg=yellow}
+: ${FAST_HIGHLIGHT_STYLES[here-document-delimiter]:=fg=yellow}
 : ${FAST_HIGHLIGHT_STYLES[comment]:=fg=black,bold}
 : ${FAST_HIGHLIGHT_STYLES[variable]:=fg=113}
 : ${FAST_HIGHLIGHT_STYLES[mathvar]:=fg=blue,bold}
@@ -367,6 +370,148 @@ typeset -ga ZLAST_COMMANDS
   fi
 }
 
+# Mask here-document bodies before passing the buffer to ${(z)}.  The lexer
+# used by that expansion does not retain here-document state and would
+# otherwise parse body lines as commands.  Keep newlines and character positions
+# unchanged so the normal highlighter can continue to calculate regions.
+#
+# $1 is the full (prebuffer + buffer) input and $2 is the prebuffer length.
+# Sets REPLY to the masked input and appends here-document regions to the
+# dynamically scoped reply array owned by -fast-highlight-process.
+-fast-highlight-mask-here-documents()
+{
+  local input=$1 output='' rest=$1 line masked_line token delimiter unquoted_delimiter
+  local quoted style style_value candidate header_buffer='' quote_state='' ch prev
+  local -a tokens line_tokens delimiters strip_tabs styles pending_delimiters pending_strip_tabs pending_styles
+  integer prebuffer_length=$2 line_start=0 line_length has_newline i
+  integer trailing_backslashes line_continues start end j escaped
+
+  while [[ -n $rest ]]; do
+    if [[ $rest == *$'\n'* ]]; then
+      line=${rest%%$'\n'*}
+      rest=${rest#*$'\n'}
+      has_newline=1
+    else
+      line=$rest
+      rest=''
+      has_newline=0
+    fi
+    line_length=$#line
+    masked_line=$line
+
+    if (( $#delimiters )); then
+      candidate=$line
+      (( strip_tabs[1] )) && candidate=${candidate##$'\t'#}
+      style=$styles[1]
+
+      if [[ $candidate == $delimiters[1] ]]; then
+        style=here-document-delimiter
+        shift delimiters strip_tabs styles
+      fi
+
+      if (( line_length )); then
+        start=$(( line_start - prebuffer_length ))
+        end=$(( line_start + line_length - prebuffer_length ))
+        if (( end > 0 )); then
+          (( start < 0 )) && start=0
+          style_value=${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}${style}]:-${FAST_HIGHLIGHT_STYLES[$style]}}
+          reply+=("$start $end $style_value")
+        fi
+      fi
+      masked_line=${(l:line_length:: :)}
+    else
+      header_buffer+=$line
+      (( has_newline )) && header_buffer+=$'\n'
+
+      # Track quotes across physical lines.  Tokenizing each line separately
+      # would mistake << inside a multiline string for a redirection.
+      escaped=0
+      prev=''
+      for (( j = 1; j <= line_length; ++j )); do
+        ch=$line[j]
+        if (( escaped )); then
+          escaped=0
+          prev=$ch
+          continue
+        fi
+        case $quote_state in
+          (single) [[ $ch == "'" ]] && quote_state='' ;;
+          (ansi)   [[ $ch == $'\\' ]] && escaped=1 || { [[ $ch == "'" ]] && quote_state=''; } ;;
+          (double) [[ $ch == $'\\' ]] && escaped=1 || { [[ $ch == '"' ]] && quote_state=''; } ;;
+          (backtick) [[ $ch == $'\\' ]] && escaped=1 || { [[ $ch == '`' ]] && quote_state=''; } ;;
+          (*)
+            if [[ -o interactive_comments && $ch == '#' &&
+                  ( j == 1 || $prev == [[:space:]\;\|\&\(\)] ) ]]; then
+              break
+            elif [[ $ch == "'" ]]; then
+              [[ $prev == '$' ]] && quote_state=ansi || quote_state=single
+            elif [[ $ch == '"' ]]; then
+              quote_state=double
+            elif [[ $ch == '`' ]]; then
+              quote_state=backtick
+            elif [[ $ch == $'\\' ]]; then
+              escaped=1
+            fi
+            ;;
+        esac
+        prev=$ch
+      done
+
+      [[ -n $quote_state ]] && line_continues=1 || line_continues=0
+      if [[ $line == *$'\\' ]]; then
+        trailing_backslashes=${#${line##*[^\\]}}
+        (( trailing_backslashes % 2 )) && line_continues=1
+      fi
+
+      if [[ -o interactive_comments ]]; then
+        line_tokens=(${(zZ+c+)line})
+        tokens=(${(zZ+c+)header_buffer})
+      else
+        line_tokens=(${(z)line})
+        tokens=(${(z)header_buffer})
+      fi
+      if (( $#line_tokens )); then
+        [[ $line_tokens[-1] == ('|'|'|&'|'||'|'&&') ]] && line_continues=1
+      fi
+
+      if (( ! line_continues )); then
+        pending_delimiters=()
+        pending_strip_tabs=()
+        pending_styles=()
+        for (( i = 1; i < $#tokens; ++i )); do
+          token=$tokens[i]
+          if [[ $token =~ '^[0-9]*<<-?$' ]]; then
+            delimiter=$tokens[i+1]
+            unquoted_delimiter=${(Q)delimiter}
+            [[ $delimiter != $unquoted_delimiter ]]
+            quoted=$?
+            pending_delimiters+=($unquoted_delimiter)
+            [[ $token == *'<<-' ]] && pending_strip_tabs+=(1) || pending_strip_tabs+=(0)
+            (( quoted == 0 )) && pending_styles+=(here-document-quoted) || pending_styles+=(here-document)
+            (( ++i ))
+          fi
+        done
+        if (( $#pending_delimiters )); then
+          delimiters+=($pending_delimiters)
+          strip_tabs+=($pending_strip_tabs)
+          styles+=($pending_styles)
+        fi
+        header_buffer=''
+      fi
+    fi
+
+    output+=$masked_line
+    if (( has_newline )); then
+      output+=$'\n'
+      (( line_start += line_length + 1 ))
+    else
+      (( line_start += line_length ))
+    fi
+  done
+
+  REPLY=$output
+}
+
 # Main syntax highlighting function.
 -fast-highlight-process()
 {
@@ -456,6 +601,10 @@ typeset -ga ZLAST_COMMANDS
   }
 
   # Processing buffer
+  if [[ $__buf == *'<<'* ]]; then
+    -fast-highlight-mask-here-documents "$__buf" "$__PBUFLEN"
+    __buf=$REPLY
+  fi
   local proc_buf=$__buf needle
   for __arg in ${interactive_comments-${(z)__buf}} \
              ${interactive_comments+${(zZ+c+)__buf}}; do

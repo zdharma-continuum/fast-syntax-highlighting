@@ -106,6 +106,72 @@ reply=()
     assert "$reply[6]" same_as ""
 }
 
+@test 'unquoted here-document body is not parsed as commands' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'cat <<EOF\nhello $USER\nEOF\necho done'
+    evl -fast-highlight-process "\$PREBUFFER" "\$BUFFER" 0
+
+    assert "$reply[1]" same_as "10 21 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document]}"
+    assert "$reply[2]" same_as "22 25 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document-delimiter]}"
+    assert "$reply[3]" same_as "0 3 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[4]" same_as "26 30 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}builtin]}"
+    assert "$reply[5]" same_as ""
+}
+
+@test 'quoted and multiple here-documents' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'diff <<\'LEFT\' <<-RIGHT\none\nLEFT\n\ttwo\n\tRIGHT'
+    evl -fast-highlight-process "\$PREBUFFER" "\$BUFFER" 0
+
+    assert "$reply[1]" same_as "23 26 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document-quoted]}"
+    assert "$reply[2]" same_as "27 31 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document-delimiter]}"
+    assert "$reply[3]" same_as "32 36 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document]}"
+    assert "$reply[4]" same_as "37 43 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document-delimiter]}"
+    assert "$reply[5]" same_as "0 4 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[6]" same_as "7 13 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}single-quoted-argument]}"
+    assert "$reply[7]" same_as ""
+}
+
+@test 'here-document after a continued pipeline' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'cat <<EOF |\n  sed s/x/y/\nhello\nEOF'
+    evl -fast-highlight-process "\$PREBUFFER" "\$BUFFER" 0
+
+    assert "$reply[1]" same_as "25 30 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document]}"
+    assert "$reply[2]" same_as "31 34 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document-delimiter]}"
+    assert "$reply[3]" same_as "0 3 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[4]" same_as "14 17 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[5]" same_as ""
+}
+
+@test 'here-document after a pipe-and-stderr continuation' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'cat <<EOF |&\n  sed s/x/y/\nhello\nEOF'
+    evl -fast-highlight-process "\$PREBUFFER" "\$BUFFER" 0
+
+    assert "$reply[1]" same_as "26 31 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document]}"
+    assert "$reply[2]" same_as "32 35 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}here-document-delimiter]}"
+    assert "$reply[3]" same_as "0 3 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[4]" same_as "15 18 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}command]}"
+    assert "$reply[5]" same_as ""
+}
+
+@test 'heredoc-like text inside a multiline quote is not a heredoc' {
+    reply=()
+    PREBUFFER=""
+    BUFFER=$'echo "first\n<<NOT_A_HEREDOC\nlast"\necho ok'
+    evl -fast-highlight-process "\$PREBUFFER" "\$BUFFER" 0
+
+    assert "$reply[1]" same_as "0 4 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}builtin]}"
+    assert "$reply[2]" same_as "5 33 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}double-quoted-argument]}"
+    assert "$reply[3]" same_as "34 38 ${FAST_HIGHLIGHT_STYLES[${FAST_THEME_NAME}builtin]}"
+    assert "$reply[4]" same_as ""
+}
+
 @test 'local var1; (( var + var1 + $var + $var1 + 123 ))' {
     reply=()
     PREBUFFER=""
