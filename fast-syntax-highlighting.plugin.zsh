@@ -364,7 +364,10 @@ alias fsh-alias=fast-theme
 -fast-highlight-fill-option-variables
 
 if [[ ! -e $FAST_WORK_DIR/secondary_theme.zsh ]] {
-    if { type curl &>/dev/null } {
+    if { [[ -f $FAST_BASE_DIR/share/free_theme.zsh ]] &&
+         command cp -- "$FAST_BASE_DIR/share/free_theme.zsh" "$FAST_WORK_DIR/secondary_theme.zsh" } {
+        :
+    } elif { type curl &>/dev/null } {
         curl -fsSL -o "$FAST_WORK_DIR/secondary_theme.zsh" \
             https://raw.githubusercontent.com/zdharma-continuum/fast-syntax-highlighting/master/share/free_theme.zsh \
             &>/dev/null
