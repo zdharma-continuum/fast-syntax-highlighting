@@ -1,8 +1,37 @@
 #!/usr/bin/env zunit
 
-@test 'does not recursively wrap add-zle-hook-widget zle-line-finish dispatcher' {
-    run zsh ./tests/zle-line-finish-repro.zsh
+@test 'preserves line-finish hooks registered before loading' {
+    run zsh ./tests/zle-line-finish-repro.zsh before
+    assert "$state" same_as "success"
+    assert "$lines[1]" same_as "ok"
+}
 
+@test 'supports zsh-hist hooks registered later in precmd' {
+    run zsh ./tests/zle-line-finish-repro.zsh delayed
+    assert "$state" same_as "success"
+    assert "$lines[1]" same_as "ok"
+}
+
+@test 'does not duplicate line-finish hooks when sourced again' {
+    run zsh ./tests/zle-line-finish-repro.zsh reload
+    assert "$state" same_as "success"
+    assert "$lines[1]" same_as "ok"
+}
+
+@test 'does not wrap the dispatcher when the zle option is disabled' {
+    run zsh ./tests/zle-line-finish-repro.zsh no-zle
+    assert "$state" same_as "success"
+    assert "$lines[1]" same_as "ok"
+}
+
+@test 'preserves an existing direct line-finish widget' {
+    run zsh ./tests/zle-line-finish-repro.zsh direct
+    assert "$state" same_as "success"
+    assert "$lines[1]" same_as "ok"
+}
+
+@test 'falls back to a direct widget if hook registration fails' {
+    run zsh ./tests/zle-line-finish-repro.zsh fallback
     assert "$state" same_as "success"
     assert "$lines[1]" same_as "ok"
 }

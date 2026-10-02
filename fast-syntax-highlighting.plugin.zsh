@@ -252,9 +252,8 @@ _zsh_highlight_bind_widgets()
   # Always update on zle-line-finish. Prefer add-zle-hook-widget when available
   # so we do not wrap its dispatcher and recursively call zle-line-finish.
   autoload -Uz +X add-zle-hook-widget 2>/dev/null
-  if (( $+functions[add-zle-hook-widget] )) && [[ -o zle ]]; then
-    add-zle-hook-widget line-finish _zsh_highlight_zle_line_finish
-  else
+  if ! { (( $+functions[add-zle-hook-widget] )) &&
+         add-zle-hook-widget line-finish _zsh_highlight_zle_line_finish; }; then
     widgets_to_bind+=(zle-line-finish)
   fi
 
