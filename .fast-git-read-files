@@ -1,0 +1,120 @@
+# -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
+# Answers the git chroma's queries from the repository files, without
+# spawning git. Output: __response (caller's local). Returns 0 answered,
+# 1 not in a work tree, 2 caller must run git.
+
+emulate -L zsh -o extendedglob
+zmodload zsh/mapfile 2>/dev/null || return 2
+
+local -a match mbegin mend ns packed found
+local cmd=$1 dir=$PWD gitdir common line word base pat section key cur value file n
+__response=()
+
+[[ -n ${GIT_DIR+1}${GIT_WORK_TREE+1}${GIT_COMMON_DIR+1} ]] && return 2
+
+while true; do
+    if [[ -d $dir/.git ]]; then
+        gitdir=$dir/.git
+        break
+    elif [[ -f $dir/.git ]]; then
+        IFS= read -r line < $dir/.git && [[ $line == gitdir:\ * ]] || return 2
+        gitdir=${line#gitdir: }
+        [[ $gitdir == /* ]] || gitdir=$dir/$gitdir
+        break
+    fi
+    [[ $dir == / ]] && return 1
+    dir=${dir:h}
+done
+
+common=$gitdir
+if [[ -f $gitdir/commondir ]]; then
+    IFS= read -r line < $gitdir/commondir || return 2
+    [[ $line == /* ]] && common=$line || common=$gitdir/$line
+fi
+
+found=( ${(M)${(f)mapfile[$common/config]}:#(#i)[[:space:]]#refstorage[[:space:]]#=*} )
+[[ -z $found || ${found[-1]##*=[[:space:]]#} == files* ]] || return 2
+
+case $cmd in
+    ('git remote')
+        [[ -f $common/config ]] || return 2
+        found=( ${(M)${(f)mapfile[$common/config]}:#[[:space:]]#\[remote[[:space:]]##\"*\"\]*} )
+        __response=( ${(u)${${found#*\"}%%\"*}} )
+        return 0
+        ;;
+    ((#b)git\ config\ --get\ ([[:alnum:]-]##).([[:alnum:]-]##))
+        section=${match[1]:l} key=${match[2]:l}
+        for file in ${XDG_CONFIG_HOME:-$HOME/.config}/git/config $HOME/.gitconfig $common/config; do
+            [[ -f $file ]] || continue
+            cur=
+            for line in ${(f)mapfile[$file]}; do
+                line=${line##[[:space:]]#}
+                if [[ $line == \[* ]]; then
+                    cur=${${${line#\[}%%\]*}:l}
+                elif [[ $cur == $section && ${${line%%[[:space:]=]*}:l} == $key ]]; then
+                    value=${${${line#*=}%%[[:space:]]#[\#\;]*}##[[:space:]]#}
+                    value=${${value#\"}%\"}
+                fi
+            done
+        done
+        __response=( $value )
+        return 0
+        ;;
+    ((#b)git\ rev-parse\ --verify\ --quiet\ \"(*)\")
+        word=$match[1]
+        base=${${word%%[~^:]*}%%@\{*}
+        if [[ $word == (@|@\{*) || $base == HEAD || $base == [[:xdigit:]](#c40)(|[[:xdigit:]](#c24)) ]]; then
+            __response=( 0 )
+            return 0
+        elif [[ $base == (FETCH_HEAD|ORIG_HEAD|MERGE_HEAD|CHERRY_PICK_HEAD|REBASE_HEAD) ]]; then
+            [[ -s $gitdir/$base ]]
+            __response=( $? )
+            return 0
+        elif [[ $base == [[:xdigit:]](#c4,39) ]]; then
+            found=( $common/objects/${base[1,2]:l}/${base[3,-1]:l}*(.N[1]) )
+            (( $#found )) || return 2
+            __response=( 0 )
+            return 0
+        fi
+        ;;
+    ((#b)git\ rev-list\ --count\ --no-walk[[:space:]]##--glob=\"refs/remotes/(*)\")
+        pat=$match[1]
+        # git implies "/*" when there are no glob characters
+        [[ $pat == *[\*\?\[]* ]] && return 2
+        ns=( remotes )
+        ;;
+    ("git for-each-ref --format='%(refname:short)' refs/heads") ns=( heads ) ;;
+    ("git for-each-ref --format='%(refname:short)'") ns=( heads remotes tags ) ;;
+    ('git tag') ns=( tags ) ;;
+    (*) return 2 ;;
+esac
+
+[[ -f $common/packed-refs ]] && packed=( ${${(f)mapfile[$common/packed-refs]}#* } )
+
+if [[ -n $base ]]; then
+    # git's lookup order for a ref name
+    for line in ${(M)base:#refs/*} refs/$base refs/{tags,heads,remotes}/$base refs/remotes/$base/HEAD; do
+        if [[ -f $common/$line ]] || (( ${packed[(Ie)$line]} )); then
+            __response=( 0 )
+            return 0
+        fi
+    done
+    __response=( 1 )
+    return 0
+fi
+
+for n in $ns; do
+    found=( $common/refs/$n/**/*(.N) )
+    found=( ${found#$common/} ${(M)packed:#refs/$n/*} )
+    case $cmd:$n in
+        ('git rev-list'*) __response=( ${#${(M)found:#refs/remotes/$pat/*}} ) ;;
+        # git shortens <remote>/HEAD to <remote>
+        (*:remotes) __response+=( ${${found#refs/remotes/}%/HEAD} ) ;;
+        (*) __response+=( ${found#refs/$n/} ) ;;
+    esac
+done
+[[ $cmd == 'git rev-list'* ]] || __response=( ${(u)__response} )
+
+return 0
+
+# vim:ft=zsh:et:sw=4

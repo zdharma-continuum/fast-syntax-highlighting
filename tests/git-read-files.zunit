@@ -1,0 +1,63 @@
+#!/usr/bin/env zunit
+@setup {
+    fpath+=( "$PWD" )
+    autoload -Uz -- .fast-git-read-files
+    export HOME=$(mktemp -d) XDG_CONFIG_HOME= GIT_CONFIG_NOSYSTEM=1
+    git init -q -b main $HOME/repo && cd $HOME/repo
+    git -c user.name=t -c user.email=t@t commit -q --allow-empty -m one
+    git -c user.name=t -c user.email=t@t commit -q --allow-empty -m two
+    git branch feature/nested && git tag v1
+    git remote add origin https://example.invalid/o.git && git remote add upstream https://example.invalid/u.git
+    git update-ref refs/remotes/origin/main HEAD && git update-ref refs/remotes/origin/topic/x HEAD~1
+    git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
+    git pack-refs --all
+    git branch loose && git tag v2 HEAD~1
+    printf '[checkout]\n\tdefaultRemote = "upstream" # c\n[checkout "x"]\n\tdefaultRemote = wrong\n' >> .git/config
+}
+
+@teardown {
+    rm -rf $HOME
+}
+
+# Callers only test membership, so order is ignored.
+@test 'answers equal git output' {
+    local q
+    local -a __response
+    for q in "git for-each-ref --format='%(refname:short)' refs/heads" \
+        "git for-each-ref --format='%(refname:short)'" "git remote" "git tag" \
+        "git config --get checkout.defaultRemote" \
+        'git rev-list --count --no-walk --glob="refs/remotes/origin/topic"' \
+        'git rev-list --count --no-walk --glob="refs/remotes/origin/main"'; do
+        .fast-git-read-files "$q"
+        assert "$q: ${(j: :)${(@o)__response}}" same_as "$q: ${(j: :)${(@o)${(f)"$(eval $q)"}}}"
+    done
+}
+
+@test 'rev-parse --verify status equals git' {
+    local w expected
+    local -a __response
+    for w in main loose heads/main refs/heads/main tags/v1 heads/v1 origin/main origin \
+        'HEAD~1' 'main^' '@' 'main@{0}' '@nonsense' ORIG_HEAD nope ${(l:40::a:)}; do
+        .fast-git-read-files "git rev-parse --verify --quiet \"$w\""
+        git rev-parse --verify --quiet "$w" >/dev/null && expected=0 || expected=1
+        assert "$w $__response" same_as "$w $expected"
+    done
+}
+
+@test 'linked worktree reads the shared refs' {
+    local -a __response
+    git worktree add -q $HOME/wt loose && cd $HOME/wt
+    .fast-git-read-files "git for-each-ref --format='%(refname:short)' refs/heads"
+    assert "${(j: :)${(@o)__response}}" same_as "feature/nested loose main"
+}
+
+@test 'returns 1 outside a repository, 2 when git must run' {
+    git repack -qad
+    run .fast-git-read-files "git rev-parse --verify --quiet \"$(git rev-parse --short HEAD)\""
+    assert $state equals 2
+    GIT_DIR=$PWD/.git run .fast-git-read-files "git remote"
+    assert $state equals 2
+    cd /
+    run .fast-git-read-files "git remote"
+    assert $state equals 1
+}
