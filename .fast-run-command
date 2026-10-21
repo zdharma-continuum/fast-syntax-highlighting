@@ -20,8 +20,13 @@
 typeset -ga __lines_list
 local -a __response
 
-if [[ -z "${FAST_HIGHLIGHT[$2-cache]}" || $(( EPOCHSECONDS - FAST_HIGHLIGHT[$2-cache-born-at] )) -gt ${4:-5} ]]; then
-    FAST_HIGHLIGHT[$2-cache-born-at]="$EPOCHSECONDS"
+# Same cache-age rules as .fast-run-git-command: never evaluate the cache
+# key inside $(( )), and load zsh/datetime so EPOCHSECONDS is actually set.
+zmodload zsh/datetime 2>/dev/null
+local __born=${FAST_HIGHLIGHT[$2-cache-born-at]}
+[[ $__born == <-> ]] || __born=0
+if [[ -z "${FAST_HIGHLIGHT[$2-cache]}" || $(( ${EPOCHSECONDS:-0} - __born )) -gt ${4:-5} ]]; then
+    FAST_HIGHLIGHT[$2-cache-born-at]="${EPOCHSECONDS:-0}"
     __response=( ${${(f)"$(command ${(Qz)1#+} 2>/dev/null)"}#${~3}} )
     [[ "$1" = "+"* ]] && __lines_list+=( "${__response[@]}" ) || __lines_list=( "${__response[@]}" )
     FAST_HIGHLIGHT[$2-cache]="${(j:;:)__response}"

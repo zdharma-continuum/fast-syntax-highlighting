@@ -423,6 +423,19 @@ else
                 →chroma/main-process-token.ch "${${FAST_HIGHLIGHT[chroma-${FAST_HIGHLIGHT[chroma-current]}-subcommand]}:-NULL}" "$__wrd"
             fi
         } else {
+            # Shell expansions are not revisions. (Q) below strips quotes, and
+            # the git chroma then stores the raw text in a cache key. Leave
+            # the original token to the main highlighter so quotes and
+            # command substitutions keep their normal styles, and so the
+            # text is never evaluated.
+            # https://github.com/zdharma-continuum/fast-syntax-highlighting/issues/78
+            if [[ ${__chroma_name} == git ]]; then
+                case $__wrd in
+                    (*'$'*|*$'\x60'*|*'<('*|*'>('*|*'=('* )
+                        return 1
+                        ;;
+                esac
+            fi
             __wrd="${__wrd//\`/x}"
             __arg="${__arg//\`/x}"
             __wrd="${(Q)__wrd}"

@@ -26,13 +26,23 @@
 typeset -ga __lines_list
 local -a __response
 
+# Cache age uses EPOCHSECONDS. Without the module it stays 0 and entries never expire.
+zmodload zsh/datetime 2>/dev/null
+
 if [[ $1 == --status ]] {
     integer __status=1
     shift
 }
 
-if [[ -z ${FAST_HIGHLIGHT[$2-cache]} || $(( EPOCHSECONDS - FAST_HIGHLIGHT[$2-cache-born-at] )) -gt ${4:-5} ]]; then
-    FAST_HIGHLIGHT[$2-cache-born-at]=$EPOCHSECONDS
+# Copy the timestamp out before doing arithmetic. $2 is a cache key and can
+# contain text from the command line (for example a commit-ish). Evaluating
+# FAST_HIGHLIGHT[$2-...] inside $(( )) re-parses that text, so a key such as
+# chroma-git-commits-$PWD-$(fzf) runs the substitution on every highlight.
+# See https://github.com/zdharma-continuum/fast-syntax-highlighting/issues/78
+local __born=${FAST_HIGHLIGHT[$2-cache-born-at]}
+[[ $__born == <-> ]] || __born=0
+if [[ -z ${FAST_HIGHLIGHT[$2-cache]} || $(( ${EPOCHSECONDS:-0} - __born )) -gt ${4:-5} ]]; then
+    FAST_HIGHLIGHT[$2-cache-born-at]=${EPOCHSECONDS:-0}
     if [[ "$(command git rev-parse --is-inside-work-tree 2>/dev/null)" = true ]]; then
         __response=( ${${(f)"$(command ${(Qz)${1#+}} 2>/dev/null)"}#$3} )
         integer retval=$?
