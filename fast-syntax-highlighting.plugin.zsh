@@ -118,18 +118,30 @@ _zsh_highlight()
 
     # region
     if (( REGION_ACTIVE == 1 )); then
-      _zsh_highlight_apply_zle_highlight region standout "$MARK" "$CURSOR"
+      # zle's own vi region includes the character under the cursor at the
+      # far end, and so do the commands that operate on the selection. A
+      # region_highlight entry covers up to but not including its end, so
+      # the far end has to be extended by one character.
+      integer fsh_rmin=$(( MARK < CURSOR ? MARK : CURSOR ))
+      integer fsh_rmax=$(( (MARK > CURSOR ? MARK : CURSOR) + 1 ))
+      _zsh_highlight_apply_zle_highlight region standout "$fsh_rmin" "$fsh_rmax"
     elif (( REGION_ACTIVE == 2 )); then
       () {
-        local needle=$'\n'
+        local needle=$'\n' tail
         integer min max
-        if (( MARK > CURSOR )) ; then
-          min=$CURSOR max=$(( MARK + 1 ))
+        if (( MARK > CURSOR )); then
+          min=$CURSOR max=$MARK
         else
           min=$MARK max=$CURSOR
         fi
+        (( max += 1 ))  # include the character under the cursor at the far end
         (( min = ${${BUFFER[1,$min]}[(I)$needle]} ))
-        (( max += ${${BUFFER:($max-1)}[(i)$needle]} - 1 ))
+        tail=${BUFFER:$max}
+        if [[ $tail == *$needle* ]]; then
+          (( max += ${tail[(i)$needle]} - 1 ))
+        else
+          (( max = $#BUFFER ))
+        fi
         _zsh_highlight_apply_zle_highlight region standout "$min" "$max"
       }
     fi
